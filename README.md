@@ -203,7 +203,7 @@ CREATE TABLE `messages_recipients` (
 INSERT INTO `rooms` (`title`) VALUES ('全体トークルーム');
 ```
 
-7. releasesから最新の◆◆◆をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(XAMPPの初期設定では"C:\xampp\htdocs")内に配置します。
+7. [最新のreleases](https://github.com/sakana-teiki/teiki-adventure/releases)をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(XAMPPの初期設定では"C:\xampp\htdocs")内に配置します。
 
 8. teiki/.htaccessのSetEnv GAME_ROOTの値を配置したディレクトリに合わせて書き換えます(XAMPPが初期設定で手順通りの場合は"C:\xampp\htdocs\teiki")。
 
@@ -257,6 +257,8 @@ Gitを利用する際に追跡を行わないファイルを指定します。Gi
 ### Q. コードのこの部分がよく分かりません。
 以下のいずれかまたはissueまでどうぞ。あるいは別の連絡先を持っている場合はそちらでも構いません。ある程度はサポートします。
 
+|サービス|アカウント|
+| --- | --- |
 |Twitter|@sakana_public|
 |Discord|( 'ω'　　)＜)#8186|
 
@@ -280,6 +282,8 @@ MIT License
 
 ただしプロジェクト内に別のオープンソースプロジェクトの成果物を含んでおり、それらのライセンスに関しては別途参照する必要があります。概要は以下のとおりです。
 
+|OSS|ライセンス|ディレクトリ|
+| --- | --- | --- |
 |jQuery|MIT License|static/scripts/jquery-3.6.0.min.js|
 |jsSHA|BSD-3-Clause License|static/scripts/jssha-sha256.js|
 |Normalize.css|MIT License|static/styles/normalize.css|
