@@ -1,0 +1,677 @@
+/* CSS変数宣言 */
+:root {
+  --columns-width: 1000px;
+
+  --main-column-width: 800px;
+  --main-column-padding-x: 20px;
+  --main-column-padding-bottom: 20px;
+
+  --sub-column-width: 200px;
+  --sub-column-padding-x: 0;
+}
+
+/* HTMLタグ */
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  font-size: 1em;
+  line-height: 1.6;
+  font-weight: 400;
+  background: #F8F8F8;
+  color: #333;
+}
+
+input, textarea, select {
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid gray;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #CCC;
+}
+
+hr {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid lightgray;
+}
+
+h1 {
+  display: block;
+  background: #444;
+  color: #EEE;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 18px;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 15px;
+  margin: 20px 0px ;
+  padding: 8px 0 8px 20px;
+  border-left: 1px solid lightgray;
+}
+
+ul {
+  padding: 0;
+}
+
+/* 汎用要素 */
+.form {
+  margin: 10px 0 0 20px;
+}
+
+.form-title {
+  font-weight: bold;
+  color: #555;
+}
+
+.form-description {
+  color: #666;
+}
+
+.form-input {
+  width: 300px;
+}
+
+.form-input-long {
+  width: 600px;
+}
+
+.form-input-table {
+  box-sizing: border-box;
+  margin: 0;
+  width: 100%;
+  padding: 2px;
+  border-radius: 0;
+}
+
+.form-textarea {
+  margin: 8px 0;
+  width: 600px;
+  height: 200px;
+  resize: none;
+}
+
+.button-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button {
+  color: #444;
+  padding: 6px 24px;
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.message-banner {
+  width: 100%;
+  margin: 20px 0;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: lightgray;
+  border-radius: 4px;
+}
+
+.message-banner-success {
+  border: 1px solid #007243;
+  background-color: #9cd9ac;
+}
+
+.message-banner-info {
+  border: 1px solid #005476;
+  background-color: #79baca;
+}
+  
+.message-banner-warning {
+  border: 1px solid #b39300;
+  background-color: #f2e6b8;
+}
+  
+.message-banner-error {
+  border: 1px solid #a61d39;
+  background-color: #e8c2bf;
+}
+
+.icon-wrapper {
+  width: 60px;
+  height: 60px;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-noimage {
+  background: #CCC;
+}
+
+.pagelinks {
+  padding: 10px;
+}
+
+.pagelink {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 57px;
+  padding: 4px 10px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  margin: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #666;
+}
+
+.pagelink-current {
+  background-color: #666;
+  color: #EEE;
+}
+
+.next-prev-pagelinks {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.next-prev-pagelinks-page {
+  font-weight: bold;
+  color: #444;
+  font-size: 18px;
+}
+
+.next-prev-pagelinks-invalid {
+  visibility: hidden;
+}
+
+/* ユーザー装飾要素 */
+
+.small {
+  font-size: 66%;
+}
+
+.large {
+  font-size: 150%;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+/* ページ共通要素 */
+#title {
+  margin: 0 auto;
+  width: var(--columns-width);
+  border-bottom: 1px solid lightgray;
+}
+
+#title-logo {
+  display: inline-block;
+  font-size: 36px;
+  padding: 10px 20px;
+  color: #666;
+  text-decoration: none;
+}
+
+#columns {
+  margin: 0 auto;
+  width: var(--columns-width);
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
+#main-column {
+  box-sizing: border-box;
+  width: var(--main-column-width);
+  padding: 0 var(--main-column-padding-x) var(--main-column-padding-bottom) var(--main-column-padding-x);
+}
+
+#sub-column {
+  box-sizing: border-box;
+  width: var(--sub-column-width);
+  padding: 0 var(--sub-column-padding-x);
+}
+
+.sidemenu-button-link {
+  text-decoration: none;
+}
+
+.sidemenu-button {
+  margin: 10px 10px 0 10px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.sidemenu-mini-link-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 10px;
+}
+
+.sidemenu-mini-link {
+  text-decoration: none;
+  color: #666;
+  font-size: 12px;
+}
+
+/* キャラクタープロフィール */
+
+.profile-main {
+  display: flex;
+}
+
+.profile-image-wrapper {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 400px;
+  height: 600px;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+}
+
+.profile-summary {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.profile-ap-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.profile-ap {
+  font-weight: bold;
+  font-size: 24px;
+  color: #AAA;
+}
+
+.profile-ap-value {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 48px;
+  color: #666;
+}
+
+.profile-statuses {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px 20px;
+  width: 100%;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.profile-statuses td {
+  border: none;
+  padding: 6px 12px;
+}
+
+.profile-status-name {
+  font-weight: bold;
+  color: #555;
+  margin-right: 20px;
+}
+
+.profile-skills {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px 24px 0 24px;
+}
+
+.profile-skill {
+  margin-bottom: 12px;
+}
+
+.profile-skill:last-child {
+  margin: 0;
+}
+
+.profile-skill-prop {
+  display: flex;
+  align-items: baseline;
+}
+
+.profile-skill-name {
+  font-weight: bold;
+  color: #555;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.profile-skill-cond {
+  font-size: 14px;
+  color: #888;
+}
+
+.profile-skill-effect {
+  margin-left: 10px;
+  color: #333;
+}
+
+.profile-tag {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 50px;
+  padding: 4px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  margin-right: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #333;
+}
+
+.profile-text {
+  margin: 0 20px;
+}
+
+.profile-character-icons-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.profile-character-icon-wrapper {
+  margin: 5px;
+}
+
+/* 新規登録ページ */
+#terms-list {
+  margin: 20px;
+}
+
+/* キャラクター一覧 */
+
+.character-list {
+  list-style: none;
+  border-top: 1px solid lightgray;
+  margin: 0 20px;
+}
+
+.character-list li {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  margin: 0;
+  padding: 10px;
+}
+
+.character-list-profile {
+  padding-left: 10px;
+}
+
+.character-list-profile-link {
+  text-decoration: none;
+}
+
+.character-list-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.character-list-eno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.character-list-tags {
+  font-size: 14px;
+  text-decoration: none;
+  color: gray;
+}
+
+/* プロフィール編集 */
+
+#profile-edit-icon {
+  margin: 20px 0;
+  width: 100%;
+}
+
+#profile-edit-icon td:nth-of-type(1) {
+  text-align: center;
+}
+
+#profile-edit-icon th:nth-of-type(2), #profile-edit-icon td:nth-of-type(2) {
+  width: 30%;
+}
+
+/* プロフィールページ */
+.profile-relation {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.profile-relation-button {
+  display: inline-flex;
+  justify-content: center;
+  padding: 4px 10px;
+  border: 1px solid #666;
+  border-radius: 4px;
+  margin: 0 5px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+.profile-relation-button-done {
+  border: 1px solid #333;
+  background: #666;
+  color: #EEE;
+}
+
+/* トークルーム一覧ページ */
+.room-list {
+  list-style: none;
+  border-top: 1px solid lightgray;
+  margin: 20px;
+}
+
+.room-list li {
+  border-bottom: 1px solid lightgray;
+  margin: 0;
+  padding: 10px;
+}
+
+.room-list-link {
+  text-decoration: none;
+}
+
+.room-list-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.room-list-rno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.room-list-tags {
+  font-size: 14px;
+  text-decoration: none;
+  color: gray;
+}
+
+.room-list-meta {
+  text-align: right;
+  line-height: 1.1;
+  font-size: 13px;
+  color: #AAA;
+}
+
+/* トークルームページ */
+.room-meta-info {
+  color: #666;
+  font-size: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.room-description {
+  margin: 0 20px;
+}
+
+.room-message-editor-wrapper {
+  margin: 0 auto;
+  width: 95%;
+}
+
+.room-message-editor {
+  box-sizing: border-box;
+  width: 100%;
+  height: 120px;
+  resize: none;
+  margin: 0;
+}
+
+.room-message-list {
+  columns: 2;
+  column-rule: 1px solid lightgray;
+}
+
+.room-message-list-single-item {
+  column-rule: 1px solid transparent;
+}
+
+.room-message {
+  border: 1px solid lightgray;
+  padding: 8px;
+  border-radius: 4px;
+  break-inside: avoid-column;
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.room-message-main {
+  box-sizing: border-box;
+  margin: 0 0 0 8px;
+  width: 100%;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.room-message-refers {
+  text-decoration: none;
+  color: #AAA;
+  font-size: 12px;
+}
+
+.room-message-info-link {
+  text-decoration: none;
+}
+
+.room-message-info {
+  font-weight: bold;
+  color: #666;
+}
+
+.room-message-info-eno {
+  font-weight: normal;
+  font-size: 12px;
+  color: #BBB;
+}
+
+.room-message-details {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.room-message-detail {
+  font-weight: normal;
+  font-size: 12px;
+  color: #BBB;
+}
+
+.room-message-actions {
+  display: flex;
+}
+
+.room-message-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+  margin-left: 4px;
+  min-width: 40px;
+  border: 1px solid lightgray;
+  background: none;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.room-modelink-wrapper {
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.room-modelink {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 50px;
+  padding: 4px 12px;
+  margin: 0 4px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+.room-modelink-current {
+  background-color: #666;
+  color: #EEE;
+}
+
+#room-reply-target-copied-dom-area {
+  user-select: none;
+  cursor: pointer;
+  margin: 10px 0;
+}
