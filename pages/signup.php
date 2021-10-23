@@ -26,13 +26,23 @@
     $token = bin2hex(openssl_random_pseudo_bytes($GAME_CONFIG['CSRF_TOKEN_LENGTH']));
 
     // DB登録処理
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       INSERT INTO `characters` (
-        `name`, `nickname`, `password`, `token`
+        `name`,
+        `nickname`,
+        `password`,
+        `token`,
+        `summary`,
+        `profile`
       ) VALUES (
-        :name, :nickname, :password, :token
+        :name,
+        :nickname,
+        :password,
+        :token,
+        '',
+        ''
       );
-    ');
+    ");
 
     $statement->bindParam(':name',     $_POST['name']);
     $statement->bindParam(':nickname', $_POST['nickname']);
