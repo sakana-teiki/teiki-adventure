@@ -31,7 +31,7 @@
 また、このプロジェクトではjQuery、jsSHA、Normalize.cssというプロジェクトを利用しています。このプロジェクトの該当部分についてそれらを利用しない形に変更しない場合、それらのプロジェクトのライセンスにも従う必要があります。
 
 ## セットアップ
-以下はWindows環境下でXAMPPを使用して新規に環境を構築する場合の手順です。
+以下はWindows環境下でXAMPPを使用して新規に環境を構築する場合の手順です。Mac環境下でMAMPを使用する場合は[こちら](https://github.com/sakana-teiki/teiki-adventure/blob/master/documents/Mac%E7%89%88%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97.md)を参照してください。
 
 ⚠️ローカルの開発環境という前提でパスワード等をセットアップしています。本番環境では決してこれらのパスワード等を使用しないでください。
 
@@ -203,7 +203,7 @@ CREATE TABLE `messages_recipients` (
 INSERT INTO `rooms` (`title`) VALUES ('全体トークルーム');
 ```
 
-7. releasesから最新の◆◆◆をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(XAMPPの初期設定では"C:\xampp\htdocs")内に配置します。
+7. [最新のreleases](https://github.com/sakana-teiki/teiki-adventure/releases)をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(XAMPPの初期設定では"C:\xampp\htdocs")内に配置します。
 
 8. teiki/.htaccessのSetEnv GAME_ROOTの値を配置したディレクトリに合わせて書き換えます(XAMPPが初期設定で手順通りの場合は"C:\xampp\htdocs\teiki")。
 
@@ -224,6 +224,8 @@ AP配布やデータ初期化など、ブラウザ以外(cron, コンソール�
 ### middlewares
 各ページの動作に必要な初期動作をまとめたphpファイルを配置します。各ページの最上部にてrequireして使用します。それぞれ以下の機能を持ちます。
 
+|ファイル|概要|
+| --- | --- |
 |initialize.php|設定値の読み込み、PDOへの接続やセッションの開始などの初期動作を行います。このファイルは必ずどのmidddlewareより先に、かつ必ず読み込む必要があります。|
 |verification.php|認証を行います。GETリクエストの場合はログインチェックを行いログインしていなければログインページへ、POSTリクエストの場合はログインチェックに加えてCSRFトークンの検証を行いNGであれば403(Forbidden)を返します。PUT, DELETEリクエストに関しては必ず405(Method Not Allowed)を返します。|
 
@@ -257,7 +259,7 @@ Gitを利用する際に追跡を行わないファイルを指定します。Gi
 ### Q. コードのこの部分がよく分かりません。
 以下のいずれかまたはissueまでどうぞ。あるいは別の連絡先を持っている場合はそちらでも構いません。ある程度はサポートします。
 
-| ツール | アカウント |
+|サービス|アカウント|
 | --- | --- |
 |Twitter|@sakana_public|
 |Discord|( 'ω'　　)＜)#8186|
