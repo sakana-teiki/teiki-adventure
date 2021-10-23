@@ -8,14 +8,14 @@
 
   // ページが負なら400(Bad Request)を返して処理を中断
   if ($page < 0) {
-    http_response_code(400); 
+    http_response_code(400);
     exit;
   }
 
   // 現在ページのキャラクター一覧を取得
   // 削除フラグが立っておらずENoがページの範囲内のキャラクターを検索
   // デフォルトの設定ではページ0であればENo.1～100、ページ1であればENo.101～200、ページnであればENo.n×100+1～(n+1)×100の範囲を表示します。
-  $statement = $GAME_PDO->prepare('
+  $statement = $GAME_PDO->prepare("
     SELECT
       `characters`.`ENo`,
       `characters`.`nickname`,
@@ -26,7 +26,7 @@
       `characters`.`AGI`,
       `characters`.`DEF`,
       `characters_icons`.`url` AS `icon`,
-      IFNULL(GROUP_CONCAT(DISTINCT `characters_tags`.`tag`  ORDER BY `characters_tags`.`id`  SEPARATOR " "), "") AS `tags`
+      IFNULL(GROUP_CONCAT(DISTINCT `characters_tags`.`tag` ORDER BY `characters_tags`.`id` SEPARATOR ' '), '') AS `tags`
     FROM
       `characters`
     LEFT JOIN
@@ -37,8 +37,8 @@
       `characters`.`ENo` BETWEEN :ENoMin AND :ENoMax AND
       `characters`.`deleted` = false
     GROUP BY
-		  `characters`.`ENo`;
-  ');
+		  `characters`.`ENo`, `characters_icons`.`url`;
+  ");
 
   $statement->bindValue(':ENoMin', $page * 100 + 1);
   $statement->bindValue(':ENoMax', ($page+1) * 100);
@@ -47,12 +47,12 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
+    http_response_code(500);
     exit;
   }
 
   $characters = $statement->fetchAll();
-  
+
   // 次のページが存在するかを取得（ページリンク生成用）
   $statement = $GAME_PDO->query('
     SELECT
@@ -68,10 +68,10 @@
   ');
 
   $result = $statement->execute();
-  
+
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
+    http_response_code(500);
     exit;
   }
 
@@ -116,7 +116,7 @@
         </a>
       </div>
       <div class="character-list-tags">
-        <?php 
+        <?php
           $tags = explode(' ', $character['tags']);
           foreach ($tags as $tag) {
         ?>

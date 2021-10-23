@@ -18,14 +18,14 @@
   // デフォルトの設定ではページ0であれば0件飛ばして30件、ページ1であれば30件飛ばして30件、ページ2であれば60件飛ばして30件、ページnであればn×30件飛ばして30件を表示します。
   // ただし、次のページがあるかどうか検出するために1件余分に取得します。
   // 31件取得してみて31件取得できれば次のページあり、取得結果の数がそれ未満であれば次のページなし（最終ページ）として扱います。
-  $statement = $GAME_PDO->prepare('
+  $statement = $GAME_PDO->prepare("
     SELECT
       `rooms`.`RNo`,
       `rooms`.`administrator`,
       `rooms`.`title`,
       `rooms`.`summary`,
       `rooms`.`last_posted_at`,
-      IFNULL(GROUP_CONCAT(DISTINCT `rooms_tags`.`tag` ORDER BY `rooms_tags`.`id` SEPARATOR " "), "") AS `tags`
+      IFNULL(GROUP_CONCAT(DISTINCT `rooms_tags`.`tag` ORDER BY `rooms_tags`.`id` SEPARATOR ' '), '') AS `tags`
     FROM
       `rooms`
     LEFT JOIN
@@ -39,7 +39,7 @@
       `rooms`.`last_posted_at` DESC
     LIMIT
       :offset, :number;
-  ');
+  ");
 
   $statement->bindValue(':offset', $page * $GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE'], PDO::PARAM_INT);
   $statement->bindValue(':number', $GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE'] + 1,     PDO::PARAM_INT);

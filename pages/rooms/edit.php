@@ -83,14 +83,14 @@
     // 部屋の削除を行う場合
     if ($_POST['delete_check'] == 'DELETE') {
       // トークルームの削除フラグをONに
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         UPDATE
           `rooms`
         SET
           `deleted` = true
         WHERE
           `RNo` = :RNo;
-      ');
+      ");
 
       $statement->bindParam(':RNo', $RNo);
 
@@ -110,7 +110,7 @@
     $GAME_PDO->beginTransaction();
 
     // トークルームの更新
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       UPDATE
         `rooms`
       SET
@@ -119,7 +119,7 @@
         `description` = :description
       WHERE
         `RNo` = :RNo;
-    ');
+    ");
 
     $statement->bindParam(':RNo',         $RNo);
     $statement->bindParam(':title',       $_POST['title']);
@@ -139,12 +139,12 @@
     $room['description'] = $_POST['description'];
 
     // すでに登録されているタグの削除
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       DELETE FROM
         `rooms_tags`
       WHERE
         `RNo` = :RNo;
-    ');
+    ");
 
     $statement->bindParam(':RNo', $RNo);
 
@@ -161,13 +161,13 @@
     $tags = array_filter($tags, "strlen"); // 空行の要素は削除する
 
     foreach ($tags as $tag) {
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `rooms_tags` (
           `RNo`, `tag`
         ) VALUES (
           :RNo, :tag
         );
-      ');
+      ");
 
       $statement->bindParam(':RNo', $RNo);
       $statement->bindParam(':tag', $tag);

@@ -24,13 +24,13 @@
     $GAME_PDO->beginTransaction();
 
     // トークルームの登録
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       INSERT INTO `rooms` (
         `administrator`, `title`, `summary`, `description`
       ) VALUES (
         :administrator, :title, :summary, :description
       );
-    ');
+    ");
 
     $statement->bindParam(':administrator', $_SESSION['ENo']);
     $statement->bindParam(':title',         $_POST['title']);
@@ -52,13 +52,13 @@
     $tags = array_filter($tags, "strlen"); // 空行の要素は削除する
 
     foreach ($tags as $tag) {
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `rooms_tags` (
           `RNo`, `tag`
         ) VALUES (
           :RNo, :tag
         );
-      ');
+      ");
 
       $statement->bindParam(':RNo', $RNo);
       $statement->bindParam(':tag', $tag);

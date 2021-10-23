@@ -75,11 +75,11 @@
         $refer = $_POST['refer']; // referにPOSTの値を設定
 
         // 返信先のルート発言IDと返信先群の取得
-        $statement = $GAME_PDO->prepare('
+        $statement = $GAME_PDO->prepare("
           SELECT
             `messages`.`MNo`,
             `messages`.`refer_root`,
-            IFNULL(GROUP_CONCAT(DISTINCT `messages_recipients`.`ENo` ORDER BY `messages_recipients`.`id` SEPARATOR ","), "") AS `recipients`
+            IFNULL(GROUP_CONCAT(DISTINCT `messages_recipients`.`ENo` ORDER BY `messages_recipients`.`id` SEPARATOR ','), '') AS `recipients`
           FROM
             `messages`
           LEFT JOIN
@@ -87,7 +87,7 @@
           WHERE
             `messages`.`MNo` = :refer AND
             `messages`.`deleted` = false;
-        ');
+        ");
 
         $statement->bindParam(':refer', $refer);
 
@@ -131,7 +131,7 @@
       $GAME_PDO->beginTransaction();
  
       // メッセージの登録
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `messages` (
           `RNo`,
           `ENo`,
@@ -149,7 +149,7 @@
           :icon,
           :message
         );
-      ');
+      ");
 
       $statement->bindParam(':RNo',       $RNo);
       $statement->bindParam(':ENo',       $_SESSION['ENo']);
@@ -172,13 +172,13 @@
 
       // 返信先の登録
       foreach ($recipients as $recipient) {
-        $statement = $GAME_PDO->prepare('
+        $statement = $GAME_PDO->prepare("
           INSERT INTO `messages_recipients` (
             `MNo`, `ENo`
           ) VALUES (
             :MNo, :recipient
           );
-        ');
+        ");
 
         $statement->bindParam(':MNo',       $MNo);
         $statement->bindParam(':recipient', $recipient);
@@ -197,14 +197,14 @@
       $GAME_PDO->commit();
 
       // 発言を行った部屋の最終投稿時刻を更新
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         UPDATE
           `rooms`
         SET
           `last_posted_at` = current_timestamp
         WHERE
           `RNo` = :RNo;
-      ');
+      ");
 
       $statement->bindParam(':RNo', $RNo);
 
@@ -258,14 +258,14 @@
       }
       
       // 対象の投稿を削除状態に
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         UPDATE
           `messages`
         SET
           `deleted` = true
         WHERE
           `MNo` = :MNo;
-      ');
+      ");
 
       $statement->bindValue(':MNo', $_POST['MNo'], PDO::PARAM_INT);
 

@@ -17,14 +17,14 @@
       }
 
       // キャラクターデータを取得
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         SELECT
           `ENo`, `password`
         FROM
           `characters`
         WHERE
           `ENo` = :ENo;
-      ');
+      ");
 
       $statement->bindParam(':ENo', $_SESSION['ENo']);
 
@@ -47,14 +47,14 @@
       $newPassword = password_hash($_POST['newPassword'], PASSWORD_DEFAULT);
 
       // パスワードのアップデート
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         UPDATE
           `characters`
         SET
           `password` = :password
         WHERE
           `ENo` = :ENo;
-      ');
+      ");
 
       $statement->bindParam(':password', $newPassword);
       $statement->bindParam(':ENo',      $_SESSION['ENo']);
@@ -74,14 +74,14 @@
     // キャラクター削除を行う場合
     if (isset($_POST['deleteCharacter']) && $_POST['deleteCharacter']) {
       // 削除フラグをONに
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         UPDATE
           `characters`
         SET
           `deleted` = true
         WHERE
           `ENo` = :ENo;
-      ');
+      ");
 
       $statement->bindParam(':ENo', $_SESSION['ENo']);
 

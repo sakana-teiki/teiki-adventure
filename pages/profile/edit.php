@@ -41,7 +41,7 @@
     $GAME_PDO->beginTransaction();
 
     // キャラクター情報のアップデート
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       UPDATE
         `characters`
       SET
@@ -51,7 +51,7 @@
         `profile`  = :profile
       WHERE
         `ENo` = :ENo;
-    ');
+    ");
     
     $statement->bindParam(':ENo',      $_SESSION['ENo']);
     $statement->bindParam(':name',     $_POST['name']);
@@ -68,12 +68,12 @@
     }
 
     // すでに登録されているプロフィール画像の削除
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       DELETE FROM
         `characters_profile_images`
       WHERE
         `ENo` = :ENo;
-    ');
+    ");
 
     $statement->bindParam(':ENo', $_SESSION['ENo']);
 
@@ -86,12 +86,12 @@
     }
 
     // すでに登録されているタグの削除
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       DELETE FROM
         `characters_tags`
       WHERE
         `ENo` = :ENo;
-    ');
+    ");
 
     $statement->bindParam(':ENo', $_SESSION['ENo']);
 
@@ -104,12 +104,12 @@
     }
 
     // すでに登録されているアイコンの削除
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       DELETE FROM
         `characters_icons`
       WHERE
         `ENo` = :ENo;
-    ');
+    ");
 
     $statement->bindParam(':ENo', $_SESSION['ENo']);
 
@@ -126,13 +126,13 @@
     $profile_images = array_filter($profile_images, "strlen"); // 空の要素は削除する
 
     foreach ($profile_images as $profile_image) {
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `characters_profile_images` (
           `ENo`, `url`
         ) VALUES (
           :ENo, :url
         );
-      ');
+      ");
 
       $statement->bindParam(':ENo', $_SESSION['ENo']);
       $statement->bindParam(':url', $profile_image);
@@ -151,13 +151,13 @@
     $tags = array_filter($tags, "strlen"); // 空の要素は削除する
 
     foreach ($tags as $tag) {
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `characters_tags` (
           `ENo`, `tag`
         ) VALUES (
           :ENo, :tag
         );
-      ');
+      ");
 
       $statement->bindParam(':ENo', $_SESSION['ENo']);
       $statement->bindParam(':tag', $tag);
@@ -178,13 +178,13 @@
         continue;
       }
 
-      $statement = $GAME_PDO->prepare('
+      $statement = $GAME_PDO->prepare("
         INSERT INTO `characters_icons` (
           `ENo`, `name`, `url`
         ) VALUES (
           :ENo, :name, :url
         );
-      ');
+      ");
 
       $statement->bindParam(':ENo',  $_SESSION['ENo']);
       $statement->bindParam(':name', $_POST['icon-'.$i.'-name']);

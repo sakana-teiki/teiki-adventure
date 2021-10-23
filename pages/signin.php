@@ -17,7 +17,7 @@
 
     // 検索処理
     // 削除フラグが立っておらずENoが指定のキャラクターを検索
-    $statement = $GAME_PDO->prepare('
+    $statement = $GAME_PDO->prepare("
       SELECT
         `ENo`, `password`, `token`
       FROM
@@ -25,7 +25,7 @@
       WHERE
         `ENo`     = :ENo  AND
         `deleted` = false;
-    ');
+    ");
 
     $statement->bindParam(':ENo', $_POST['eno']);
 
