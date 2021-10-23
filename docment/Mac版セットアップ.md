@@ -178,6 +178,7 @@ INSERT INTO `rooms` (`title`) VALUES ('全体トークルーム');
 7. [最新のreleases](https://github.com/sakana-teiki/teiki-adventure/releases)をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(MAMPの初期設定では"/Applications/MAMP/htdocs/")内に配置します。
 
 8. teiki/.htaccessのSetEnv GAME_ROOTの値を配置したディレクトリに合わせて書き換えます(MAMPが初期設定で手順通りの場合は"/Applications/MAMP/htdocs/teiki")。
+teikiから変更する場合は、configs/environment.phpの$GAME_CONFIG['URI']も合わせて変更します
 
 9. ブラウザで[http://localhost/teiki/](http://localhost/teiki/)にアクセスします。
 
