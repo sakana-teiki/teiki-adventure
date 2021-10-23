@@ -279,6 +279,11 @@ Gitを利用する際に追跡を行わないファイルを指定します。Gi
 ### Q. URLの長いアイコンをいっぱい登録したらアイコンが一部途切れる/出てこない。
 MySQLのGROUP_CONCATの最大長に引っかかっていると思われます。group_concat_max_lenの設定を十分な長さに変更してください。
 
+### Q. さくらのレンタルサーバ等で、Failed to open stream: No such file or directory...のようなエラーが出る。
+さくらのレンタルサーバ等、一部のレンタルサーバでは.htaccess記載のSetEnvの値が無効になります。各phpファイルの「GETENV('GAME_ROOT').」を「$_SERVER['DOCUMENT_ROOT'].'/teiki'.」に置換するなどで対応を行ってください。
+
+なお、$_SERVER['DOCUMENT_ROOT']の値もレンタルサーバによっては適切な値が取得できないことがあります。その場合も適宜対応を行ってください。対応方法が分からない等あればお問い合わせください。
+
 ## ライセンス
 MIT License
 
