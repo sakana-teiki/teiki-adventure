@@ -80,7 +80,7 @@
 <?php foreach ($rooms as $room) { ?>
   <li>
     <div class="room-list-info">
-      <a class="room-list-link" href="<?=$GAME_CONFIG['URI']?>room?RNo=<?=$room['RNo']?>">
+      <a class="room-list-link" href="<?=$GAME_CONFIG['URI']?>room?room=<?=$room['RNo']?>">
         <span class="room-list-title"><?=htmlspecialchars($room['title'])?></span>
         <span class="room-list-rno">&lt; RNo.<?=$room['RNo']?> &gt;</span>
       </a>

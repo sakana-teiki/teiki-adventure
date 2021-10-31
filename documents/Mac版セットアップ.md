@@ -3,6 +3,8 @@
 
 ⚠️ローカルの開発環境という前提でパスワード等をセットアップしています。本番環境では決してこれらのパスワード等を使用しないでください。
 
+ℹ️このプロジェクトを利用したサイトを公開する前にはdocuments/公開前のチェックリスト.mdを確認してください。
+
 ℹ️パスワードやDB名、公開ディレクトリなど環境設定を変更した場合はteiki/configs/environment.phpの該当の値も書き換えてください。
 
 1. 以下のソフトウェアをインストールします。
@@ -34,154 +36,12 @@ exit;
  - パスワードを要求されるので先ほど作成した `dbpassword` と入力
  - 今作った `Localhost-teiki` を押してログイン
 
-6. （Windowsと同一）以下のコマンド群を実行します。
+6. [最新のreleases](https://github.com/sakana-teiki/teiki-adventure/releases)をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(MAMPの初期設定では"/Applications/MAMP/htdocs/")内に配置します。
 
-``` sql
-CREATE TABLE `characters` (
-	`ENo`      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`password` TEXT         NOT NULL,
-	`token`    TEXT         NOT NULL,
-	`name`     TEXT         NOT NULL,
-	`nickname` TEXT         NOT NULL,
-	`summary`  TEXT         NOT NULL,
-	`profile`  TEXT         NOT NULL,
-	`AP`       INT UNSIGNED NOT NULL DEFAULT 0,
-	`NP`       INT UNSIGNED NOT NULL DEFAULT 0,
-	`ATK`      INT UNSIGNED NOT NULL DEFAULT 0,
-	`DEX`      INT UNSIGNED NOT NULL DEFAULT 0,
-	`MND`      INT UNSIGNED NOT NULL DEFAULT 0,
-	`AGI`      INT UNSIGNED NOT NULL DEFAULT 0,
-	`DEF`      INT UNSIGNED NOT NULL DEFAULT 0,
-	`deleted`  BOOLEAN      NOT NULL DEFAULT false,
-
-	PRIMARY KEY (`ENo`)
-);
-
-CREATE TABLE `characters_tags` (
-	`id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`ENo` INT UNSIGNED NOT NULL,
-	`tag` TEXT         NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`)
-);
-
-CREATE TABLE `characters_icons` (
-	`id`   INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`ENo`  INT UNSIGNED NOT NULL,
-	`name` TEXT         NOT NULL,
-	`url`  TEXT         NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`)
-);
-
-CREATE TABLE `characters_profile_images` (
-	`id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`ENo` INT UNSIGNED NOT NULL,
-	`url` TEXT         NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`)
-);
-
-CREATE TABLE `characters_favs` (
-	`id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`faver` INT UNSIGNED NOT NULL,
-	`faved` INT UNSIGNED NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`faver`) REFERENCES `characters`(`ENo`),
-	FOREIGN KEY (`faved`) REFERENCES `characters`(`ENo`),
-	UNIQUE (`faver`, `faved`)
-);
-
-CREATE TABLE `characters_mutes` (
-	`id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`muter` INT UNSIGNED NOT NULL,
-	`muted` INT UNSIGNED NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`muter`) REFERENCES `characters`(`ENo`),
-	FOREIGN KEY (`muted`) REFERENCES `characters`(`ENo`),
-	UNIQUE (`muter`, `muted`)
-);
-
-CREATE TABLE `characters_blocks` (
-	`id`      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`blocker` INT UNSIGNED NOT NULL,
-	`blocked` INT UNSIGNED NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`blocker`) REFERENCES `characters`(`ENo`),
-	FOREIGN KEY (`blocked`) REFERENCES `characters`(`ENo`),
-	UNIQUE (`blocker`, `blocked`)
-);
-
-CREATE TABLE `rooms` (
-	`RNo`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`administrator`  INT UNSIGNED,
-	`title`          TEXT         NOT NULL,
-	`deleted`        BOOLEAN      NOT NULL DEFAULT false,
-	`summary`        TEXT         NOT NULL,
-	`description`    TEXT         NOT NULL,
-	`created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`last_posted_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-	PRIMARY KEY (`RNo`),
-	FOREIGN KEY (`administrator`) REFERENCES `characters`(`ENo`),
-	INDEX (`last_posted_at`)
-);
-
-CREATE TABLE `rooms_tags` (
-	`id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`RNo` INT UNSIGNED NOT NULL,
-	`tag` TEXT         NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`RNo`) REFERENCES `rooms`(`RNo`)
-);
-
-CREATE TABLE `messages` (
-	`MNo`        INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`RNo`        INT UNSIGNED NOT NULL,
-	`ENo`        INT UNSIGNED NOT NULL,
-	`refer`      INT UNSIGNED,
-	`refer_root` INT UNSIGNED,
-	`icon`       TEXT         NOT NULL,
-	`name`       TEXT         NOT NULL,
-	`message`    TEXT         NOT NULL,
-	`deleted`    BOOLEAN      NOT NULL DEFAULT false,
-	`posted_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-	PRIMARY KEY (`MNo`),
-	FOREIGN KEY (`ENo`)        REFERENCES `characters`(`ENo`),
-	FOREIGN KEY (`RNo`)        REFERENCES `rooms`(`RNo`),
-	FOREIGN KEY (`refer`)      REFERENCES `messages`(`MNo`),
-	FOREIGN KEY (`refer_root`) REFERENCES `messages`(`MNo`),
-	INDEX (`posted_at`)
-);
-
-CREATE TABLE `messages_recipients` (
-	`id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`MNo` INT UNSIGNED NOT NULL,
-	`ENo` INT UNSIGNED NOT NULL,
-
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`MNo`) REFERENCES `messages`(`MNo`),
-	FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`)
-);
-
-INSERT INTO `rooms` (`title`) VALUES ('全体トークルーム');
-```
-
-7. [最新のreleases](https://github.com/sakana-teiki/teiki-adventure/releases)をダウンロードして解凍し、出てきたteikiフォルダをhtdocs(MAMPの初期設定では"/Applications/MAMP/htdocs/")内に配置します。
-
-8. teiki/.htaccessのSetEnv GAME_ROOTの値を配置したディレクトリに合わせて書き換えます(MAMPが初期設定で手順通りの場合は"/Applications/MAMP/htdocs/teiki")。
+7. teiki/.htaccessのSetEnv GAME_ROOTの値を配置したディレクトリに合わせて書き換えます(MAMPが初期設定で手順通りの場合は"/Applications/MAMP/htdocs/teiki")。
 teikiから変更する場合は、configs/environment.phpの$GAME_CONFIG['URI']も合わせて変更します。
 
-9. ブラウザで[http://localhost/teiki/](http://localhost/teiki/)にアクセスします。
-
+8. ブラウザで[http://localhost/teiki/control-panel/initialize](http://localhost/teiki/control-panel/initialize)にアクセスし、表示されたサイトで`init`を入力して「データ初期化」をクリックします。
 
 ## うまく動かなかったら
 #### ログを見る

@@ -1,15 +1,14 @@
 <?php
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+
   // POSTリクエスト時の処理
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
-    // 以下の条件のうちいずれかを満たせば400(Bad Request)を返し処理を中断
     if (
-      !isset($_POST['eno'])      || // 受け取ったデータにENoがない
-      !isset($_POST['password']) || // 受け取ったデータにパスワードがない
-      $_POST['eno'] == ''        || // 受け取ったパスワードが空文字列
-      !preg_match('/^([1-9][0-9]*)$/', $_POST['eno']) // ENoの内容が正の整数でない（判定には正規表現を使用）
+      !validatePOST('password', ['non-empty'])            ||
+      !validatePOST('eno',      ['non-empty', 'integer'])
     ) {
       http_response_code(400);
       exit;
@@ -19,7 +18,10 @@
     // 削除フラグが立っておらずENoが指定のキャラクターを検索
     $statement = $GAME_PDO->prepare("
       SELECT
-        `ENo`, `password`, `token`
+        `ENo`,
+        `password`,
+        `token`,
+        `administrator`
       FROM
         `characters`
       WHERE
@@ -53,8 +55,9 @@
     
     session_regenerate_id(true); // セッションIDを再生成（セッション固定攻撃対策）
 
-    $_SESSION['ENo']   = $data['ENo'];   // セッションにENoを設定
-    $_SESSION['token'] = $data['token']; // セッションにCSRFトークンを設定
+    $_SESSION['ENo']   = $data['ENo'];                   // セッションにENoを設定
+    $_SESSION['token'] = $data['token'];                 // セッションにCSRFトークンを設定
+    $_SESSION['administrator'] = $data['administrator']; // セッションに管理者ステータスを設定
 
     http_response_code(200); // ここまで全てOKなら200を返して処理を終了
     exit;
@@ -73,8 +76,6 @@
 <section>
   <h2>ログイン</h2>
 
-  <div id="error-message-area"></div>
-
   <section class="form">
     <div class="form-title">ENo</div>
     <input id="input-eno" class="form-input" type="text" placeholder="ENo">
@@ -84,6 +85,8 @@
     <div class="form-title">パスワード</div>
     <input id="input-password" class="form-input" type="password" placeholder="パスワード">
   </section>
+
+  <div id="error-message-area"></div>
   
   <div class="button-wrapper">
     <button id="signin-button" class="button">ログイン</button>
@@ -118,8 +121,8 @@
       return;
     }
     // ENoの入力形式が正しくない場合エラーメッセージを表示して処理を中断
-    // (数として解釈不能、整数でない、0以下)
-    if (Number(inputENo) == NaN || !Number.isInteger(Number(inputENo)) || Number(inputENo) <= 0) {
+    // (数として解釈不能、整数でない)
+    if (Number(inputENo) == NaN || !Number.isInteger(Number(inputENo))) {
       showErrorMessage('ENoの入力形式が正しくありません');
       return;
     }

@@ -15,4 +15,6 @@ $GAME_CONFIG['MYSQL_DBNAME']   = 'teiki_adventure'; // 使用するMySQLのDB名
 $GAME_CONFIG['MYSQL_USERNAME'] = 'teiki';           // 使用するMySQLのユーザー名です。
 $GAME_CONFIG['MYSQL_PASSWORD'] = 'dbpassword';      // 使用するMySQLのパスワードです。
 
+//初期化キー設定
+$GAME_CONFIG['INITIALIZE_KEY'] = 'init'; // ゲームデータの初期化に使用するパスワードです。公開する環境では必ず複雑なパスワードに変更してください。
 ?>

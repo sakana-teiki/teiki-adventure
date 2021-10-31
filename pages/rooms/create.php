@@ -2,18 +2,16 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+
   // POSTリクエスト時の処理
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
-    // 以下の条件のうちいずれかを満たせば400(Bad Request)を返し処理を中断
     if (
-      !isset($_POST['title'])       || // 受け取ったデータにタイトルがない
-      !isset($_POST['tags'])        || // 受け取ったデータにタグがない
-      !isset($_POST['summary'])     || // 受け取ったデータにサマリーがない
-      !isset($_POST['description']) || // 受け取ったデータに説明文がない
-      $_POST['title'] == ''         || // 受け取ったタイトルが空文字列
-      mb_strlen($_POST['title'])   > $GAME_CONFIG['TITLE_MAX_LENGTH']     || // 受け取ったタイトルが長すぎる
-      mb_strlen($_POST['summary']) > $GAME_CONFIG['ROOM_SUMMARY_MAX_LENGTH'] // 受け取ったサマリーが長すぎる
+      !validatePOST('title',       ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['ROOM_TITLE_MAX_LENGTH'])       ||
+      !validatePOST('description', [                            'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['ROOM_DESCRIPTION_MAX_LENGTH']) ||
+      !validatePOST('summary',     [             'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['ROOM_SUMMARY_MAX_LENGTH'])     ||
+      !validatePOST('tags',        [             'single-line'])
     ) {
       http_response_code(400);
       exit;
@@ -26,9 +24,15 @@
     // トークルームの登録
     $statement = $GAME_PDO->prepare("
       INSERT INTO `rooms` (
-        `administrator`, `title`, `summary`, `description`
+        `administrator`,
+        `title`,
+        `summary`,
+        `description`
       ) VALUES (
-        :administrator, :title, :summary, :description
+        :administrator,
+        :title,
+        :summary,
+        :description
       );
     ");
 
@@ -45,7 +49,55 @@
       exit;
     }
 
-    $RNo = intval($GAME_PDO->lastInsertId()); // RNoを取得
+    $lastInsertId = intval($GAME_PDO->lastInsertId()); // 登録されたidを取得
+
+    // RNo情報の登録（登録されたトークルームのうち、公共トークルームを除いた指定のid以下のトークルームがいくつ存在しているか？の数をRNoとする。）
+    $statement = $GAME_PDO->prepare("
+      UPDATE
+        `rooms`
+      SET
+        `RNo` = (
+          SELECT
+            COUNT(*)
+          FROM
+            `rooms`
+          WHERE
+            `administrator` IS NOT NULL AND `id` <= :id
+        )
+      WHERE
+        `id` = :id;
+    ");
+
+    $statement->bindParam(':id', $lastInsertId);
+
+    $result = $statement->execute();
+
+    if (!$result) {
+      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      $GAME_PDO->rollBack();
+      exit;
+    }
+
+    // 登録されたRNoの取得
+    $statement = $GAME_PDO->prepare("
+      SELECT
+        `RNo`
+      FROM
+        `rooms`
+      WHERE
+        `id` = :id;
+    ");
+
+    $statement->bindParam(':id', $lastInsertId);
+
+    $result = $statement->execute();
+    $room   = $statement->fetch();
+
+    if (!$result || !$room) {
+      http_response_code(500); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      $GAME_PDO->rollBack();
+      exit;
+    }
 
     // タグの登録
     $tags = explode(' ', $_POST['tags']);
@@ -60,7 +112,7 @@
         );
       ");
 
-      $statement->bindParam(':RNo', $RNo);
+      $statement->bindParam(':RNo', $room['RNo']);
       $statement->bindParam(':tag', $tag);
 
       $result = $statement->execute();
@@ -74,7 +126,7 @@
 
     // ここまで全て成功した場合はコミットしてリダイレクト
     $GAME_PDO->commit();
-    header('Location:'.$GAME_CONFIG['URI'].'room?RNo='.$RNo, true, 302);
+    header('Location:'.$GAME_CONFIG['URI'].'room?room='.$room['RNo'], true, 302);
     exit;
   }
 
@@ -83,22 +135,24 @@
   require GETENV('GAME_ROOT').'/components/header.php';
 ?>
 
+<h1>トークルーム作成</h1>
+
 <form id="create-room-form" method="post">
+  <h2>作成内容</h2>
+
   <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
 
-  <h2>トークルーム作成</h2>
-
   <section class="form">
-    <div class="form-title">タイトル（<?=$GAME_CONFIG['TITLE_MAX_LENGTH']?>文字まで）</div>
+    <div class="form-title">タイトル（<?=$GAME_CONFIG['ROOM_TITLE_MAX_LENGTH']?>文字まで）</div>
     <input id="input-title" class="form-input" type="text" name="title" placeholder="タイトル">
   </section>
 
   <section class="form">
-    <div class="form-title">タグ</div>
+    <div class="form-title">タグ（<?=$GAME_CONFIG['ROOM_TAG_MAX']?>個、各タグ<?=$GAME_CONFIG['ROOM_TAG_MAX_LENGTH']?>文字まで）</div>
     <div class="form-description">
       半角スペースで区切ることで複数指定できます。
     </div>
-    <input class="form-input-long" type="text" name="tags" placeholder="タグ">
+    <input id="input-tags" class="form-input-long" type="text" name="tags" placeholder="タグ">
   </section>
 
   <section class="form">
@@ -110,12 +164,12 @@
   </section>
 
   <section class="form">
-    <div class="form-title">説明文</div>
+    <div class="form-title">説明文（<?=$GAME_CONFIG['ROOM_DESCRIPTION_MAX_LENGTH']?>文字まで）</div>
     <div class="form-description">
       説明文はプロフィールと同様の書式で装飾することができます。<br>
       詳しくはルールブックを確認してください。
     </div>
-    <textarea class="form-textarea" type="text" name="description" placeholder="説明文"></textarea>
+    <textarea id="input-description" class="form-textarea" type="text" name="description" placeholder="説明文"></textarea>
   </section>
 
   <div id="error-message-area"></div>
@@ -141,8 +195,10 @@
 
   $('#create-room-form').submit(function(){
     // 値を取得
-    var inputTitle   = $('#input-title').val();
-    var inputSummary = $('#input-summary').val();
+    var inputTitle       = $('#input-title').val();
+    var inputSummary     = $('#input-summary').val();
+    var inputTags        = $('#input-tags').val();
+    var inputDescription = $('#input-description').val();
 
     // 入力値検証
     // タイトルが入力されていない場合エラーメッセージを表示して送信を中断
@@ -151,7 +207,7 @@
       return false;
     }
     // タイトルが長すぎる場合エラーメッセージを表示して送信を中断
-    if (inputTitle.length > <?=$GAME_CONFIG['TITLE_MAX_LENGTH']?>) {
+    if (inputTitle.length > <?=$GAME_CONFIG['ROOM_TITLE_MAX_LENGTH']?>) {
       showErrorMessage('タイトルが長すぎます');
       return false;
     }
@@ -159,6 +215,29 @@
     // サマリーが長すぎる場合エラーメッセージを表示して送信を中断
     if (inputSummary.length > <?=$GAME_CONFIG['ROOM_SUMMARY_MAX_LENGTH']?>) {
       showErrorMessage('サマリーが長すぎます');
+      return false;
+    }
+
+    // タグの検証
+    var tags = inputTags.split(' ');
+
+    // タグの数が多すぎる場合エラーメッセージを表示して送信を中断
+    if (tags.length > <?=$GAME_CONFIG['ROOM_TAG_MAX']?>) {
+      showErrorMessage('タグの数が多すぎます');
+      return false;
+    }
+
+    // タグに長すぎるものがある場合エラーメッセージを表示して送信を中断
+    tags.forEach(function(tag) {
+      if (tag.length > <?=$GAME_CONFIG['ROOM_TAG_MAX_LENGTH']?>) {
+        showErrorMessage('文字数制限を超過したタグがあります');
+        return false;
+      }
+    });
+
+    // 説明文が長すぎる場合エラーメッセージを表示して送信を中断
+    if (inputDescription.length > <?=$GAME_CONFIG['ROOM_DESCRIPTION_MAX_LENGTH']?>) {
+      showErrorMessage('説明文が長すぎます');
       return false;
     }
 

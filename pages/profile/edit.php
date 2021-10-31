@@ -2,24 +2,41 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
   require_once GETENV('GAME_ROOT').'/utils/parser.php';
+
+  // アイコンの付与上限数を取得
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `additional_icons`
+    FROM
+      `characters`
+    WHERE
+      `ENo` = :ENo;
+  ");
+
+  $statement->bindParam(':ENo', $_SESSION['ENo']);
+
+  $result          = $statement->execute();
+  $additionalIcons = $statement->fetch();
+
+  if (!$result || !$additionalIcons) {
+    // SQLの実行や実行結果の取得に失敗した場合は500(Internal Server Error)を返し処理を中断
+    http_response_code(500); 
+    exit;
+  }
 
   // POSTの場合
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証1
     // 以下の条件のうちいずれかを満たせば400(Bad Request)を返し処理を中断
     if (
-      !isset($_POST['name'])           || // 受け取ったデータにフルネームがない
-      !isset($_POST['nickname'])       || // 受け取ったデータに短縮名がない
-      !isset($_POST['summary'])        || // 受け取ったデータにサマリーがない
-      !isset($_POST['profile_images']) || // 受け取ったデータにプロフィール画像がない
-      !isset($_POST['profile'])        || // 受け取ったデータにプロフィールがない
-      !isset($_POST['tags'])           || // 受け取ったデータにタグがない
-      $_POST['name']     == ''         || // 受け取ったフルネームが空文字列
-      $_POST['nickname'] == ''         || // 受け取った短縮名が空文字列
-      mb_strlen($_POST['name'])     > $GAME_CONFIG['NAME_MAX_LENGTH']           || // 受け取ったフルネームが長すぎる
-      mb_strlen($_POST['nickname']) > $GAME_CONFIG['NICKNAME_MAX_LENGTH']       || // 受け取った短縮名が長すぎる
-      mb_strlen($_POST['summary'])  > $GAME_CONFIG['CHARACTER_SUMMARY_MAX_LENGTH'] // 受け取ったサマリーが長すぎる
+      !validatePOST('profile_images', ['disallow-special-chars']) ||
+      !validatePOST('profile',        ['disallow-special-chars']) ||
+      !validatePOST('tags',           ['single-line', 'disallow-special-chars']) ||
+      !validatePOST('summary',        ['single-line', 'disallow-special-chars'], $GAME_CONFIG['CHARACTER_SUMMARY_MAX_LENGTH']) || 
+      !validatePOST('name',           ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH'])     ||
+      !validatePOST('nickname',       ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH'])
     ) {
       http_response_code(400);
       exit;
@@ -172,7 +189,7 @@
     }
 
     // アイコンの登録
-    for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX']; $i++) {
+    for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX'] + $additionalIcons['additional_icons']; $i++) {
       // 名前もURLも登録されていない項目は処理を飛ばす
       if (strlen($_POST['icon-'.$i.'-name']) == 0 && strlen($_POST['icon-'.$i.'-url']) == 0) {
         continue;
@@ -203,7 +220,7 @@
     $GAME_PDO->commit();
   }
 
-  // DBから値を取得
+  // キャラクターの設定値を取得
   $statement = $GAME_PDO->prepare("
     SELECT
       `ENo`,
@@ -238,6 +255,8 @@
   require GETENV('GAME_ROOT').'/components/header.php';
 ?>
 
+<h1>キャラクター設定</h1>
+
 <form id="profile-edit-form" method="post">
   <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
 
@@ -245,16 +264,16 @@
     <h2>キャラクターリスト関連</h2>
 
     <section class="form">
-      <div class="form-title">キャラクターの短縮名（<?=$GAME_CONFIG['NICKNAME_MAX_LENGTH']?>文字まで）</div>
+      <div class="form-title">キャラクターの短縮名（<?=$GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']?>文字まで）</div>
       <input id="input-nickname" name="nickname" class="form-input" type="text" placeholder="短縮名" value="<?=htmlspecialchars($data['nickname'])?>">
     </section>
 
     <section class="form">
-      <div class="form-title">タグ</div>
+      <div class="form-title">タグ（<?=$GAME_CONFIG['CHARACTER_TAG_MAX']?>個、各タグ<?=$GAME_CONFIG['CHARACTER_TAG_MAX_LENGTH']?>文字まで）</div>
       <div class="form-description">
         半角スペースで区切ることで複数指定できます。
       </div>
-      <input name="tags" class="form-input-long" type="text" placeholder="タグ" value="<?=htmlspecialchars($data['tags'])?>">
+      <input id="input-tags" name="tags" class="form-input-long" type="text" placeholder="タグ" value="<?=htmlspecialchars($data['tags'])?>">
     </section>
 
     <section class="form">
@@ -270,7 +289,7 @@
     <h2>キャラクターリスト関連</h2>
 
     <section class="form">
-      <div class="form-title">キャラクターのフルネーム（<?=$GAME_CONFIG['NAME_MAX_LENGTH']?>文字まで）</div>
+      <div class="form-title">キャラクターのフルネーム（<?=$GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']?>文字まで）</div>
       <input id="input-name" name="name" class="form-input" type="text" placeholder="フルネーム" value="<?=htmlspecialchars($data['name'])?>">
     </section>
 
@@ -283,12 +302,12 @@
     </section>
 
     <section class="form">
-      <div class="form-title">プロフィール文</div>
+      <div class="form-title">プロフィール文（<?=$GAME_CONFIG['CHARACTER_PROFILE_MAX_LENGTH']?>文字まで）</div>
       <div class="form-description">
         プロフィール文は指定のタグで囲むことで装飾することができます。<br>
         詳しくはルールブックを確認してください。
       </div>
-      <textarea name="profile" class="form-textarea" placeholder="プロフィール文"><?=htmlspecialchars($data['profile'])?></textarea>
+      <textarea id="input-profile" name="profile" class="form-textarea" placeholder="プロフィール文"><?=htmlspecialchars($data['profile'])?></textarea>
     </section>
   </section>
 
@@ -297,6 +316,9 @@
 
     一番上に指定したアイコンはキャラクターリストで表示されます。<br>
     アイコン名もURLも登録されていない項目は上に詰められます。
+<?php if ($additionalIcons['additional_icons']) { ?>
+    <br>追加アイコン枠（<?=$GAME_CONFIG['CHARACTER_ICON_MAX']+1?>番以降）に登録されたアイコンはプロフィール欄では表示されません。
+<?php } ?>
 
     <table id="profile-edit-icon">
       <thead>
@@ -308,7 +330,7 @@
       </thead>
       <tbody>
       <?php
-        for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX']; $i++) {
+        for ($i = 0; $i < $GAME_CONFIG['CHARACTER_ICON_MAX'] + $additionalIcons['additional_icons']; $i++) {
       ?>
         <tr>
           <td>
@@ -354,6 +376,8 @@
     var inputName     = $('#input-name').val();
     var inputNickname = $('#input-nickname').val();
     var inputSummary  = $('#input-summary').val();
+    var inputTags     = $('#input-tags').val();
+    var inputProfile  = $('#input-profile').val();
 
     // 入力値検証
     // フルネームが入力されていない場合エラーメッセージを表示して送信を中断
@@ -362,7 +386,7 @@
       return false;
     }
     // フルネームが長すぎる場合エラーメッセージを表示して送信を中断
-    if (inputName.length > <?=$GAME_CONFIG['NAME_MAX_LENGTH']?>) {
+    if (inputName.length > <?=$GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']?>) {
       showErrorMessage('フルネームが長すぎます');
       return false;
     }
@@ -373,7 +397,7 @@
       return false;
     }
     // 短縮名が長すぎる場合エラーメッセージを表示して送信を中断
-    if (inputNickname.length > <?=$GAME_CONFIG['NICKNAME_MAX_LENGTH']?>) {
+    if (inputNickname.length > <?=$GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']?>) {
       showErrorMessage('短縮名が長すぎます');
       return false;
     }
@@ -381,6 +405,29 @@
     // サマリーが長すぎる場合エラーメッセージを表示して送信を中断
     if (inputSummary.length > <?=$GAME_CONFIG['CHARACTER_SUMMARY_MAX_LENGTH']?>) {
       showErrorMessage('サマリーが長すぎます');
+      return false;
+    }
+
+    // タグの検証
+    var tags = inputTags.split(' ');
+
+    // タグの数が多すぎる場合エラーメッセージを表示して送信を中断
+    if (tags.length > <?=$GAME_CONFIG['CHARACTER_TAG_MAX']?>) {
+      showErrorMessage('タグの数が多すぎます');
+      return false;
+    }
+
+    // タグに長すぎるものがある場合エラーメッセージを表示して送信を中断
+    tags.forEach(function(tag) {
+      if (tag.length > <?=$GAME_CONFIG['CHARACTER_TAG_MAX_LENGTH']?>) {
+        showErrorMessage('文字数制限を超過したタグがあります');
+        return false;
+      }
+    });
+
+    // プロフィールが長すぎる場合エラーメッセージを表示して送信を中断
+    if (inputProfile.length > <?=$GAME_CONFIG['CHARACTER_PROFILE_MAX_LENGTH']?>) {
+      showErrorMessage('プロフィールが長すぎます');
       return false;
     }
 
