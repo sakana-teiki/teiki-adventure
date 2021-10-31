@@ -22,8 +22,9 @@
   // セッションの開始
   ini_set('session.gc_maxlifetime' , $GAME_CONFIG['SESSION_LIFETIME']); // セッションの有効時間を指定
   ini_set('session.cookie_lifetime', $GAME_CONFIG['SESSION_LIFETIME']); // クッキーの有効時間を指定
-  session_name($GAME_CONFIG['SESSION_NAME']);  // セッション名を指定
-  
+  session_name($GAME_CONFIG['SESSION_NAME']); // セッション名を指定
+  session_cache_limiter('private_no_expire'); // フォーム再送信の確認が出ないようにする
+
   session_start();
 
   $GAME_LOGGEDIN = isset($_SESSION['ENo']); // ログインしているかどうか
