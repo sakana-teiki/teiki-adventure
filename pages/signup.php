@@ -1,19 +1,15 @@
 <?php
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+
   // POSTリクエスト時の処理
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
-    // 以下の条件のうちいずれかを満たせば400(Bad Request)を返し処理を中断
     if (
-      !isset($_POST['name'])     || // 受け取ったデータにフルネームがない
-      !isset($_POST['nickname']) || // 受け取ったデータに短縮名がない
-      !isset($_POST['password']) || // 受け取ったデータにパスワードがない
-      $_POST['name']     == ''   || // 受け取ったフルネームが空文字列
-      $_POST['nickname'] == ''   || // 受け取った短縮名が空文字列
-      $_POST['password'] == ''   || // 受け取ったパスワードが空文字列
-      mb_strlen($_POST['name'])     > $GAME_CONFIG['NAME_MAX_LENGTH']  || // 受け取ったフルネームが長すぎる
-      mb_strlen($_POST['nickname']) > $GAME_CONFIG['NICKNAME_MAX_LENGTH'] // 受け取った短縮名が長すぎる
+      !validatePOST('password', ['non-empty']) ||
+      !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH'])     ||
+      !validatePOST('nickname', ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH'])
     ) {
       http_response_code(400);
       exit;
@@ -25,7 +21,10 @@
     // CSRFトークンの生成
     $token = bin2hex(openssl_random_pseudo_bytes($GAME_CONFIG['CSRF_TOKEN_LENGTH']));
 
-    // DB登録処理
+    // トランザクション開始
+    $GAME_PDO->beginTransaction();
+
+    // キャラクター情報の登録
     $statement = $GAME_PDO->prepare("
       INSERT INTO `characters` (
         `name`,
@@ -33,12 +32,14 @@
         `password`,
         `token`,
         `summary`,
-        `profile`
+        `profile`,
+        `webhook`
       ) VALUES (
         :name,
         :nickname,
         :password,
         :token,
+        '',
         '',
         ''
       );
@@ -52,15 +53,69 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返し処理を中断
+      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      $GAME_PDO->rollBack();
       exit;
     }
 
-    $ENo = intval($GAME_PDO->lastInsertId()); // ENoを取得
+    $lastInsertId = intval($GAME_PDO->lastInsertId()); // 登録されたidを取得
+
+    // ENo情報の登録（登録されたキャラクターのうち、管理者アカウントを除いた指定のid以下のキャラクターが何キャラクター存在しているか？の数をENoとする。）
+    $statement = $GAME_PDO->prepare("
+      UPDATE
+        `characters`
+      SET
+        `ENo` = (
+          SELECT
+            COUNT(*)
+          FROM
+            `characters`
+          WHERE
+            `administrator` = false AND `id` <= :id
+        )
+      WHERE
+        `id` = :id;
+    ");
+
+    $statement->bindParam(':id', $lastInsertId);
+
+    $result = $statement->execute();
+
+    if (!$result) {
+      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      $GAME_PDO->rollBack();
+      exit;
+    }
+
+    // 登録されたENoの取得
+    $statement = $GAME_PDO->prepare("
+      SELECT
+        `ENo`
+      FROM
+        `characters`
+      WHERE
+        `id` = :id;
+    ");
+
+    $statement->bindParam(':id', $lastInsertId);
+
+    $result    = $statement->execute();
+    $character = $statement->fetch();
+
+    if (!$result || !$character) {
+      http_response_code(500); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      $GAME_PDO->rollBack();
+      exit;
+    }
+
+    // ここまで全て成功した場合はコミット
+    $GAME_PDO->commit();
+
     session_regenerate_id(true); // セッションIDを再生成（セッション固定攻撃対策）
 
-    $_SESSION['ENo']   = $ENo;   // セッションにENoを設定
-    $_SESSION['token'] = $token; // セッションにCSRFトークンを設定
+    $_SESSION['ENo']           = $character['ENo']; // セッションにENoを設定
+    $_SESSION['token']         = $token;            // セッションにCSRFトークンを設定
+    $_SESSION['administrator'] = false;             // セッションに管理者ステータスを設定
 
     http_response_code(200); // ここまで全てOKなら200を返して処理を終了
     exit;
@@ -87,10 +142,8 @@
 <section>
   <h2>新規登録</h2>
 
-  <div id="error-message-area"></div>
-
   <section class="form">
-    <div class="form-title">キャラクターのフルネーム（<?=$GAME_CONFIG['NAME_MAX_LENGTH']?>文字まで）</div>
+    <div class="form-title">キャラクターのフルネーム（<?=$GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']?>文字まで）</div>
     <div class="form-description">
       キャラクターのフルネームを入力します。後からでも変更可能です。
     </div>
@@ -98,7 +151,7 @@
   </section>
 
   <section class="form">
-    <div class="form-title">キャラクターの短縮名（<?=$GAME_CONFIG['NICKNAME_MAX_LENGTH']?>文字まで）</div>
+    <div class="form-title">キャラクターの短縮名（<?=$GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']?>文字まで）</div>
     <div class="form-description">
       キャラクターの短縮名を入力します。後からでも変更可能です。
     </div>
@@ -120,6 +173,8 @@
     </div>
     <input id="input-confirm" class="form-input" type="password" placeholder="再入力">
   </section>
+
+  <div id="error-message-area"></div>
 
   <div class="button-wrapper">
     <button id="signup-button" class="button">登録</button>
@@ -156,7 +211,7 @@
       return;
     }
     // フルネームが長すぎる場合エラーメッセージを表示して処理を中断
-    if (inputName.length > <?=$GAME_CONFIG['NAME_MAX_LENGTH']?>) {
+    if (inputName.length > <?=$GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']?>) {
       showErrorMessage('フルネームが長すぎます');
       return;
     }
@@ -167,7 +222,7 @@
       return;
     }
     // 短縮名が長すぎる場合エラーメッセージを表示して処理を中断
-    if (inputNickname.length > <?=$GAME_CONFIG['NICKNAME_MAX_LENGTH']?>) {
+    if (inputNickname.length > <?=$GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']?>) {
       showErrorMessage('短縮名が長すぎます');
       return;
     }

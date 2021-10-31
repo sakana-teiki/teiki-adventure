@@ -8,6 +8,9 @@
   require_once GETENV('GAME_ROOT').'/configs/environment.php';
   require_once GETENV('GAME_ROOT').'/configs/general.php';
 
+  // タイムゾーンの指定
+  date_default_timezone_set($GAME_CONFIG['DEFAULT_TIMEZONE']);
+
   // DBに接続
   try {
     $GAME_PDO = new PDO('mysql:dbname='.$GAME_CONFIG['MYSQL_DBNAME'].';host='.$GAME_CONFIG['MYSQL_HOST'].':'.$GAME_CONFIG['MYSQL_PORT'], $GAME_CONFIG['MYSQL_USERNAME'], $GAME_CONFIG['MYSQL_PASSWORD']);
@@ -25,5 +28,5 @@
   session_start();
 
   $GAME_LOGGEDIN = isset($_SESSION['ENo']); // ログインしているかどうか
-
+  $GAME_LOGGEDIN_AS_ADMINISTRATOR = isset($_SESSION['administrator']) && $_SESSION['administrator']; // 管理者としてログインしているかどうか
 ?>

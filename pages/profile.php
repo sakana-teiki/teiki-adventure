@@ -1,6 +1,9 @@
 <?php
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+  require_once GETENV('GAME_ROOT').'/utils/notification.php';
+
   // GET以外の場合のみ認証を必要とする
   if ($_SERVER['REQUEST_METHOD'] != 'GET') {
     require GETENV('GAME_ROOT').'/middlewares/verification.php';
@@ -8,12 +11,23 @@
 
   require_once GETENV('GAME_ROOT').'/utils/parser.php';
 
+  // 入力値検証＆対象の取得
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // POSTの場合、対象をtargetに指定
-    $target = $_POST['target'];
+    // POSTの場合
+    if (!validatePOST('target', ['non-empty', 'natural-number'])) {
+      http_response_code(400); 
+      exit;
+    }
+
+    $target = $_POST['target']; // targetの値を対象に指定
   } else {
-    // GETの場合は対象をURLパラメータのENoに指定
-    $target = $_GET['ENo'];
+    // GETの場合
+    if (!validateGET('ENo', ['non-empty', 'natural-number'])) {
+      http_response_code(400); 
+      exit;
+    }
+
+    $target = $_GET['ENo']; // URLパラメータのENoを対象に指定
   }
 
   // ログインしている場合、お気に入りしているか/ミュートしているか/ブロックしているか/ブロックされているかを取得
@@ -37,6 +51,49 @@
       http_response_code(500); 
       exit;
     }
+  }
+
+  // DBから対象キャラクターの値を取得
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `ENo`,
+      `name`,
+      `nickname`,
+      `AP`,
+      `ATK`,
+      `DEX`,
+      `MND`,
+      `AGI`,
+      `DEF`,
+      `profile`,
+      `webhook`,
+      (SELECT GROUP_CONCAT(`url`               SEPARATOR '\n') FROM `characters_profile_images` WHERE `ENo` = :ENo GROUP BY `ENo`) AS `profile_images`,
+      (SELECT GROUP_CONCAT(`tag`               SEPARATOR ' ')  FROM `characters_tags`           WHERE `ENo` = :ENo GROUP BY `ENo`) AS `tags`,
+      (SELECT GROUP_CONCAT(`name`, '\n', `url` SEPARATOR '\n') FROM `characters_icons`          WHERE `ENo` = :ENo GROUP BY `ENo`) AS `icons`,
+      `notification_faved`,
+      `notification_webhook_faved`
+    FROM
+      `characters`
+    WHERE
+      `ENo`     = :ENo AND
+      `deleted` = false;
+  ");
+
+  $statement->bindParam(':ENo', $target);
+
+  $result = $statement->execute();
+  $data   = $statement->fetch();
+
+  if (!$result) {
+    // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
+    http_response_code(500); 
+    exit;
+  }
+
+  if (!$data) {
+    // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
+    http_response_code(404); 
+    exit;
   }
   
   // POSTの場合各アクションを行う
@@ -70,6 +127,38 @@
           }
 
           $relation['fav'] = true;
+
+          // お気に入り通知が有効ならお気に入りされました通知を作成
+          if ($data['notification_faved']) {
+            $statement = $GAME_PDO->prepare("
+              INSERT INTO `notifications` (
+                `ENo`,
+                `type`,
+                `target`,
+                `message`
+              ) VALUES (
+                :ENo,
+                'faved',
+                :target,
+                ''
+              );
+            ");
+
+            $statement->bindParam(':ENo',    $target);
+            $statement->bindParam(':target', $_SESSION['ENo']);
+
+            $result = $statement->execute();
+          
+            if (!$result) {
+              http_response_code(500); 
+              exit;
+            }
+          }
+
+          // Webhookが入力されており、Discordお気に入り通知が有効なら通知を送信
+          if ($data['webhook'] && $data['notification_webhook_faved']) {
+            notifyDiscord($data['webhook'], 'ENo.'.$data['ENo'].' '.$data['nickname'].'にお気に入りされました。');
+          }
         }
 
         break;
@@ -215,45 +304,6 @@
         http_response_code(400);
         exit;
     }
-  }
-
-  // DBから各種プロフィールの値を取得
-  $statement = $GAME_PDO->prepare("
-    SELECT
-      `ENo`,
-      `name`,
-      `AP`,
-      `ATK`,
-      `DEX`,
-      `MND`,
-      `AGI`,
-      `DEF`,
-      `profile`,
-      (SELECT GROUP_CONCAT(`url`               SEPARATOR '\n') FROM `characters_profile_images` WHERE `ENo` = :ENo GROUP BY `ENo`) AS `profile_images`,
-      (SELECT GROUP_CONCAT(`tag`               SEPARATOR ' ')  FROM `characters_tags`           WHERE `ENo` = :ENo GROUP BY `ENo`) AS `tags`,
-      (SELECT GROUP_CONCAT(`name`, '\n', `url` SEPARATOR '\n') FROM `characters_icons`          WHERE `ENo` = :ENo GROUP BY `ENo`) AS `icons`
-    FROM
-      `characters`
-    WHERE
-      `ENo`     = :ENo AND
-      `deleted` = false;
-  ");
-
-  $statement->bindParam(':ENo', $target);
-
-  $result = $statement->execute();
-  $data   = $statement->fetch();
-
-  if (!$result) {
-    // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
-  }
-
-  if (!$data) {
-    // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
   }
 
   $PAGE_SETTING['TITLE'] = 'ENo.'.$data['ENo'].' '.$data['name'];

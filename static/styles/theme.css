@@ -100,6 +100,12 @@ ul {
   resize: none;
 }
 
+.form-check-button {
+  height: 36px;
+  margin-left: 4px;
+  padding: 0 10px;
+}
+
 .button-wrapper {
   width: 100%;
   display: flex;
@@ -114,6 +120,11 @@ ul {
   border-radius: 4px;
   margin: 4px;
   cursor: pointer;
+}
+
+.button-enable {
+  background-color: #444;
+  color: white;
 }
 
 .message-banner {
@@ -674,4 +685,206 @@ ul {
   user-select: none;
   cursor: pointer;
   margin: 10px 0;
+}
+
+/* 掲示板 */
+#board-table {
+  margin: 10px 0 0 10px;
+}
+
+#board-table tr td {
+  padding: 5px 10px;
+}
+
+#board-table a {
+  text-decoration: none;
+}
+
+.thread-list {
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-size: 15px;
+}
+
+.thread-list th {
+  background-color: #444;
+  border: 1px solid #F8F8F8;
+  color: #EEE;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.thread-list td {
+  border: 1px solid #F8F8F8;
+}
+
+.thread-list th:nth-child(1), .thread-list td:nth-child(1) {
+  text-align: center;
+  width: 50px;
+}
+
+.thread-list th:nth-child(2), .thread-list td:nth-child(2) {
+  text-align: center;
+  width: 30px;
+}
+
+.thread-list th:nth-child(3), .thread-list td:nth-child(3) {
+  width: 300px;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread-list th:nth-child(4), .thread-list td:nth-child(4) {
+  width: 100px;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread-list th:nth-child(5), .thread-list td:nth-child(5) {
+  text-align: center;
+  width: 50px;
+}
+
+.thread-list th:nth-child(6), .thread-list td:nth-child(6) {
+  text-align: center;
+  width: 200px;
+}
+
+.thread-list a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #444;
+}
+
+.thread-body {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #EEE;
+}
+
+.thread-body th {
+  background-color: #444;
+  border: 1px solid #F8F8F8;
+  color: #EEE;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.thread-body th:nth-child(1), .thread-body td:nth-child(1) {
+  width: 200px;
+}
+
+.thread-body th:nth-child(2), .thread-body td:nth-child(2) {
+  padding-left: 5px;
+}
+
+.thread-body-message {
+  padding: 5px;
+}
+
+.flag-administrator {
+  color: #c2193e;
+  font-weight: bold;
+}
+
+.announcement-detail {
+  color: #666;
+  font-weight: normal; 
+  font-size: 12px;
+}
+
+.show-all-announcement {
+  display: flex;
+  justify-content: flex-end;
+  color: #444;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* ダイレクトメッセージ */
+
+.direct-messages {
+  width: 95%;
+  margin: 0 auto;
+  border-bottom: 1px solid lightgray;
+}
+
+.direct-message {
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border-top: 1px solid lightgray;
+}
+
+.direct-message-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.direct-message-link {
+  text-decoration: none;
+  user-select: none;
+}
+
+.direct-message-nickname {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.direct-message-eno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.direct-message-timestamp {
+  color: #888;
+  font-size: 14px;
+}
+
+.direct-message-body {
+  
+}
+
+.direct-message-body-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #888;
+}
+
+.direct-message-body-nickname {
+  color: #444;
+  font-weight: bold;
+}
+
+/* 通知 */
+.notifications {
+  border-bottom: 1px solid lightgray;
+}
+
+.notification {
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border-top: 1px solid lightgray;
+}
+
+.notification-message {
+  font-weight: bold;
+}
+
+.notification-detail {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #888;
+}
+
+.notification-timestamp {
+  text-align: right;
+  font-size: 14px;
+  color: #888;
 }

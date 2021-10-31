@@ -127,7 +127,7 @@
   <h2>アイコン</h2>
   <div class="profile-character-icons-wrapper">
   <?php
-    for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX']; $i++) {
+    for ($i = 0; $i < $GAME_CONFIG['CHARACTER_ICON_MAX']; $i++) {
   ?>
     <div class="profile-character-icon-wrapper">
   <?php
