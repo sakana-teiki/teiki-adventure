@@ -70,51 +70,6 @@ exit;
 
 7. ブラウザで[http://localhost/teiki/control-panel/initialize](http://localhost/teiki/control-panel/initialize)にアクセスし、表示されたサイトで`init`を入力して「データ初期化」をクリックします。
 
-## 各ディレクトリ/ファイルの役割
-この項目では初期で各ディレクトリ及びファイルがどのような役割になっているかを解説します。
-
-### actions
-AP配布やデータ初期化など、ブラウザ以外(cron, コンソール等)から起動することを想定したphpファイルを配置します。まだ開発中のため、現段階では何も入っていません。
-
-### components
-ページの部品となるphpファイルを配置します。値を必要とする場合、$COMPONENTS_コンポーネント名['属性名']に代入して受け渡すようにします(例：icon.php)。header.phpとfooter.phpについては例外的に$PAGE_SETTING['属性名']で値を受け取ります。
-
-### configs
-設定を行うためのphpファイルを配置します。主に環境設定に関する設定値はenvironment.phpに、そうでない設定値はgeneral.phpに記載します。
-
-### middlewares
-各ページの動作に必要な初期動作をまとめたphpファイルを配置します。各ページの最上部にてrequireして使用します。それぞれ以下の機能を持ちます。
-
-|ファイル|概要|
-| --- | --- |
-|initialize.php|設定値の読み込み、PDOへの接続やセッションの開始などの初期動作を行います。このファイルは必ずどのmidddlewareより先に、かつ必ず読み込む必要があります。|
-|verification.php|認証を行います。GETリクエストの場合はログインチェックを行いログインしていなければログインページへ、POSTリクエストの場合はログインチェックに加えてCSRFトークンの検証を行いNGであれば403(Forbidden)を返します。PUT, DELETEリクエストに関しては必ず405(Method Not Allowed)を返します。|
-
-### pages
-各ページのphpファイルを配置します。このディレクトリに配置したphpファイルは例えば「`http://example.com/teiki/`」で公開する場合、pages/home.phpであればURLは「`http://example.com/teiki/home`」、pages/hoge/index.phpであればURLは「`http://example.com/teiki/hoge/`」でアクセスできるようになります。
-
-ページの構造について、詳しくはpages/_template.phpを参照してください。
-
-### static
-画像やスクリプトなど、静的なファイルを配置します。このディレクトリに配置したファイルは例えば「`http://example.com/teiki/`」で公開する場合、static/favicon.icoであればURLは「`http://example.com/teiki/favicon.ico`」、static/styles/theme.cssであればURLは「`http://example.com/teiki/styles/theme.css`」でアクセスできます。
-
-現在、index.htm、index.htmlを配置しても/で終わるURLによってアクセスできないという既知の不具合があります。
-
-### utils
-複数のphpファイルで使用する関数をまとめます。
-
-### .gitignore
-Gitを利用する際に追跡を行わないファイルを指定します。Gitを利用しない場合は不要です。
-
-### .htaccess
-アクセス制御を行うためのファイルです。このファイルでpages/とstatic/への転送設定を行っています。
-
-### LICENSE
-このプロジェクトの頒布条件を記載したファイルです。
-
-### README&#046;md
-このファイルです。動作には不要なため、削除しても構いません。
-
 ## Q&A
 
 ### Q. コードのこの部分がよく分かりません。
