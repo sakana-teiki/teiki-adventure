@@ -85,6 +85,48 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.character-list {
+  list-style: none;
+  border-top: 1px solid lightgray;
+  margin: 0 20px;
+}
+
+.character-list li {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  margin: 0;
+  padding: 10px;
+}
+
+.character-list-profile {
+  padding-left: 10px;
+}
+
+.character-list-profile-link {
+  text-decoration: none;
+}
+
+.character-list-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.character-list-eno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.character-list-tags {
+  font-size: 14px;
+  text-decoration: none;
+  color: gray;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>キャラクターリスト</h1>

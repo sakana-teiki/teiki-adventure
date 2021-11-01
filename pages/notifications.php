@@ -153,6 +153,44 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+
+.notifications {
+  border-bottom: 1px solid lightgray;
+}
+
+.notification {
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border-top: 1px solid lightgray;
+}
+
+.notification-link {
+  text-decoration: none;
+  user-select: none;
+}
+
+.notification-message {
+  color: #444;
+  font-weight: bold;
+}
+
+.notification-detail {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #888;
+}
+
+.notification-timestamp {
+  text-align: right;
+  font-size: 14px;
+  color: #888;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>通知</h1>

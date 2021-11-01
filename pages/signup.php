@@ -125,6 +125,13 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+#terms-list {
+  margin: 20px;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <?php

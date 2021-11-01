@@ -310,6 +310,35 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.profile-relation {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.profile-relation-button {
+  display: inline-flex;
+  justify-content: center;
+  padding: 4px 10px;
+  border: 1px solid #666;
+  border-radius: 4px;
+  margin: 0 5px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+.profile-relation-button-done {
+  border: 1px solid #333;
+  background: #666;
+  color: #EEE;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>ENo.<?=$data['ENo']?> <?=htmlspecialchars($data['name'])?></h1>

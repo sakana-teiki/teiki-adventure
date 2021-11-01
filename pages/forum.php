@@ -5,6 +5,21 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+#board-table {
+  margin: 10px 0 0 10px;
+}
+
+#board-table tr td {
+  padding: 5px 10px;
+}
+
+#board-table a {
+  text-decoration: none;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>掲示板</h1>

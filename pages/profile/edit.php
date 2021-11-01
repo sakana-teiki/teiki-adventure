@@ -254,6 +254,22 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+#profile-edit-icon {
+  margin: 20px 0;
+  width: 100%;
+}
+
+#profile-edit-icon td:nth-of-type(1) {
+  text-align: center;
+}
+
+#profile-edit-icon th:nth-of-type(2), #profile-edit-icon td:nth-of-type(2) {
+  width: 30%;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>キャラクター設定</h1>

@@ -67,6 +67,50 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.room-list {
+  list-style: none;
+  border-top: 1px solid lightgray;
+  margin: 20px;
+}
+
+.room-list li {
+  border-bottom: 1px solid lightgray;
+  margin: 0;
+  padding: 10px;
+}
+
+.room-list-link {
+  text-decoration: none;
+}
+
+.room-list-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.room-list-rno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.room-list-tags {
+  font-size: 14px;
+  text-decoration: none;
+  color: gray;
+}
+
+.room-list-meta {
+  text-align: right;
+  line-height: 1.1;
+  font-size: 13px;
+  color: #AAA;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>トークルーム一覧</h1>

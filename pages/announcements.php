@@ -33,6 +33,23 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.announcement-detail {
+  color: #666;
+  font-weight: normal; 
+  font-size: 12px;
+}
+
+.show-all-announcement {
+  display: flex;
+  justify-content: flex-end;
+  color: #444;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>お知らせ</h1>

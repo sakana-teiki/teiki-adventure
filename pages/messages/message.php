@@ -190,6 +190,64 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.direct-messages {
+  width: 95%;
+  margin: 0 auto;
+  border-bottom: 1px solid lightgray;
+}
+
+.direct-message {
+  box-sizing: border-box;
+  padding: 5px 10px;
+  border-top: 1px solid lightgray;
+}
+
+.direct-message-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.direct-message-link {
+  text-decoration: none;
+  user-select: none;
+}
+
+.direct-message-nickname {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222222;
+}
+
+.direct-message-eno {
+  font-size: 13px;
+  margin-left: 3px;
+  color: gray;
+}
+
+.direct-message-timestamp {
+  color: #888;
+  font-size: 14px;
+}
+
+.direct-message-body {
+  
+}
+
+.direct-message-body-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #888;
+}
+
+.direct-message-body-nickname {
+  color: #444;
+  font-weight: bold;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=htmlspecialchars('ダイレクトメッセージ | ENo.'.$target['ENo'].' '.$target['nickname'])?></h1>

@@ -174,6 +174,73 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.thread-list {
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-size: 15px;
+}
+
+.thread-list th {
+  background-color: #444;
+  border: 1px solid #F8F8F8;
+  color: #EEE;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.thread-list td {
+  border: 1px solid #F8F8F8;
+}
+
+.thread-list th:nth-child(1), .thread-list td:nth-child(1) {
+  text-align: center;
+  width: 50px;
+}
+
+.thread-list th:nth-child(2), .thread-list td:nth-child(2) {
+  text-align: center;
+  width: 30px;
+}
+
+.thread-list th:nth-child(3), .thread-list td:nth-child(3) {
+  width: 300px;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread-list th:nth-child(4), .thread-list td:nth-child(4) {
+  width: 100px;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread-list th:nth-child(5), .thread-list td:nth-child(5) {
+  text-align: center;
+  width: 50px;
+}
+
+.thread-list th:nth-child(6), .thread-list td:nth-child(6) {
+  text-align: center;
+  width: 200px;
+}
+
+.thread-list a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #444;
+}
+
+.flag-administrator {
+  color: #c2193e;
+  font-weight: bold;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=$boardTitle?>掲示板</h1>

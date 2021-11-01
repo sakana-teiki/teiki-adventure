@@ -5,6 +5,41 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.rulebook-table {
+  width: 100%;
+  border-top: 1px solid #444;
+  border-bottom: 1px solid #444;
+  border-spacing: 0 10px;
+  margin: 30px 0;
+}
+
+.rulebook-table th {
+  width: 130px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.rulebook-table td {
+  padding: 4px 10px;
+  border-left: 1px solid rgb(146, 136, 136);
+}
+
+.rulebook-list {
+  margin: 30px 10px;
+  border-top: 1px solid #444;
+  list-style-type: none;
+}
+
+.rulebook-list li {
+  padding: 15px;
+  color: #777;
+  font-weight: bold;
+  border-bottom: 1px solid #444;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>ルールブック</h1>

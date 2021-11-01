@@ -161,6 +161,39 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.thread-body {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #EEE;
+}
+
+.thread-body th {
+  background-color: #444;
+  border: 1px solid #F8F8F8;
+  color: #EEE;
+  font-family: 'BIZ UDPGothic', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', Meiryo, 'ＭＳ Ｐゴシック', sans-serif;
+}
+
+.thread-body th:nth-child(1), .thread-body td:nth-child(1) {
+  width: 200px;
+}
+
+.thread-body th:nth-child(2), .thread-body td:nth-child(2) {
+  padding-left: 5px;
+}
+
+.thread-body-message {
+  padding: 5px;
+}
+
+.flag-administrator {
+  color: #c2193e;
+  font-weight: bold;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=htmlspecialchars('#'.$thread['id'].' '.$thread['title'])?></h1>

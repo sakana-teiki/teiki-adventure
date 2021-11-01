@@ -821,6 +821,143 @@
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<style>
+
+.room-meta-info {
+  color: #666;
+  font-size: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.room-description {
+  margin: 0 20px;
+}
+
+.room-message-editor-wrapper {
+  margin: 0 auto;
+  width: 95%;
+}
+
+.room-message-editor {
+  box-sizing: border-box;
+  width: 100%;
+  height: 120px;
+  resize: none;
+  margin: 0;
+}
+
+.room-message-list {
+  columns: 2;
+  column-rule: 1px solid lightgray;
+}
+
+.room-message-list-single-item {
+  column-rule: 1px solid transparent;
+}
+
+.room-message {
+  border: 1px solid lightgray;
+  padding: 8px;
+  border-radius: 4px;
+  break-inside: avoid-column;
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.room-message-main {
+  box-sizing: border-box;
+  margin: 0 0 0 8px;
+  width: 100%;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.room-message-refers {
+  text-decoration: none;
+  color: #AAA;
+  font-size: 12px;
+}
+
+.room-message-info-link {
+  text-decoration: none;
+}
+
+.room-message-info {
+  font-weight: bold;
+  color: #666;
+}
+
+.room-message-info-eno {
+  font-weight: normal;
+  font-size: 12px;
+  color: #BBB;
+}
+
+.room-message-details {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.room-message-detail {
+  font-weight: normal;
+  font-size: 12px;
+  color: #BBB;
+}
+
+.room-message-actions {
+  display: flex;
+}
+
+.room-message-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+  margin-left: 4px;
+  min-width: 40px;
+  border: 1px solid lightgray;
+  background: none;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.room-modelink-wrapper {
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.room-modelink {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 50px;
+  padding: 4px 12px;
+  margin: 0 4px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+}
+
+.room-modelink-current {
+  background-color: #666;
+  color: #EEE;
+}
+
+#room-reply-target-copied-dom-area {
+  user-select: none;
+  cursor: pointer;
+  margin: 10px 0;
+}
+
+</style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?php if ($room['administrator']) { ?>RNo.<?=$room['RNo']?> <?php } ?><?=htmlspecialchars($room['title'])?></h1>
