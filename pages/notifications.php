@@ -11,11 +11,13 @@
       `notifications`.`target`,
       '管理者からのメッセージがあります。' AS `message`,
       `notifications`.`message` AS `detail`,
+      null as `link_target`,
       `notifications`.`notificated_at`
     FROM
       `notifications`
     WHERE
-      (`notifications`.`type` = 'announcement' OR `notifications`.`type` = 'administrator') AND
+      `notifications`.`type` = 'administrator' AND
+      `notificated_at` < CURRENT_TIMESTAMP     AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
     UNION
@@ -24,8 +26,35 @@
       `notifications`.`id`,
       `notifications`.`type`,
       `notifications`.`target`,
-      CONCAT('RNo.', `rooms`.`RNo`, ' ', `rooms`.`title`, 'にて', 'ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からの返信があります。') AS `message`,
+      'お知らせが更新されました。' AS `message`,
+      `announcements`.`title` AS `detail`,
+      null as `link_target`,
+      `notifications`.`notificated_at`
+    FROM
+      `notifications`
+    JOIN
+      `announcements` ON `notifications`.`target` = `announcements`.`id`
+    WHERE
+      `notifications`.`type` = 'announcement' AND
+      `notificated_at` < CURRENT_TIMESTAMP    AND
+      (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
+
+    UNION
+
+    SELECT
+      `notifications`.`id`,
+      `notifications`.`type`,
+      `notifications`.`target`,
+      (
+        CASE
+        WHEN `rooms`.`official` = true THEN
+          CONCAT(`rooms`.`title`, 'にて', 'ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からの返信があります。')
+        ELSE
+          CONCAT('RNo.', `rooms`.`RNo`, ' ', `rooms`.`title`, 'にて', 'ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からの返信があります。')
+        END
+      )  AS `message`,
       `messages`.`message` AS `detail`,
+      `rooms`.`RNo` as `link_target`,
       `notifications`.`notificated_at`
     FROM
       `notifications`
@@ -36,7 +65,8 @@
     JOIN
       `rooms`      ON `messages`.`RNo` = `rooms`.`RNo`
     WHERE
-      `notifications`.`type` = 'replied' AND
+      `notifications`.`type` = 'replied'   AND
+      `notificated_at` < CURRENT_TIMESTAMP AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
     UNION
@@ -47,6 +77,7 @@
       `notifications`.`target`,
       CONCAT('RNo.', `rooms`.`RNo`, ' ', `rooms`.`title`, 'に', `notifications`.`count`, '件の新着があります。') AS `message`,
       '' AS `detail`,
+      `rooms`.`RNo` as `link_target`,
       `notifications`.`notificated_at`
     FROM
       `notifications`
@@ -54,6 +85,7 @@
       `rooms` ON `notifications`.`target` = `rooms`.`RNo`
     WHERE
       `notifications`.`type` = 'new_arrival' AND
+      `notificated_at` < CURRENT_TIMESTAMP   AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
     UNION
@@ -64,13 +96,15 @@
       `notifications`.`target`,
       CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からお気に入りされました。') AS `message`,
       '' AS `detail`,
+      `characters`.`ENo` as `link_target`,
       `notifications`.`notificated_at`
     FROM
       `notifications`
     JOIN
       `characters` ON `notifications`.`target` = `characters`.`ENo`
     WHERE
-      `notifications`.`type` = 'faved' AND
+      `notifications`.`type` = 'faved'     AND
+      `notificated_at` < CURRENT_TIMESTAMP AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
     UNION
@@ -81,6 +115,7 @@
       `notifications`.`target`,
       CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からのダイレクトメッセージがあります。') AS `message`,
       `direct_messages`.`message` AS `detail`,
+      `characters`.`ENo` as `link_target`,
       `notifications`.`notificated_at`
     FROM
       `notifications`
@@ -90,6 +125,7 @@
       `characters`      ON `direct_messages`.`from` = `characters`.`ENo`
     WHERE
       `notifications`.`type` = 'direct_message' AND
+      `notificated_at` < CURRENT_TIMESTAMP      AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
     ORDER BY
@@ -111,6 +147,8 @@
 
   $notifications = $statement->fetchAll();
 
+  // 公式トークルームとして設定に登録されているRNoは置換する
+
   $PAGE_SETTING['TITLE'] = '通知';
 
   require GETENV('GAME_ROOT').'/components/header.php';
@@ -130,11 +168,21 @@
 <?php } else { ?>
   <section class="notifications">
 <?php foreach ($notifications as $notification) { ?>
+<?php if (!is_null($notification['link_target']) || $notification['type'] == 'announcement') { ?>
+  <?php if ($notification['type'] == 'announcement')   { ?><a href="<?=$GAME_CONFIG['URI']?>announcements" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'replied')        { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>&mode=rel" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'new_arrival')    { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'faved')          { ?><a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'direct_message') { ?><a href="<?=$GAME_CONFIG['URI']?>messages/message?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+<?php } ?>
     <section class="notification">
       <div class="notification-message"><?=htmlspecialchars($notification['message'])?></div>
       <div class="notification-detail"><?=deleteProfileDecoration($notification['detail'])?></div>
       <div class="notification-timestamp"><?=$notification['notificated_at']?></div>
     </section>
+<?php if (!is_null($notification['link_target']) || $notification['type'] == 'announcement') { ?>
+  </a>
+<?php } ?>
 <?php } ?>
   </section>
 <?php } ?>

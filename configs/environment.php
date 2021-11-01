@@ -6,7 +6,8 @@
 */
 
 //URL設定
-$GAME_CONFIG['URI'] = '/teiki/'; // ゲームが公開されるURIを指定します。例えば'http://example.com/ta/'で公開する場合は'/ta/'を、'http://example.com/'で公開する場合は'/'を指定します。
+$GAME_CONFIG['ABSOLUTE_URI'] = 'http://localhost/teiki/'; // ゲームが公開されるURIをプロトコルから指定します。
+$GAME_CONFIG['URI']          = '/teiki/';                 // ゲームが公開されるURIを指定します。例えば'http://example.com/ta/'で公開する場合は'/ta/'を、'http://example.com/'で公開する場合は'/'を指定します。
 
 //MySQL設定
 $GAME_CONFIG['MYSQL_HOST']     = 'localhost';       // 使用するMySQLのホストです。

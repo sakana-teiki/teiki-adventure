@@ -40,7 +40,29 @@
       exit;
     }
 
-    // ここまで全て成功した場合はコミットしてリダイレクト
+    $lastInsertId = intval($GAME_PDO->lastInsertId()); // idを取得
+
+    // 通知の発行
+    $statement = $GAME_PDO->prepare("
+      INSERT INTO `notifications` (
+        `ENo`,
+        `type`,
+        `target`,
+        `notificated_at`
+      ) VALUES (
+        null,
+        'announcement',
+        :id,
+        :notificated_at
+      );
+    ");
+
+    $statement->bindParam(':id',             $lastInsertId);
+    $statement->bindValue(':notificated_at', $_POST['time'] ? $_POST['time'] : date('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+    $result = $statement->execute();
+
+    // リダイレクト
     header('Location:'.$GAME_CONFIG['URI'].'announcements', true, 302);
     exit;
   }

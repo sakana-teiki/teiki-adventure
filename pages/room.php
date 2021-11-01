@@ -241,7 +241,7 @@
       $statement->bindParam(':referRoot', $referRoot);
       $statement->bindParam(':name',      $_POST['name']);
       $statement->bindParam(':icon',      $_POST['icon']);
-      $statement->bindParam(':message',   $_POST['message']);
+      $statement->bindValue(':message',   messageDecoration($_POST['message']));
 
       $result = $statement->execute();
 
@@ -956,7 +956,7 @@ foreach ($messages as $message) {
       <a class="room-message-info-link" href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$message['ENo']?>">
         <div class="room-message-info"><?=htmlspecialchars($message['name'])?> <span class="room-message-info-eno">(ENo.<?=$message['ENo']?>)</span></div>
       </a>
-      <div class="room-message-body"><?=profileDecoration($message['message'])?></div>
+      <div class="room-message-body"><?=$message['message'] // 投稿時にHTMLのエスケープ処理を行っているのでここはエスケープ不要 ?></div>
       <div class="room-message-details">
         <div class="room-message-detail">
           <?=$message['posted_at']?> #<?=$message['id']?>

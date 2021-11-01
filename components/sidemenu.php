@@ -9,6 +9,7 @@
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>setting"><div class="sidemenu-button">設定</div></a>
 <?php } ?>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>characters"><div class="sidemenu-button">キャラクターリスト</div></a>
+<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>rulebook"><div class="sidemenu-button">ルールブック</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>forum"><div class="sidemenu-button">掲示板</div></a>
 <?php if ($GAME_LOGGEDIN_AS_ADMINISTRATOR) { ?>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>control-panel/"><div class="sidemenu-button">コントロールパネル</div></a>

@@ -3,6 +3,12 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
+  // ユーティリティ関数のロード部分
+  require_once GETENV('GAME_ROOT').'/utils/notification.php';
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+  require_once GETENV('GAME_ROOT').'/utils/parser.php';
+  require_once GETENV('GAME_ROOT').'/utils/decoration.php';
+
   // ページの表示に必要なDBアクセスなどの表示前動作
 
   // ページの設定
