@@ -185,8 +185,9 @@
 
   $PAGE_SETTING['TITLE'] = 'トークルーム編集';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <form id="update-room-form" method="post">
   <input type="hidden" name="room" value="<?=htmlspecialchars($RNo)?>">

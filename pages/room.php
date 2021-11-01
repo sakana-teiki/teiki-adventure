@@ -819,8 +819,9 @@
 
   $PAGE_SETTING['TITLE'] = $room['administrator'] ? 'RNo.'.$RNo.' '.$room['title'] : $room['title'];
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?php if ($room['administrator']) { ?>RNo.<?=$room['RNo']?> <?php } ?><?=htmlspecialchars($room['title'])?></h1>
 

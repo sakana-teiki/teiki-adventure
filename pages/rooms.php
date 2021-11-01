@@ -65,8 +65,9 @@
 
   $PAGE_SETTING['TITLE'] = 'トークルーム一覧';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>トークルーム一覧</h1>
 

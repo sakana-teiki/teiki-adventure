@@ -83,8 +83,9 @@
 
   $PAGE_SETTING['TITLE'] = 'キャラクターリスト';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>キャラクターリスト</h1>
 

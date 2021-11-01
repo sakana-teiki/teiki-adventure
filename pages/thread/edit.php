@@ -281,8 +281,9 @@
 
   $PAGE_SETTING['TITLE'] = $editType == 'thread' ? 'スレッド編集' : 'レス編集';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?= $editType == 'thread' ? 'スレッド編集' : 'レス編集' ?></h1>
 

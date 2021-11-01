@@ -132,8 +132,9 @@
 
   $PAGE_SETTING['TITLE'] = 'トークルーム作成';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>トークルーム作成</h1>
 

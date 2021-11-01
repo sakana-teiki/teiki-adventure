@@ -151,8 +151,9 @@
 
   $PAGE_SETTING['TITLE'] = '通知';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>通知</h1>
 

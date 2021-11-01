@@ -222,8 +222,9 @@
 
   $PAGE_SETTING['TITLE'] = 'ダイレクトメッセージ';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>ダイレクトメッセージ</h1>
 

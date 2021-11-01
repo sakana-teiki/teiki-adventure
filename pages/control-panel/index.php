@@ -6,8 +6,9 @@
   
   $PAGE_SETTING['TITLE'] = 'コントロールパネル';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>コントロールパネル</h1>
 

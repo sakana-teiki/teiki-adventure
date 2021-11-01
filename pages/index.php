@@ -4,8 +4,9 @@
   $PAGE_SETTING['TITLE'] = 'Teiki Adventure';
   $PAGE_SETTING['DISABLE_TITLE_TEMPLATE'] = true;
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h2>イントロダクション</h2>
 <p>

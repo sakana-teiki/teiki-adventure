@@ -251,9 +251,10 @@
   $icons = parseIconsResult($data['icons']);
 
   $PAGE_SETTING['TITLE'] = 'プロフィール編集';
-  
-  require GETENV('GAME_ROOT').'/components/header.php';
+
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>キャラクター設定</h1>
 

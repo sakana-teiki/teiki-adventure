@@ -31,8 +31,9 @@
 
   $PAGE_SETTING['TITLE'] = 'お知らせ';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>お知らせ</h1>
 

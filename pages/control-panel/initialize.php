@@ -57,8 +57,9 @@
 
   $PAGE_SETTING['TITLE'] = 'データ初期化';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>データ初期化</h1>
 

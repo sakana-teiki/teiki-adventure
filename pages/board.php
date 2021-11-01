@@ -172,8 +172,9 @@
 
   $PAGE_SETTING['TITLE'] = $boardTitle.'掲示板';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=$boardTitle?>掲示板</h1>
 

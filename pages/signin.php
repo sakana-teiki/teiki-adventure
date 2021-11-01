@@ -65,8 +65,9 @@
 
   $PAGE_SETTING['TITLE'] = 'ログイン';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <?php
   if ($_SERVER['REQUEST_METHOD'] == 'GET') {

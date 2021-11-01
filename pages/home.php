@@ -40,8 +40,9 @@
 
   $PAGE_SETTING['TITLE'] = 'ホーム';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>ENo.<?=$data['ENo']?> <?=htmlspecialchars($data['name'])?></h1>
 

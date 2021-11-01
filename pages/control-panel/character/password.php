@@ -47,8 +47,9 @@
 
   $PAGE_SETTING['TITLE'] = 'パスワード再発行';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>パスワード再発行</h1>
 

@@ -159,8 +159,9 @@
 
   $PAGE_SETTING['TITLE'] = '#'.$thread['id'].' '.$thread['title'];
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=htmlspecialchars('#'.$thread['id'].' '.$thread['title'])?></h1>
 

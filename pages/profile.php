@@ -307,9 +307,10 @@
   }
 
   $PAGE_SETTING['TITLE'] = 'ENo.'.$data['ENo'].' '.$data['name'];
-  
-  require GETENV('GAME_ROOT').'/components/header.php';
+
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1>ENo.<?=$data['ENo']?> <?=htmlspecialchars($data['name'])?></h1>
 <?php if ($GAME_LOGGEDIN && $data['ENo'] != $_SESSION['ENo']) { // ログインしており、表示しているのが自分のキャラクターではない場合 ?>

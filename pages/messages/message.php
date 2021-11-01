@@ -139,7 +139,6 @@
     }
   }
 
-
   // メッセージの取得
   $statement = $GAME_PDO->prepare("
     SELECT
@@ -189,8 +188,9 @@
 
   $PAGE_SETTING['TITLE'] = 'ダイレクトメッセージ | ENo.'.$target['ENo'].' '.$target['nickname'];
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <h1><?=htmlspecialchars('ダイレクトメッセージ | ENo.'.$target['ENo'].' '.$target['nickname'])?></h1>
 

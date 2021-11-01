@@ -201,8 +201,9 @@
 
   $PAGE_SETTING['TITLE'] = '設定';
 
-  require GETENV('GAME_ROOT').'/components/header.php';
 ?>
+<?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
+<?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
 <?php
   if ($_SERVER['REQUEST_METHOD'] == 'GET') { // GETリクエスト時の処理
