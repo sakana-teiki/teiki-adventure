@@ -34,7 +34,11 @@
       `rooms`.`administrator` IS NOT NULL AND
       `rooms`.`deleted` = false
     GROUP BY
-		  `rooms`.`RNo`
+		  `rooms`.`RNo`,
+      `rooms`.`administrator`,
+      `rooms`.`title`,
+      `rooms`.`summary`,
+      `rooms`.`last_posted_at`
     ORDER BY
       `rooms`.`last_posted_at` DESC
     LIMIT

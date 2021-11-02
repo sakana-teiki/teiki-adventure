@@ -48,11 +48,13 @@
         `ENo`,
         `type`,
         `target`,
+        `message`,
         `notificated_at`
       ) VALUES (
         null,
         'announcement',
         :id,
+        '',
         :notificated_at
       );
     ");

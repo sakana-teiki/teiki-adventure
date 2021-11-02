@@ -57,12 +57,16 @@
         `rooms`
       SET
         `RNo` = (
-          SELECT
-            COUNT(*)
-          FROM
-            `rooms`
-          WHERE
-            `administrator` IS NOT NULL AND `id` <= :id
+          SELECT 
+           *
+          FROM (
+            SELECT
+              COUNT(*)
+            FROM
+              `rooms`
+            WHERE
+              `administrator` IS NOT NULL AND `id` <= :id
+          ) `r`
         )
       WHERE
         `id` = :id;

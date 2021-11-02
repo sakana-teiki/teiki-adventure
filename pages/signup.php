@@ -66,12 +66,16 @@
         `characters`
       SET
         `ENo` = (
-          SELECT
-            COUNT(*)
-          FROM
-            `characters`
-          WHERE
-            `administrator` = false AND `id` <= :id
+          SELECT 
+           *
+          FROM (
+            SELECT
+              COUNT(*)
+            FROM
+              `characters`
+            WHERE
+              `administrator` = false AND `id` <= :id
+          ) `c`
         )
       WHERE
         `id` = :id;

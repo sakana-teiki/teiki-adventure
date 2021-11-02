@@ -51,7 +51,7 @@
     $statement->bindParam(':message',       $_POST['message']);
     $statement->bindParam(':secret',        $_POST['secret']);
     $statement->bindParam(':password',      $password);
-    $statement->bindParam(':administrator', $GAME_LOGGEDIN_AS_ADMINISTRATOR);
+    $statement->bindParam(':administrator', $GAME_LOGGEDIN_AS_ADMINISTRATOR, PDO::PARAM_BOOL);
 
     $result = $statement->execute();
 

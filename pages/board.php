@@ -31,6 +31,8 @@
     // IPから発言IDを生成
     $identifier = substr(base64_encode(hash_hmac("sha1", $_SERVER["REMOTE_ADDR"], $GAME_CONFIG['IDENTIFIER_SECRET'])), 0, $GAME_CONFIG['IDENTIFIER_LENGTH']);
 
+    $GAME_PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
     // スレッドの登録
     $statement = $GAME_PDO->prepare("
       INSERT INTO `threads` (
@@ -54,14 +56,14 @@
       );
     ");
 
-    $statement->bindParam(':title',         $_POST['title']);
-    $statement->bindParam(':name',          $_POST['name']);
-    $statement->bindParam(':identifier',    $identifier);
-    $statement->bindParam(':message',       $_POST['message']);
-    $statement->bindParam(':secret',        $_POST['secret']);
-    $statement->bindParam(':password',      $password);
-    $statement->bindParam(':administrator', $GAME_LOGGEDIN_AS_ADMINISTRATOR);
-    $statement->bindParam(':board',         $_POST['board']);
+    $statement->bindValue(':title',         $_POST['title']);
+    $statement->bindValue(':name',          $_POST['name']);
+    $statement->bindValue(':identifier',    $identifier);
+    $statement->bindValue(':message',       $_POST['message']);
+    $statement->bindValue(':secret',        $_POST['secret']);
+    $statement->bindValue(':password',      $password);
+    $statement->bindValue(':administrator', $GAME_LOGGEDIN_AS_ADMINISTRATOR, PDO::PARAM_BOOL);
+    $statement->bindValue(':board',         $_POST['board']);
 
     $result = $statement->execute();
 

@@ -37,7 +37,15 @@
       `characters`.`ENo` BETWEEN :ENoMin AND :ENoMax AND
       `characters`.`deleted` = false
     GROUP BY
-		  `characters`.`ENo`, `characters_icons`.`url`;
+      `characters`.`ENo`,
+      `characters`.`nickname`,
+      `characters`.`summary`,
+      `characters`.`ATK`,
+      `characters`.`DEX`,
+      `characters`.`MND`,
+      `characters`.`AGI`,
+      `characters`.`DEF`,
+      `characters_icons`.`url`;
   ");
 
   $statement->bindValue(':ENoMin', $page * 100 + 1);
