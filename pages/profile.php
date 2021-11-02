@@ -157,7 +157,25 @@
 
           // Webhookが入力されており、Discordお気に入り通知が有効なら通知を送信
           if ($data['webhook'] && $data['notification_webhook_faved']) {
-            notifyDiscord($data['webhook'], 'ENo.'.$data['ENo'].' '.$data['nickname'].'にお気に入りされました。');
+            // お気に入りを行ったキャラクター（ユーザー）の情報を取得
+            $statement = $GAME_PDO->prepare("
+              SELECT
+                `ENo`,
+                `nickname`
+              FROM
+                `characters`
+              WHERE
+                `ENo` = :user;
+            ");
+
+            $statement->bindParam(':user', $_SESSION['ENo']);
+
+            $result    = $statement->execute();
+            $faverInfo = $statement->fetch();
+          
+            if ($result && $faverInfo) {
+              notifyDiscord($data['webhook'], 'ENo.'.$faverInfo['ENo'].' '.$faverInfo['nickname'].'にお気に入りされました。 '.$GAME_CONFIG['ABSOLUTE_URI'].'profile?ENo='.$faverInfo['ENo']);
+            }
           }
         }
 

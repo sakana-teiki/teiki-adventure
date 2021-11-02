@@ -294,14 +294,14 @@
           )
 
           SELECT
-            `messages`.`ENo`,
+            `messages_recipients`.`ENo`,
             'replied',
             :id,
             ''
           FROM
-            `messages`
+            `messages_recipients`
           JOIN
-            `messages_recipients` ON `messages_recipients`.`message` = `messages`.`id`
+            `messages` ON `messages`.`id` = `messages_recipients`.`message`
           JOIN
             `characters` ON `characters`.`ENo` = `messages_recipients`.`ENo`
           WHERE
@@ -341,9 +341,9 @@
         if ($result && $webhooks) {
           foreach ($webhooks as $webhook) {
             if ($room['official']) {
-              notifyDiscord($webhook['webhook'], $room['title'].'にてENo.'.$user['ENo'].' '.$user['nickname'].'からの返信があります。');
+              notifyDiscord($webhook['webhook'], $room['title'].'にてENo.'.$user['ENo'].' '.$user['nickname'].'からの返信があります。 '.$GAME_CONFIG['ABSOLUTE_URI'].'room?room='.$roomId.'&mode=rel');
             } else {
-              notifyDiscord($webhook['webhook'], 'RNo.'.$RNo.' '.$room['title'].'にてENo.'.$user['ENo'].' '.$user['nickname'].'からの返信があります。');
+              notifyDiscord($webhook['webhook'], 'RNo.'.$RNo.' '.$room['title'].'にてENo.'.$user['ENo'].' '.$user['nickname'].'からの返信があります。 '.$GAME_CONFIG['ABSOLUTE_URI'].'room?room='.$roomId.'&mode=rel');
             }
           }
         }
@@ -447,7 +447,7 @@
 
       if ($result && $subscribers) {
         foreach ($subscribers as $subscriber) {
-          notifyDiscord($subscriber['webhook'], 'RNo.'.$RNo.' '.$room['title'].'に新規メッセージがあります。');
+          notifyDiscord($subscriber['webhook'], 'RNo.'.$RNo.' '.$room['title'].'に新規メッセージがあります。 '.$GAME_CONFIG['ABSOLUTE_URI'].'room?room='.$roomId);
         }
       }
 

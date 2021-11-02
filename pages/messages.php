@@ -128,7 +128,7 @@
       $result = $statement->execute();
       $nickname = $statement->fetch();
 
-      notifyDiscord($target['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'からのダイレクトメッセージがあります。');
+      notifyDiscord($target['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'からのダイレクトメッセージがあります。 '.$GAME_CONFIG['ABSOLUTE_URI'].'messages/message?ENo='.$_SESSION['ENo']);
     }
   }
 

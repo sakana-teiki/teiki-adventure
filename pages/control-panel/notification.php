@@ -83,7 +83,7 @@
       $_POST['discord'] == 'true'       &&
       $character['webhook'] != ''
     ) {
-      notifyDiscord($character['webhook'], "管理者からのメッセージがあります。\n".$_POST['message']);
+      notifyDiscord($character['webhook'], "管理者からのメッセージがあります。\n".$_POST['message']."\n".$GAME_CONFIG['ABSOLUTE_URI']."notifications");
     }
   }
 
