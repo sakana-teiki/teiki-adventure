@@ -11,7 +11,7 @@
 function notifyDiscord($url, $message) {
   global $GAME_CONFIG;
 
-  file_get_contents($url, false, stream_context_create(array(
+  @file_get_contents($url, false, stream_context_create(array(
     'http' => array(
       'method' => 'POST',
       'header' => 'Content-Type: application/json',
