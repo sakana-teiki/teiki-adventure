@@ -45,12 +45,16 @@ $GAME_CONFIG['CHARACTER_LIST_ITEMS_PER_PAGE'] = 100; // キャラクターリス
 $GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE']      = 30;  // トークルーム一覧ページで1ページあたりに表示するトークルーム数を指定します。
 $GAME_CONFIG['ROOM_MESSAGES_PER_PAGE']        = 20;  // トークルームで1ページあたりに表示するメッセージ数を指定します。
 $GAME_CONFIG['THREADS_PER_PAGE']              = 50;  // 掲示板で1ページあたりに表示するスレッド数を指定します。
+$GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE']      = 50;  // 個別のダイレクトメッセージで1ページあたりに表示するダイレクトメッセージ数を指定します。
 $GAME_CONFIG['ANNOUNCEMENTS_LIMIT']           = 5;   // お知らせ画面を表示した際のデフォルトのお知らせの表示件数を指定します。
 $GAME_CONFIG['NOTIFICATIONS_LIMIT']           = 50;  // 通知画面を表示した際の通知の表示件数を指定します。
 
 //通知関連
 $GAME_CONFIG['DISCORD_NOTIFICATION_PREFIX'] = 'Teiki Adventure / '; // Discord通知の先頭に共通で付ける文言を指定します。
-$GAME_CONFIG['DISCORD_WEBHOOK_PREFIX']      = 'https://discord.com/api/webhooks/'; // DiscordのウェブフックURLの共通先頭部分の文字列を指定します。
+$GAME_CONFIG['WEBHOOK_ACCEPTABLE_PREFIXES'] = [                     // ウェブフックURLの共通先頭部分の文字列を指定します。複数指定可能です。一番上のURLのものが設定ページでプレースホルダ表示されます。
+  'https://discordapp.com/api/webhooks/',
+  'https://discord.com/api/webhooks/'
+]; 
 
 //タイムゾーン関連
 $GAME_CONFIG['DEFAULT_TIMEZONE'] = 'Asia/Tokyo'; // date関数などで使用されるタイムゾーンを指定します。

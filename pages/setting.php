@@ -2,7 +2,7 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
-  require_once GETENV('GAME_ROOT').'/utils/validation.php';
+  require_once GETENV('GAME_ROOT').'/utils/validation.php';  
 
   // POSTリクエスト時の処理
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -14,11 +14,25 @@
     // カテゴリごとに処理を振り分け
     if ($_POST['category'] == 'notification') {
       // 通知の場合
+
+      // ウェブフックURLが正しいものか判定する関数を定義
+      function isAcceptableWebhookURL($url) {
+        global $GAME_CONFIG;
+      
+        foreach ($GAME_CONFIG['WEBHOOK_ACCEPTABLE_PREFIXES'] as $prefix) {
+          if (strpos($url, $prefix) === 0) {
+            return true;
+          }
+        }
+        
+        return false;
+      }
+
       // 入力値検証
       // 以下の条件のうちいずれかを満たせば400(Bad Request)を返し処理を中断
       if (
         !isset($_POST['webhook']) || // 受け取ったデータにウェブフックURLがない
-        ($_POST['webhook'] && strpos($_POST['webhook'], $GAME_CONFIG['DISCORD_WEBHOOK_PREFIX']) !== 0) || // ウェブフックURLが入力されており、URLの内容が不正（URLの先頭部分がおかしい）
+        ($_POST['webhook'] && !isAcceptableWebhookURL($_POST['webhook']))              || // ウェブフックURLが入力されており、URLの内容が不正（URLの先頭部分がおかしい）
         !validatePOST('notification_replied',                ['non-empty', 'boolean']) ||
         !validatePOST('notification_new_arrival',            ['non-empty', 'boolean']) ||
         !validatePOST('notification_faved',                  ['non-empty', 'boolean']) ||
@@ -241,7 +255,7 @@
 
   <section class="form">
     <div class="form-title">DiscordウェブフックURL</div>
-    <input id="input-webhook" class="form-input-long" type="text" placeholder="<?=$GAME_CONFIG['DISCORD_WEBHOOK_PREFIX']?>..." value="<?=htmlspecialchars($character['webhook'])?>">
+    <input id="input-webhook" class="form-input-long" type="text" placeholder="<?=$GAME_CONFIG['WEBHOOK_ACCEPTABLE_PREFIXES'][0]?>..." value="<?=htmlspecialchars($character['webhook'])?>">
   </section>
 
   <div id="notification-error-message-area"></div>
@@ -319,11 +333,27 @@
     // 各種の値を取得
     var inputWebhook = $('#input-webhook').val();
 
+    // 許容可能なウェブフックURLの先頭部分
+    var acceptableWebhookURLs = <?=
+      json_encode($GAME_CONFIG['WEBHOOK_ACCEPTABLE_PREFIXES'])
+    ?>;
+
     // 入力値検証
     // ウェブフックURLが入力されており、形式が不正（URLの先頭部分が不適）な場合エラーメッセージを表示して処理を中断
-    if (inputWebhook && inputWebhook.indexOf('<?=$GAME_CONFIG['DISCORD_WEBHOOK_PREFIX']?>') !== 0) {
-      showErrorMessage('notification', 'ウェブフックURLの形式が不正です');
-      return;
+    if (inputWebhook) {
+      var checkPassed = false;
+
+      for (var i = 0; i < acceptableWebhookURLs.length; i++) {
+        if (inputWebhook.indexOf(acceptableWebhookURLs[i]) === 0) {
+          checkPassed = true;
+          break;
+        }
+      }
+
+      if (!checkPassed) {
+        showErrorMessage('notification', 'ウェブフックURLの形式が不正です');
+        return;
+      }
     }
 
     waitingResponse = true; // レスポンス待ち状態をONに

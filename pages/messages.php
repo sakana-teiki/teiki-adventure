@@ -135,78 +135,49 @@
   // メッセージの取得
   $statement = $GAME_PDO->prepare("
     SELECT
-      *
-    FROM (
+      `direct_messages`.`message`,
+      `direct_messages`.`sended_at`,
+      `direct_messages`.`from` AS `from_ENo`,
+      `direct_messages`.`to`   AS `to_ENo`,
+      `cf`.`nickname`          AS `from_nickname`,
+      `ct`.`nickname`          AS `to_nickname`,
       (
+        CASE
+          WHEN `direct_messages`.`from` = :ENo THEN `direct_messages`.`to`
+          WHEN `direct_messages`.`to`   = :ENo THEN `direct_messages`.`from`
+          ELSE null 
+        END
+      ) AS `other_side`
+    FROM
+      `direct_messages`
+    JOIN
+      `characters` AS `cf` ON `cf`.`ENo` = `direct_messages`.`from`
+    JOIN
+      `characters` AS `ct` ON `ct`.`ENo` = `direct_messages`.`to`
+    WHERE
+      (`direct_messages`.`from` = :ENo OR `direct_messages`.`to` = :ENo) AND
+      `cf`.`deleted` = false AND
+      `ct`.`deleted` = false AND
+      NOT EXISTS (
         SELECT
-          `direct_messages`.`message`,
-          `direct_messages`.`sended_at`,
-          `direct_messages`.`from` AS `user_ENo`,
-          `direct_messages`.`to`   AS `target_ENo`,
-          `cf`.`nickname`          AS `user_nickname`,
-          `ct`.`nickname`          AS `target_nickname`,
-          'sended'                 AS `type`
+          *
         FROM
-          `direct_messages`
-        JOIN
-          `characters` AS `cf` ON `cf`.`ENo` = `direct_messages`.`from`
-        JOIN
-          `characters` AS `ct` ON `ct`.`ENo` = `direct_messages`.`to`
+          `direct_messages` AS `ldm`
         WHERE
-          `direct_messages`.`from` = :ENo AND
-          `cf`.`deleted` = false          AND
-          `ct`.`deleted` = false          AND
-          NOT EXISTS (
-            SELECT
-              *
-            FROM
-              `characters_blocks`
-            WHERE
-              (`characters_blocks`.`blocker` = `direct_messages`.`from` AND `characters_blocks`.`blocked` = `direct_messages`.`to`  ) OR
-              (`characters_blocks`.`blocker` = `direct_messages`.`to`   AND `characters_blocks`.`blocked` = `direct_messages`.`from`)
-          )
-        ORDER BY
-          `direct_messages`.`sended_at` DESC
-      )
-
-      UNION ALL
-    
-      (
+          (`direct_messages`.`from` = `ldm`.`from` OR `direct_messages`.`to` = `ldm`.`to`) AND
+          `direct_messages`.`sended_at` < `ldm`.`sended_at`
+      ) AND
+      NOT EXISTS (
         SELECT
-          `direct_messages`.`message`,
-          `direct_messages`.`sended_at`,
-          `direct_messages`.`to`   AS `user_ENo`,
-          `direct_messages`.`from` AS `target_ENo`,
-          `ct`.`nickname`          AS `user_nickname`,
-          `cf`.`nickname`          AS `target_nickname`,
-          'recieved'               AS `type`
+          *
         FROM
-          `direct_messages`
-        JOIN
-          `characters` AS `cf` ON `cf`.`ENo` = `direct_messages`.`from`
-        JOIN
-          `characters` AS `ct` ON `ct`.`ENo` = `direct_messages`.`to`
+          `characters_blocks`
         WHERE
-          `direct_messages`.`to` = :ENo AND
-          `cf`.`deleted` = false        AND
-          `ct`.`deleted` = false        AND
-          NOT EXISTS (
-            SELECT
-              *
-            FROM
-              `characters_blocks`
-            WHERE
-              (`characters_blocks`.`blocker` = `direct_messages`.`from` AND `characters_blocks`.`blocked` = `direct_messages`.`to`  ) OR
-              (`characters_blocks`.`blocker` = `direct_messages`.`to`   AND `characters_blocks`.`blocked` = `direct_messages`.`from`)
-          )
-        ORDER BY
-          `direct_messages`.`sended_at` DESC
+          (`characters_blocks`.`blocker` = `direct_messages`.`from` AND `characters_blocks`.`blocked` = `direct_messages`.`to`  ) OR
+          (`characters_blocks`.`blocker` = `direct_messages`.`to`   AND `characters_blocks`.`blocked` = `direct_messages`.`from`)
       )
-    ) AS `ungrouped_direct_messages`
-    GROUP BY
-      `ungrouped_direct_messages`.`user_ENo`, `ungrouped_direct_messages`.`target_ENo`
     ORDER BY
-      `ungrouped_direct_messages`.`sended_at` DESC;
+      `sended_at` DESC;
   ");
 
   $statement->bindParam(':ENo', $_SESSION['ENo'], PDO::PARAM_INT);
@@ -294,17 +265,30 @@
 <?php } else { ?>
   <section class="direct-messages">
 <?php foreach ($messages as $message) { ?>
+<?php
+  if ($message['other_side'] == $message['from_ENo']) {
+    // other_sideがfromなら自分が送信したメッセージ
+    $targetENo             = $message['from_ENo'];
+    $targetNickname        = $message['from_nickname'];
+    $latestMessageNickname = $message['to_nickname'];
+  } else {
+    // そうでないなら相手から受信したメッセージ
+    $targetENo             = $message['to_ENo'];
+    $targetNickname        = $message['to_nickname'];
+    $latestMessageNickname = $message['from_nickname'];
+  }
+?>
     <section class="direct-message">
-      <a class="direct-message-link" href="<?=$GAME_CONFIG['URI']?>messages/message?ENo=<?=$message['target_ENo']?>">
+      <a class="direct-message-link" href="<?=$GAME_CONFIG['URI']?>messages/message?ENo=<?=$targetENo?>">
         <div class="direct-message-details">
           <div>
-            <span class="direct-message-nickname"><?=htmlspecialchars($message['target_nickname'])?></span>
-            <span class="direct-message-eno">&lt; ENo.<?=$message['target_ENo']?> &gt;</span>
+            <span class="direct-message-nickname"><?=htmlspecialchars($targetNickname)?></span>
+            <span class="direct-message-eno">&lt; ENo.<?=$targetENo?> &gt;</span>
           </div>
           <div class="direct-message-timestamp"><?=$message['sended_at']?></div>
         </div>
         <div class="direct-message-body-ellipsis">
-          <span class="direct-message-body-nickname"><?=$message['type'] == 'recieved' ? htmlspecialchars($message['target_nickname']) : htmlspecialchars($message['user_nickname']) ?>:</span>
+          <span class="direct-message-body-nickname"><?=htmlspecialchars($latestMessageNickname)?>:</span>
           <?=htmlspecialchars($message['message'])?>
         </div>
       </a>

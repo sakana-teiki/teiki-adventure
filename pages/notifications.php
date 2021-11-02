@@ -147,7 +147,19 @@
 
   $notifications = $statement->fetchAll();
 
-  // 公式トークルームとして設定に登録されているRNoは置換する
+  // 公式トークルームとして設定に登録されているRNoをエイリアスに置換する関数
+  // RNoが公式トークルームのものでなければそのまま、公式トークルームのものであればエイリアスに変換
+  function replaceRNoToAlias($roomRNo) {
+    global $GAME_CONFIG;
+
+    foreach ($GAME_CONFIG['PUBLIC_ROOMS'] as $publicRoom) {
+      if ($roomRNo == $publicRoom['RNo']) {
+        return $publicRoom['alias'];
+      }
+    }
+
+    return $roomRNo;
+  }
 
   $PAGE_SETTING['TITLE'] = '通知';
 
@@ -209,7 +221,7 @@
 <?php foreach ($notifications as $notification) { ?>
 <?php if (!is_null($notification['link_target']) || $notification['type'] == 'announcement') { ?>
   <?php if ($notification['type'] == 'announcement')   { ?><a href="<?=$GAME_CONFIG['URI']?>announcements" class="notification-link"><?php } ?>
-  <?php if ($notification['type'] == 'replied')        { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>&mode=rel" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'replied')        { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=replaceRNoToAlias($notification['link_target'])?>&mode=rel" class="notification-link"><?php } ?>
   <?php if ($notification['type'] == 'new_arrival')    { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
   <?php if ($notification['type'] == 'faved')          { ?><a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
   <?php if ($notification['type'] == 'direct_message') { ?><a href="<?=$GAME_CONFIG['URI']?>messages/message?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>

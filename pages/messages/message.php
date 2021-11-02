@@ -12,6 +12,17 @@
     $targetENo = $_GET['ENo'];  // GETの場合URLパラメータのENoを対象とする
   }
 
+  // 現在のページ
+  // pageの指定があればその値-1、指定がなければ0
+  // インデックス値のように扱いたいため内部的には受け取った値-1をページとします。
+  $page = isset($_GET['page']) ? intval($_GET['page']) -1 : 0;
+
+  // ページが負なら400(Bad Request)を返して処理を中断
+  if ($page < 0) {
+    http_response_code(400); 
+    exit;
+  }  
+
   if ($_SESSION['ENo'] == $targetENo) {
     // 自分自身が対象の場合400(Bad Request)を返し処理を中断
     http_response_code(400);
@@ -140,6 +151,9 @@
   }
 
   // メッセージの取得
+  // デフォルトの設定ではページ0であれば0件飛ばして50件、ページ1であれば50件飛ばして50件、ページ2であれば100件飛ばして50件、ページnであればn×50件飛ばして50件を表示します。
+  // ただし、次のページがあるかどうか検出するために1件余分に取得します。
+  // 51件取得してみて51件取得できれば次のページあり、取得結果の数がそれ未満であれば次のページなし（最終ページ）として扱います。
   $statement = $GAME_PDO->prepare("
     SELECT
       `direct_messages`.`message`,
@@ -171,11 +185,15 @@
           (`characters_blocks`.`blocker` = `direct_messages`.`to`   AND `characters_blocks`.`blocked` = `direct_messages`.`from`)
       )
     ORDER BY
-      `direct_messages`.`sended_at` DESC;
+      `direct_messages`.`sended_at` DESC
+    LIMIT
+      :offset, :number;
   ");
 
   $statement->bindParam(':ENo',    $_SESSION['ENo'], PDO::PARAM_INT);
   $statement->bindParam(':target', $target['ENo'],   PDO::PARAM_INT);
+  $statement->bindValue(':offset', $page * $GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE'], PDO::PARAM_INT);
+  $statement->bindValue(':number', $GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE'] + 1,     PDO::PARAM_INT);
 
   $result = $statement->execute();
 
@@ -185,6 +203,15 @@
   }
 
   $messages = $statement->fetchAll();
+
+  // 1件余分に取得できていれば次のページありとして余分な1件を切り捨て
+  if (count($messages) == $GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE'] + 1) {
+    $existsNext = true;
+    array_pop($messages);
+  } else {
+  // 取得件数が足りなければ次のページなしとする
+    $existsNext = false;
+  }
 
   $PAGE_SETTING['TITLE'] = 'ダイレクトメッセージ | ENo.'.$target['ENo'].' '.$target['nickname'];
 
@@ -258,6 +285,13 @@
 <?php if (!$messages) { ?>
   <p>ダイレクトメッセージはありません。</p>
 <?php } else { ?>
+
+  <section class="pagelinks next-prev-pagelinks">
+    <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?ENo=<?=$targetENo?>&page=<?=$page+1-1?>">前のページ</a></div>
+    <span class="next-prev-pagelinks-page">ページ<?=$page+1?></span>
+    <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?ENo=<?=$targetENo?>&page=<?=$page+1+1?>">次のページ</a></div>
+  </section>
+
   <section class="direct-messages">
 <?php foreach ($messages as $message) { ?>
     <section class="direct-message">
@@ -274,6 +308,13 @@
     </section>
 <?php }?>
   </section>
+
+  <section class="pagelinks next-prev-pagelinks">
+    <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?ENo=<?=$targetENo?>&page=<?=$page+1-1?>">前のページ</a></div>
+    <span class="next-prev-pagelinks-page">ページ<?=$page+1?></span>
+    <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?ENo=<?=$targetENo?>&page=<?=$page+1+1?>">次のページ</a></div>
+  </section>
+
 <?php } ?>
 
 </section>
