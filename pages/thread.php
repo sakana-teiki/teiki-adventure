@@ -14,8 +14,7 @@
       !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_NAME_MAX_LENGTH'])    ||
       !validatePOST('message',  ['non-empty'               , 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH'])
     ) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     // パスワードのサーバー側ハッシュ化
@@ -56,8 +55,7 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     // スレッドの最終投稿の更新
@@ -80,8 +78,7 @@
 
   // idの内容を検証
   if (!validateGET('id', ['non-empty', 'natural-number'])) {
-    http_response_code(400); 
-    exit;
+    responseError(400);
   }
 
   // スレッドの値を取得
@@ -110,16 +107,14 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $thread = $statement->fetch();
 
   if (!$thread) {
     // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
+    responseError(404);
   }
 
   // スレッドのレスを取得
@@ -146,8 +141,7 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500); 
   }
 
   // ステータス表示用

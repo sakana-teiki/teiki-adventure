@@ -31,6 +31,10 @@
       <td>交流等を行うための掲示板です。</td>
     </tr>
     <tr>
+      <th><a href="<?=$GAME_CONFIG['URI']?>board?board=trade">取引掲示板</a></th>
+      <td>アイテム取引を行うための掲示板です。</td>
+    </tr>
+    <tr>
       <th><a href="<?=$GAME_CONFIG['URI']?>board?board=bug">不具合掲示板</a></th>
       <td>不具合等を報告するための掲示板です。</td>
     </tr>

@@ -1,19 +1,30 @@
 SetEnv GAME_ROOT "C:\xampp\htdocs\teiki"
 
+ErrorDocument 400 /teiki/error-pages/400.html
+ErrorDocument 403 /teiki/error-pages/403.html
+ErrorDocument 404 /teiki/error-pages/404.html
+ErrorDocument 500 /teiki/error-pages/500.html
+ErrorDocument 503 /teiki/error-pages/503.html
+
 RewriteEngine On
+
+RewriteRule ^error-pages/ - [L]
 RewriteRule ^static/ - [L]
-RewriteRule ^.*\.(ico|js|css|jpe?g|png|gif|html?|zip)$ static/$0 [NC,L]
+
+RewriteRule ^.*\.(ico|js|css|jpe?g|a?png|gif|html?|zip)$ static/$0 [NC,L]
+
 RewriteCond %{REQUEST_URI} \/$
 RewriteRule ^.* pages/$0index.php [L]
+
 RewriteRule ^(?!pages/).* pages/$0.php [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^pages/(.*)index.php static/$1 [L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^pages/(.*).php static/$1 [L]
 
 #　以下のように動作します。
-#　　.ico, .js, .css, .jpg, .jpeg, .png, .gif, .htm, .html, .zipで終わるアクセス（＝拡張子が指定のもの）はstatic/～～に転送します。
-#　　そうでないものはpages/～～.php（ディレクトリの場合はpages/～～/index.php）に転送し、該当のphpがあればそれを表示します。
+#　　.ico, .js, .css, .jpg, .jpeg, .apng, .png, .gif, .htm, .html, .zipで終わるアクセス（＝拡張子が指定のもの）はstatic/～～に転送します。
+#　　そうでないものはpages/～～.php（ディレクトリの場合はpages/～～/）に転送し、該当のphpがあればそれを表示します。
 #　　なければstatic/～～に転送します。
-#
-#　付記：
-#　　副作用としてpages内に対象が存在しない状態でindex.phpを省略した形式にてアクセスしようとした場合
-#　　static/～～/indexにアクセスしようとします。static内でindex.htmlを配置したい場合などは若干困るかも。（修正予定）

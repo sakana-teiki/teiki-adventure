@@ -11,8 +11,7 @@
       !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH'])     ||
       !validatePOST('nickname', ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // パスワードのサーバー側ハッシュ化
@@ -53,9 +52,8 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     $lastInsertId = intval($GAME_PDO->lastInsertId()); // 登録されたidを取得
@@ -86,9 +84,8 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     // 登録されたENoの取得
@@ -107,9 +104,8 @@
     $character = $statement->fetch();
 
     if (!$result || !$character) {
-      http_response_code(500); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     // ここまで全て成功した場合はコミット

@@ -9,8 +9,7 @@
 
   // ページが負なら400(Bad Request)を返して処理を中断
   if ($page < 0) {
-    http_response_code(400); 
-    exit;
+    responseError(400);
   }
 
   // 現在ページのトークルームを取得
@@ -52,8 +51,7 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $rooms = $statement->fetchAll();

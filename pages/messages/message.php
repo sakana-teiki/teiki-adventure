@@ -19,14 +19,12 @@
 
   // ページが負なら400(Bad Request)を返して処理を中断
   if ($page < 0) {
-    http_response_code(400); 
-    exit;
+    responseError(400); 
   }  
 
   if ($_SESSION['ENo'] == $targetENo) {
     // 自分自身が対象の場合400(Bad Request)を返し処理を中断
-    http_response_code(400);
-    exit;
+    responseError(400);
   }
 
   // 対象と対象との関係性の取得
@@ -54,20 +52,17 @@
   
   if (!$result || !$target) {
     // SQLの実行に失敗した場合あるいは結果が存在しない場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   if ($target['deleted']) {
     // 対象が削除済の場合404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
+    responseError(404);
   }
 
   if ($target['block'] || $target['blocked']) {
     // ブロックしている、あるいはされている場合は403(Forbidden)を返し処理を中断
-    http_response_code(403); 
-    exit;
+    responseError(403);
   }
 
   // POSTリクエスト時の処理
@@ -77,8 +72,7 @@
       !validatePOST('eno',     ['non-empty', 'natural-number']) ||
       !validatePOST('message', ['disallow-special-chars'], $GAME_CONFIG['DIRECT_MESSEAGE_MAX_LENGTH'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // メッセージの登録
@@ -101,8 +95,7 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     $lastInsertId = intval($GAME_PDO->lastInsertId()); // idを取得
@@ -198,8 +191,7 @@
   $result = $statement->execute();
 
   if (!$result) {
-    http_response_code(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
-    exit;
+    responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
   }
 
   $messages = $statement->fetchAll();

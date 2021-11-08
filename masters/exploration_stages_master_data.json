@@ -1,0 +1,23 @@
+[
+    {
+        "stage_id": "1",
+        "complete_requirement": "3",
+        "requirement_stage_id": null,
+        "title": "小道",
+        "text": "街の近くの小道。整備が行き届いておらず小石が多い。"
+    },
+    {
+        "stage_id": "2",
+        "complete_requirement": "5",
+        "requirement_stage_id": "1",
+        "title": "森",
+        "text": "少し薄暗い森。"
+    },
+    {
+        "stage_id": "3",
+        "complete_requirement": "5",
+        "requirement_stage_id": "2",
+        "title": "草原",
+        "text": "心地よい風が吹き抜ける草原。"
+    }
+]

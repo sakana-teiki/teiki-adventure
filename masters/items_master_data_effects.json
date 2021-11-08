@@ -1,0 +1,57 @@
+[
+    {
+        "item": "6",
+        "effect": "GainNP",
+        "value": "10"
+    },
+    {
+        "item": "7",
+        "effect": "GainATK",
+        "value": "1"
+    },
+    {
+        "item": "8",
+        "effect": "GainDEX",
+        "value": "1"
+    },
+    {
+        "item": "9",
+        "effect": "GainMND",
+        "value": "1"
+    },
+    {
+        "item": "10",
+        "effect": "GainAGI",
+        "value": "1"
+    },
+    {
+        "item": "11",
+        "effect": "GainDEF",
+        "value": "1"
+    },
+    {
+        "item": "12",
+        "effect": "GainATK",
+        "value": "1"
+    },
+    {
+        "item": "12",
+        "effect": "GainDEX",
+        "value": "1"
+    },
+    {
+        "item": "12",
+        "effect": "GainMND",
+        "value": "1"
+    },
+    {
+        "item": "12",
+        "effect": "GainAGI",
+        "value": "1"
+    },
+    {
+        "item": "12",
+        "effect": "GainDEF",
+        "value": "1"
+    }
+]

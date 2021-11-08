@@ -8,6 +8,9 @@
   require_once GETENV('GAME_ROOT').'/configs/environment.php';
   require_once GETENV('GAME_ROOT').'/configs/general.php';
 
+  // 全体で利用可能な関数の読み込み
+  require_once GETENV('GAME_ROOT').'/utils/general.php';
+
   // タイムゾーンの指定
   date_default_timezone_set($GAME_CONFIG['DEFAULT_TIMEZONE']);
 
@@ -29,4 +32,27 @@
 
   $GAME_LOGGEDIN = isset($_SESSION['ENo']); // ログインしているかどうか
   $GAME_LOGGEDIN_AS_ADMINISTRATOR = isset($_SESSION['administrator']) && $_SESSION['administrator']; // 管理者としてログインしているかどうか
+
+  // メンテナンス状態の取得
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `maintenance`
+    FROM
+      `game_status`;
+  ");
+  
+  $result     = $statement->execute();
+  $gameStatus = $statement->fetch();
+
+  if (!$result || !$gameStatus) {
+    $GAME_MAINTENANCE = false;
+  } else {
+    $GAME_MAINTENANCE = $gameStatus['maintenance'];
+  }
+
+  // メンテナンス中なら503を表示して中断
+  if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $GAME_MAINTENANCE) {
+    responseError(503);
+  }
+
 ?>

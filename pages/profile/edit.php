@@ -22,8 +22,7 @@
 
   if (!$result || !$additionalIcons) {
     // SQLの実行や実行結果の取得に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   // POSTの場合
@@ -38,8 +37,7 @@
       !validatePOST('name',           ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH'])     ||
       !validatePOST('nickname',       ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // 入力値検証2
@@ -49,8 +47,7 @@
         !isset($_POST['icon-'.$i.'-name']) || // 受け取ったデータに名前がない
         !isset($_POST['icon-'.$i.'-url'])     // 受け取ったデータにURLがない
       ) {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
     }
 
@@ -79,9 +76,8 @@
     $result = $statement->execute();
 
     if (!$result) { // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      http_response_code(500);
       $GAME_PDO->rollBack();
-      exit;
+      responseError(500);
     }
 
     // すでに登録されているプロフィール画像の削除
@@ -97,9 +93,8 @@
     $result = $statement->execute();
     
     if (!$result) {
-      http_response_code(500);
       $GAME_PDO->rollBack();
-      exit;
+      responseError(500);
     }
 
     // すでに登録されているタグの削除
@@ -115,9 +110,8 @@
     $result = $statement->execute();
     
     if (!$result) {
-      http_response_code(500);
       $GAME_PDO->rollBack();
-      exit;
+      responseError(500);
     }
 
     // すでに登録されているアイコンの削除
@@ -133,9 +127,8 @@
     $result = $statement->execute();
     
     if (!$result) {
-      http_response_code(500);
       $GAME_PDO->rollBack();
-      exit;
+      responseError(500);
     }
 
     // プロフィール画像の登録
@@ -157,9 +150,8 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500);
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
     }
 
@@ -182,9 +174,8 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500);
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
     }
 
@@ -210,9 +201,8 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500);
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
     }
 
@@ -244,8 +234,7 @@
 
   if (!$result || !$data) {
     // SQLの実行や実行結果の取得に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $icons = parseIconsResult($data['icons']);

@@ -1,0 +1,68 @@
+[
+    {
+        "stage": "1",
+        "item": "1",
+        "rate_numerator": "80",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "1",
+        "item": "1",
+        "rate_numerator": "80",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "1",
+        "item": "1",
+        "rate_numerator": "80",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "2",
+        "item": "1",
+        "rate_numerator": "40",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "2",
+        "item": "2",
+        "rate_numerator": "60",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "2",
+        "item": "2",
+        "rate_numerator": "60",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "3",
+        "item": "1",
+        "rate_numerator": "40",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "3",
+        "item": "2",
+        "rate_numerator": "80",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "3",
+        "item": "3",
+        "rate_numerator": "80",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "3",
+        "item": "4",
+        "rate_numerator": "100",
+        "rate_denominator": "100"
+    },
+    {
+        "stage": "3",
+        "item": "5",
+        "rate_numerator": "100",
+        "rate_denominator": "100"
+    }
+]

@@ -23,8 +23,7 @@
   $result = $statement->execute();
 
   if (!$result) {
-    http_response_code(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
-    exit;
+    responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
   }
 
   $announcements = $statement->fetchAll();

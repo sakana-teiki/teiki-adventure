@@ -19,13 +19,11 @@
       !isset($_POST['csrf_token']) ||            // 受け取ったデータにCSRFトークンが含まれていない場合
       $_POST['csrf_token'] != $_SESSION['token'] // セッションに記録されたCSRFトークンと受け取ったCSRFトークンが合致しない場合
     ) {
-      http_response_code(403);
-      exit;
+      responseError(403);
     }
   } else {
     // GET, POSTリクエスト以外(PUT, DELETE)の場合は必ず405(Method Not Allowed)を返し以降の処理を行わない
-    http_response_code(405);
-    exit;
+    responseError(405);
   }
   
 ?>

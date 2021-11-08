@@ -15,16 +15,14 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // POSTの場合
     if (!validatePOST('target', ['non-empty', 'natural-number'])) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     $target = $_POST['target']; // targetの値を対象に指定
   } else {
     // GETの場合
     if (!validateGET('ENo', ['non-empty', 'natural-number'])) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     $target = $_GET['ENo']; // URLパラメータのENoを対象に指定
@@ -48,8 +46,7 @@
   
     if (!$result || !$relation) {
       // SQLの実行に失敗した場合あるいは結果が存在しない場合は500(Internal Server Error)を返し処理を中断
-      http_response_code(500); 
-      exit;
+      responseError(500);
     }
   }
 
@@ -59,7 +56,6 @@
       `ENo`,
       `name`,
       `nickname`,
-      `AP`,
       `ATK`,
       `DEX`,
       `MND`,
@@ -86,22 +82,19 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   if (!$data) {
     // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
+    responseError(404);
   }
   
   // POSTの場合各アクションを行う
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 自分自身をお気に入り、ミュートetc..しようとしていた場合400(Bad Request)を返し処理を中断
     if ($target == $_SESSION['ENo']) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     switch ($_POST['action']) {
@@ -122,8 +115,7 @@
           $result = $statement->execute();
         
           if (!$result) {
-            http_response_code(500); 
-            exit;
+            responseError(500);
           }
 
           $relation['fav'] = true;
@@ -150,8 +142,7 @@
             $result = $statement->execute();
           
             if (!$result) {
-              http_response_code(500); 
-              exit;
+              responseError(500);
             }
           }
 
@@ -195,8 +186,7 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500); 
-          exit;
+          responseError(500);
         }
 
         $relation['fav'] = false;
@@ -218,8 +208,7 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500); 
-          exit;
+          responseError(500);
         }
 
         $relation['mute'] = true;
@@ -240,8 +229,7 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500); 
-          exit;
+          responseError(500);
         }
 
         $relation['mute'] = false;
@@ -265,9 +253,8 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500);
           $GAME_PDO->rollBack();
-          exit;
+          responseError(500);
         }
         
         $statement = $GAME_PDO->prepare("
@@ -284,9 +271,8 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500); 
           $GAME_PDO->rollBack();
-          exit;
+          responseError(500);
         }
 
         $GAME_PDO->commit();
@@ -310,8 +296,7 @@
         $result = $statement->execute();
         
         if (!$result) {
-          http_response_code(500); 
-          exit;
+          responseError(500);
         }
 
         $relation['block'] = false;
@@ -319,8 +304,7 @@
         break;
       default:
         // actionが以上のどれでもない場合は400を返して処理を中断
-        http_response_code(400);
-        exit;
+        responseError(400);
     }
   }
 

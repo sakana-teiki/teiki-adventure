@@ -8,8 +8,7 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
     if (!validatePOST('eno', ['non-empty', 'natural-number'])) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // パスワードの生成
@@ -40,8 +39,7 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
   }
 

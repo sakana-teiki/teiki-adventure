@@ -10,8 +10,7 @@
       !validatePOST('password', ['non-empty'])            ||
       !validatePOST('eno',      ['non-empty', 'integer'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // 検索処理
@@ -35,22 +34,19 @@
 
     if (!$result) {
       // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-      http_response_code(500); 
-      exit;
+      responseError(500); 
     }
 
     $data = $statement->fetch(); // 実行結果を取得
 
     if (!$data) {
       // 結果が見つからない場合は404(Not Found)を返し処理を中断
-      http_response_code(404);
-      exit;
+      responseError(404);
     }
 
     if (!password_verify($_POST['password'], $data['password'])) {
       // パスワードの照合を行い合致しない場合は403(Forbidden)を返し処理を中断
-      http_response_code(403);
-      exit;
+      responseError(403);
     }
     
     session_regenerate_id(true); // セッションIDを再生成（セッション固定攻撃対策）

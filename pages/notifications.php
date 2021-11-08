@@ -4,6 +4,7 @@
   
   require_once GETENV('GAME_ROOT').'/utils/decoration.php';
   
+  // 通知の取得
   $statement = $GAME_PDO->prepare("
     SELECT
       `notifications`.`id`,
@@ -141,8 +142,7 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $notifications = $statement->fetchAll();
@@ -160,6 +160,20 @@
 
     return $roomRNo;
   }
+
+  // 通知最終確認時刻の更新
+  $statement = $GAME_PDO->prepare("
+    UPDATE
+      `characters`
+    SET
+      `notifications_last_checked_at` = CURRENT_TIMESTAMP
+    WHERE
+      `ENo` = :ENo;
+  ");
+
+  $statement->bindParam(':ENo', $_SESSION['ENo']);
+  
+  $statement->execute();
 
   $PAGE_SETTING['TITLE'] = '通知';
 

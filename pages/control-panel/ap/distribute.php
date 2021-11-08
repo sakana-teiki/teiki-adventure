@@ -8,24 +8,20 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
     if (
-      !validatePOST('eno',    ['non-empty', 'natural-number']) ||
-      !validatePOST('number', ['non-empty', 'natural-number'])
+      !validatePOST('ap', ['non-empty', 'natural-number'])
     ) {
       responseError(400);
     }
 
-    // キャラクターのアイコン上限の付与
+    // 配布AP量に加算
     $statement = $GAME_PDO->prepare("
       UPDATE
-        `characters`
+        `game_status`
       SET
-        `additional_icons` = `additional_icons` + :number
-      WHERE
-        `ENo` = :ENo;
+        `AP` = `AP` + :ap;
     ");
 
-    $statement->bindParam(':number', $_POST['number'], PDO::PARAM_INT);
-    $statement->bindParam(':ENo',    $_POST['eno']);
+    $statement->bindParam(':ap', $_POST['ap'], PDO::PARAM_INT);
 
     $result = $statement->execute();
 
@@ -34,47 +30,38 @@
     }
   }
 
-  $PAGE_SETTING['TITLE'] = 'パスワード再発行';
+  $PAGE_SETTING['TITLE'] = 'AP配布';
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
-<h1>パスワード再発行</h1>
+<h1>AP配布</h1>
 
 <?php if ($_SERVER['REQUEST_METHOD'] == 'POST') { ?>
 <section>
   <h2>実行結果</h2>
 
   <p>
-    ENo.<?=$_POST['eno']?>にアイコン上限数が<?=$_POST['number']?>付与されました。 
+    APを<?=$_POST['ap']?>配布しました。 
   </p>
 </section>
 <?php } ?>
 
 <section>
-  <h2>アイコン上限付与対象</h2>
+  <h2>配布数</h2>
 
   <form id="form" method="post">
     <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
-    
     <section class="form">
-      <div class="form-title">ENo</div>
-      <div class="form-description">アイコン上限付与を行うキャラクターのENoを指定します。</div>
-      <input id="input-eno" class="form-input" type="number" name="eno" placeholder="ENo">
-      <button id="check-eno" type="button" class="form-check-button">対象を確認</button>
-    </section>
-
-    <section class="form">
-      <div class="form-title">アイコン上限付与数</div>
-      <div class="form-description">アイコン上限の付与数を指定します。</div>
-      <input id="input-additional-icons" class="form-input" type="number" name="number" placeholder="アイコン上限付与数">
+      <div class="form-title">AP配布数</div>
+      <input id="input-ap" class="form-input" type="number" name="ap" placeholder="AP配布数" min="1" value="1">
     </section>
 
     <div id="error-message-area"></div>
 
     <div class="button-wrapper">
-      <button class="button" type="submit">付与</button>
+      <button class="button" type="submit">配布</button>
     </div>
   </form>
 </section>
@@ -100,19 +87,12 @@
 
   $('#form').submit(function(){
     // 値を取得
-    var inputENo             = $('#input-eno').val();
-    var inputAdditionalIcons = $('#input-additional_icons').val();
+    var inputAP = $('#input-ap').val();
 
     // 入力値検証
-    // ENoが入力されていない場合エラーメッセージを表示して送信を中断
-    if (!inputENo) {
-      showErrorMessage('ENoが入力されていません');
-      return false;
-    }
-
-    // アイコン上限付与数が入力されていない場合エラーメッセージを表示して送信を中断
-    if (!inputAdditionalIcons) {
-      showErrorMessage('アイコン上限付与数が入力されていません。');
+    // AP配布数が入力されていない場合エラーメッセージを表示して送信を中断
+    if (!inputAP) {
+      showErrorMessage('AP配布数が入力されていません。');
       return false;
     }
 

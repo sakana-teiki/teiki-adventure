@@ -12,8 +12,7 @@
       !validatePOST('message', ['non-empty']) ||
       !validatePOST('time',    [])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // お知らせの登録
@@ -36,8 +35,7 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      exit;
+      responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     $lastInsertId = intval($GAME_PDO->lastInsertId()); // idを取得

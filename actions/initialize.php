@@ -4,8 +4,8 @@
   
   $GAME_PDO = new PDO('mysql:dbname='.$GAME_CONFIG['MYSQL_DBNAME'].';host='.$GAME_CONFIG['MYSQL_HOST'].':'.$GAME_CONFIG['MYSQL_PORT'], $GAME_CONFIG['MYSQL_USERNAME'], $GAME_CONFIG['MYSQL_PASSWORD']);
 
-  // $ACTION_INITIALIZE['skip_confirm']がtrueでなければ確認処理を行う
-  if (!(isset($ACTION_INITIALIZE['skip_confirm']) && $ACTION_INITIALIZE['skip_confirm'])) {
+  // コンソールからの実行であれば確認処理を行う
+  if (php_sapi_name() == 'cli') {
     echo '本当に初期化を行いますか？初期化を行う場合yesと入力してください。: ';
     $input = trim(fgets(STDIN));
     
@@ -19,6 +19,10 @@
   // 外部キーの対象となっているテーブルはその外部キーの参照を行っているテーブルを削除しないと削除できないため、CREATEの時とは逆の順序で実行します。
   $statement = $GAME_PDO->prepare("
     DROP TABLE IF EXISTS
+      `exploration_logs`,
+      `trades`,
+      `flea_markets`,
+      `items_yield`,
       `announcements`,
       `threads_responses`,
       `threads`,
@@ -29,13 +33,21 @@
       `rooms_subscribers`,
       `rooms_tags`,
       `rooms`,
+      `characters_results`,
+      `characters_declarations`,
+      `characters_items`,
       `characters_blocks`,
       `characters_mutes`,
       `characters_favs`,
       `characters_profile_images`,
       `characters_icons`,
       `characters_tags`,
-      `characters`;
+      `characters`,
+      `game_status`,
+      `exploration_stages_master_data_drop_items`,
+      `exploration_stages_master_data`,
+      `items_master_data_effects`,
+      `items_master_data`;
   ");
 
   $result = $statement->execute();
@@ -45,8 +57,70 @@
     exit;
   }
 
-  // テーブルの削除
+  // テーブルの作成
   $statement = $GAME_PDO->prepare("
+    CREATE TABLE `items_master_data` (
+      `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `item_id`        INT UNSIGNED NOT NULL,
+      `name`           TEXT         NOT NULL,
+      `description`    TEXT         NOT NULL,
+      `price`          INT UNSIGNED NOT NULL,
+      `shop`           BOOLEAN      NOT NULL,
+      `tradable`       BOOLEAN      NOT NULL,
+      `usable`         BOOLEAN      NOT NULL,
+      `relinquishable` BOOLEAN      NOT NULL,
+      `createable`     BOOLEAN      NOT NULL,
+      `category`       ENUM('material', 'consumable') NOT NULL,
+      
+      PRIMARY KEY (`id`),
+      UNIQUE(`item_id`)
+    );
+
+    CREATE TABLE `items_master_data_effects` (
+      `id`     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `item`   INT UNSIGNED NOT NULL,
+      `effect` TEXT         NOT NULL,
+      `value`  INT,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`)
+    );
+
+    CREATE TABLE `exploration_stages_master_data` (
+      `id`                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `stage_id`             INT UNSIGNED NOT NULL,
+      `complete_requirement` INT UNSIGNED NOT NULL,
+      `requirement_stage_id` INT UNSIGNED,
+      `title`                TEXT         NOT NULL,
+      `text`                 TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      UNIQUE(`stage_id`)
+    );
+
+    CREATE TABLE `exploration_stages_master_data_drop_items` (
+      `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `stage`            INT UNSIGNED NOT NULL,
+      `item`             INT UNSIGNED NOT NULL,
+      `rate_numerator`   INT UNSIGNED NOT NULL,
+      `rate_denominator` INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`item`)  REFERENCES `items_master_data`(`item_id`),
+      FOREIGN KEY (`stage`) REFERENCES `exploration_stages_master_data`(`stage_id`)
+    );
+
+    CREATE TABLE `game_status` (
+      `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `distributing_ap` BOOLEAN      NOT NULL,
+      `maintenance`     BOOLEAN      NOT NULL,
+      `update_status`   BOOLEAN      NOT NULL,
+      `next_update_nth` INT UNSIGNED NOT NULL,
+      `AP`              INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`)
+    );
+
     CREATE TABLE `characters` (
       `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `ENo`              INT,
@@ -57,13 +131,14 @@
       `summary`          TEXT         NOT NULL,
       `profile`          TEXT         NOT NULL,
       `webhook`          TEXT         NOT NULL,
-      `AP`               INT UNSIGNED NOT NULL DEFAULT 0,
+      `consumedAP`       INT UNSIGNED NOT NULL DEFAULT 0,
       `NP`               INT UNSIGNED NOT NULL DEFAULT 0,
       `ATK`              INT UNSIGNED NOT NULL DEFAULT 0,
       `DEX`              INT UNSIGNED NOT NULL DEFAULT 0,
       `MND`              INT UNSIGNED NOT NULL DEFAULT 0,
       `AGI`              INT UNSIGNED NOT NULL DEFAULT 0,
       `DEF`              INT UNSIGNED NOT NULL DEFAULT 0,
+      `money`            INT UNSIGNED NOT NULL DEFAULT 0,
       `additional_icons` INT UNSIGNED NOT NULL DEFAULT 0,
       `deleted`          BOOLEAN      NOT NULL DEFAULT false,
       `administrator`    BOOLEAN      NOT NULL DEFAULT false,
@@ -140,6 +215,34 @@
       FOREIGN KEY (`blocker`) REFERENCES `characters`(`ENo`),
       FOREIGN KEY (`blocked`) REFERENCES `characters`(`ENo`),
       UNIQUE (`blocker`, `blocked`)
+    );
+
+    CREATE TABLE `characters_items` (
+      `id`     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`    INT          NOT NULL,
+      `item`   INT UNSIGNED NOT NULL,
+      `number` INT UNSIGNED NOT NULL,
+      
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`),
+      UNIQUE (`ENo`, `item`)
+    );
+
+    CREATE TABLE `characters_declarations` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`   INT          NOT NULL,
+      `nth`   INT UNSIGNED NOT NULL,
+      `diary` TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`)
+    );
+
+    CREATE TABLE `characters_results` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`   INT          NOT NULL,
+      `nth`   INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`)
     );
     
     CREATE TABLE `rooms` (
@@ -250,7 +353,7 @@
       `updated_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `last_posted_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `administrator`  BOOLEAN      NOT NULL DEFAULT false,
-      `board` ENUM('community', 'bug')          NOT NULL,
+      `board` ENUM('community', 'trade', 'bug') NOT NULL,
       `state` ENUM('open', 'closed', 'deleted') NOT NULL DEFAULT 'open',
 
       PRIMARY KEY (`id`),
@@ -285,12 +388,84 @@
       PRIMARY KEY (`id`),
       INDEX (`announced_at`)
     );
+
+    CREATE TABLE `items_yield` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `item`  INT UNSIGNED NOT NULL,
+      `yield` INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`)
+    );
+
+    CREATE TABLE `flea_markets` (
+      `id`                 INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `seller`             INT          NOT NULL,
+      `buyer`              INT,
+      `sell_item`          INT UNSIGNED,
+      `sell_item_number`   INT UNSIGNED NOT NULL,
+      `demand_item`        INT UNSIGNED,
+      `demand_item_number` INT UNSIGNED NOT NULL,
+      `state` ENUM('sale', 'sold', 'cancelled') NOT NULL DEFAULT 'sale',
+      
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`sell_item`)   REFERENCES `items_master_data`(`item_id`),
+      FOREIGN KEY (`demand_item`) REFERENCES `items_master_data`(`item_id`)
+    );
+
+    CREATE TABLE `trades` (
+      `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `master`      INT          NOT NULL,
+      `target`      INT          NOT NULL,
+      `item`        INT UNSIGNED,
+      `item_number` INT UNSIGNED NOT NULL,
+      `state` ENUM('trading', 'finished', 'cancelled_by_master', 'cancelled_by_target') NOT NULL,
+      
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`)
+    );
+
+    CREATE TABLE `exploration_logs` (
+      `id`        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `leader`    INT          NOT NULL,
+      `stage`     INT UNSIGNED NOT NULL,
+      `timestamp` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`leader`) REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`stage`)  REFERENCES `exploration_stages_master_data`(`stage_id`)
+    );
   ");
 
   $result = $statement->execute();
 
   if (!$result) {
     echo "テーブルの作成時にエラーが発生しました。";
+    exit;
+  }
+
+  // ゲームステータスの作成
+  // 非メンテナンス中、自動AP配布を行わない、前回結果確定済、次回更新回数1、配布AP量0
+  $statement = $GAME_PDO->prepare("
+    INSERT INTO `game_status` (
+      `maintenance`,
+      `distributing_ap`,
+      `update_status`,
+      `next_update_nth`,
+      `AP`
+    ) VALUES (
+      false,
+      false,
+      true,
+      1,
+      0
+    );
+  ");
+
+  $result = $statement->execute();
+
+  if (!$result) {
+    echo "ゲームステータスの作成時にエラーが発生しました。";
     exit;
   }
 
@@ -376,6 +551,8 @@
       exit;
     }
   }
+
+  require_once GETENV('GAME_ROOT').'/actions/import_master.php';
   
   echo "初期化が完了しました。";
   echo "セッションデータは残留しているため、必要な場合はセッションの削除も行ってください。";

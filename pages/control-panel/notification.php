@@ -15,15 +15,13 @@
       !validatePOST('message',  ['non-empty', 'disallow-special-chars']) ||
       ($_POST['target']  != 'all' && $_POST['target']  != 'particular') // 通知先がallでもparticularでもない
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // 特定のENoへの通知の場合    
     if ($_POST['target'] == 'particular') {
       if (!ctype_digit($_POST['eno'])) { // 受け取ったENoが数値として解釈不能な場合400(Bad Request)を返し処理を中断
-        http_response_code(400); 
-        exit;
+        responseError(400);
       }
 
       $target = intval($_POST['eno']); // 対象を受け取ったENoに
@@ -45,8 +43,7 @@
           
       if (!$result || !$character) {
         // 実行に失敗した場合もしくはキャラクターの取得に失敗した場合500(Internal Server Error)を返して処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
     } else {
       $target = null; // 対象をnullに（null=全体）
@@ -73,8 +70,7 @@
         
     if (!$result) {
       // 実行に失敗した場合500(Internal Server Error)を返して処理を中断
-      http_response_code(500); 
-      exit;
+      responseError(500);
     }
   
     // 特定のENoへの通知かつDiscord通知を行う場合で、対象キャラクターがwebhookを登録している場合

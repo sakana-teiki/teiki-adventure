@@ -16,8 +16,7 @@
         !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_NAME_MAX_LENGTH'])    ||
         !validatePOST('message',  ['non-empty'               , 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH'])
       )  {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
 
       // ステートの値がopenでもclosedでもdeletedでもない場合400(Bad Request)を返し処理を中断
@@ -26,8 +25,7 @@
         $_POST['state'] != 'closed'  &&
         $_POST['state'] != 'deleted'
       ) {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
       
       // 対象のスレッドを取得
@@ -49,28 +47,24 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       $thread = $statement->fetch(); // 実行結果を取得
 
       if (!$thread) {
         // 結果が見つからない場合は404(Not Found)を返し処理を中断
-        http_response_code(404);
-        exit;
+        responseError(404);
       }
 
       if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $thread['administrator']) {
         // 管理者でないユーザーが管理者による投稿を編集しようとしていた場合、403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
 
       if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && !password_verify($_POST['password'], $thread['password'])) {
         // ゲーム管理者としてログインしていない場合、編集パスワードの照合を行い合致しない場合は403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
 
       // スレッドのアップデート
@@ -97,8 +91,7 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500); 
       }
 
       http_response_code(200); // ここまで全てOKなら200を返して処理を終了
@@ -113,8 +106,7 @@
         !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_NAME_MAX_LENGTH'])    ||
         !validatePOST('message',  ['non-empty'               , 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH'])
       )  {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
       
       // ステートの値がasisでもdeletedでもない場合400(Bad Request)を返し処理を中断
@@ -122,8 +114,7 @@
         $_POST['state'] != 'asis'    &&
         $_POST['state'] != 'deleted'
       ) {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
       
       // 対象のレスポンスを取得
@@ -145,28 +136,24 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500); 
       }
 
       $response = $statement->fetch(); // 実行結果を取得
 
       if (!$response) {
         // 結果が見つからない場合は404(Not Found)を返し処理を中断
-        http_response_code(404);
-        exit;
+        responseError(404);
       }
 
       if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $response['administrator']) {
         // 管理者でないユーザーが管理者による投稿を編集しようとしていた場合、403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
 
       if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && !password_verify($_POST['password'], $response['password'])) {
         // ゲーム管理者としてログインしていない場合、編集パスワードの照合を行い合致しない場合は403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
 
       // レスポンスのアップデート
@@ -191,16 +178,14 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       http_response_code(200); // ここまで全てOKなら200を返して処理を終了
       exit;
     } else {
       // どちらでもない場合400(Bad Request)を返して処理を中断
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
   }
 
@@ -213,8 +198,7 @@
     $editType = 'response';
   } else {
     // どちらでもない場合400(Bad Request)を返して処理を中断
-    http_response_code(400);
-    exit;
+    responseError(400);
   }
 
   if ($editType == 'thread') {
@@ -238,15 +222,13 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     $data = $statement->fetch();
 
     if (!$data) {
-      http_response_code(404); // 取得に失敗した場合は404(Not Found)を返して処理を中断
-      exit;
+      responseError(404); // 取得に失敗した場合は404(Not Found)を返して処理を中断
     }
   } else if ($editType == 'response') {
     // 編集タイプがレスポンスの場合、対象のレスポンスを取得
@@ -267,15 +249,13 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     $data = $statement->fetch();
 
     if (!$data) {
-      http_response_code(404); // 取得に失敗した場合は404(Not Found)を返して処理を中断
-      exit;
+      responseError(404); // 取得に失敗した場合は404(Not Found)を返して処理を中断
     }
   }
 

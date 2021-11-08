@@ -14,15 +14,17 @@
       !validatePOST('name',     ['non-empty', 'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_NAME_MAX_LENGTH'])    ||
       !validatePOST('message',  ['non-empty'               , 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // 入力値検証2
-    // boardの指定がcommunityでもbugでもなければ400(Bad Request)を返し処理を中断
-    if ($_POST['board'] !== 'community' && $_POST['board'] !== 'bug') {
-      http_response_code(400);
-      exit;
+    // boardの指定がcommunityでもtradeでもbugでもなければ400(Bad Request)を返し処理を中断
+    if (
+      $_POST['board'] !== 'community' &&
+      $_POST['board'] !== 'trade'     &&
+      $_POST['board'] !== 'bug'
+    ) {
+      responseError(400);
     }
 
     // パスワードのサーバー側ハッシュ化
@@ -68,8 +70,7 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
-      exit;
+      responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
     $lastInsertId = intval($GAME_PDO->lastInsertId()); // 登録されたidを取得
@@ -82,20 +83,21 @@
 
   // URLパラメータにboardの指定がなければ404(Not Found)を返して処理を中断
   if (!isset($_GET['board'])) {
-    http_response_code(404);
-    exit;
+    responseError(404);
   }
 
   switch($_GET['board']) {
     case 'community':
       $boardTitle = '交流'; // URLパラメータのboardの指定がcommunityの場合掲示板名を「交流」に
       break;
+    case 'trade':
+      $boardTitle = '取引'; // URLパラメータのboardの指定がtradeの場合掲示板名を「取引」に
+      break;
     case 'bug':
       $boardTitle = '不具合'; // URLパラメータのboardの指定がbugの場合掲示板名を「不具合」に
       break;
     default:
-      http_response_code(404); // boardの指定がそれ以外の場合404(Not Found)を返して処理を中断
-      exit;
+      responseError(404); // boardの指定がそれ以外の場合404(Not Found)を返して処理を中断
   }
 
   // 現在のページ
@@ -105,8 +107,7 @@
 
   // ページが負なら400(Bad Request)を返して処理を中断
   if ($page < 0) {
-    http_response_code(400); 
-    exit;
+    responseError(400);
   }
 
   // 現在のページのスレッドを取得
@@ -150,8 +151,7 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $threads = $statement->fetchAll();

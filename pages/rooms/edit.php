@@ -8,16 +8,14 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // POSTの場合
     if (!validatePOST('room', ['non-empty', 'integer'])) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     $RNo = $_POST['room']; // POSTのRNoの値を取得
   } else {
     // GETの場合
     if (!validateGET('room', ['non-empty', 'integer'])) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     $RNo = $_GET['room']; // GETのRNoの値を取得
@@ -44,22 +42,19 @@
   $result = $statement->execute();
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $room = $statement->fetch();
 
   if (!$room) {
     // トークルームの取得に失敗した場合は404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
+    responseError(404);
   }
 
   if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $room['administrator'] != $_SESSION['ENo']) {
     // ゲームの管理者でもトークルームの管理者でもない場合は403(Forbidden)を返し処理を中断
-    http_response_code(403); 
-    exit;
+    responseError(403);
   }
 
   // POSTリクエスト時の処理
@@ -72,8 +67,7 @@
       !validatePOST('tags',         [             'single-line', 'disallow-special-chars']) ||
       !validatePOST('delete_check', [])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // 部屋の削除を行う場合
@@ -93,8 +87,7 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500); // 失敗した場合は500(Internal Server Error)を返して処理を中断
-        exit;
+        responseError(500); // 失敗した場合は500(Internal Server Error)を返して処理を中断
       } else {
         header('Location:'.$GAME_CONFIG['URI'].'rooms', true, 302); // 成功した場合はトークルーム一覧にリダイレクト
         exit;
@@ -125,9 +118,8 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // DBへの登録に失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     $room['title']       = $_POST['title'];
@@ -147,9 +139,8 @@
     $result = $statement->execute();
     
     if (!$result) {
-      http_response_code(500);
       $GAME_PDO->rollBack();
-      exit;
+      responseError(500);
     }
 
     // タグの登録
@@ -171,9 +162,8 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500);
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
     }
 

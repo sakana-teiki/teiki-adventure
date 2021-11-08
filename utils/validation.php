@@ -37,6 +37,11 @@ function validateString($target, $validators, $maxLength = -1) {
           return false;
         }
         break;
+      case 'non-negative-integer': // 検査対象は空文字列か0以上の整数でなければならない
+        if ($target !== '' && !preg_match('/^[0-9]+$/', $target)) {
+          return false;
+        }
+        break;
       case 'natural-number': // 検査対象は空文字列か自然数でなければならない
         if ($target !== '' && !preg_match('/^[1-9][0-9]*$/', $target)) {
           return false;

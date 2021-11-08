@@ -16,8 +16,7 @@
       !validatePOST('mode',   []) ||
       !validatePOST('room',   ['non-empty'])
     ) {
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
 
     $roomId = $_POST['room'];                                 // POSTのroomの値を取得
@@ -36,8 +35,7 @@
     $RNo = intval($roomId);
     foreach ($GAME_CONFIG['PUBLIC_ROOMS'] as $publicRoom) {
       if ($RNo == $publicRoom['RNo']) {
-        http_response_code(404); 
-        exit;
+        responseError(404);
       }
     }
   } else {
@@ -52,8 +50,7 @@
     }
     
     if (!$publicRoomAliasMatched) {
-      http_response_code(404); 
-      exit;
+      responseError(404);
     }
   }
 
@@ -64,8 +61,7 @@
 
   // $modeがresで$rootの設定がなければ400を返して処理を中断
   if ($mode == 'res' && $root == null) {
-    http_response_code(400); 
-    exit;
+    responseError(400);
   }
 
   // 現在のページ
@@ -75,8 +71,7 @@
 
   // ページが負なら400(Bad Request)を返して処理を中断
   if ($page < 0) {
-    http_response_code(400); 
-    exit;
+    responseError(400);
   }
 
   // DBからキャラクターを取得
@@ -98,8 +93,7 @@
 
   if (!$result || !$user) {
     // SQLの実行または結果の取得に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   // DBからトークルームのデータを取得
@@ -126,16 +120,14 @@
   $result = $statement->execute();
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
   $room = $statement->fetch();
 
   if (!$room) {
     // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-    http_response_code(404); 
-    exit;
+    responseError(404);
   }
 
   // POSTの処理
@@ -149,8 +141,7 @@
         !validatePOST('name',    ['single-line', 'disallow-special-chars'], $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']) ||
         !validatePOST('message', ['non-empty',   'disallow-special-chars'], $GAME_CONFIG['ROOM_MESSAGE_MAX_LENGTH'])
       ) {
-        http_response_code(400); 
-        exit;
+        responseError(400);
       }
 
       // 返信を行う場合
@@ -179,16 +170,14 @@
 
         if (!$result) {
           // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-          http_response_code(500); 
-          exit;
+          responseError(500);
         }
 
         $data = $statement->fetch();
       
         if (!$data) {
           // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-          http_response_code(404); 
-          exit;
+          responseError(404);
         }
 
         $referRoot  = $data['refer_root'] ? $data['refer_root'] : $data['id'];   // 返信先にrefer_rootが存在する場合はそれを、ない場合は返信先のidをreferRootに
@@ -247,9 +236,8 @@
 
       if (!$result) {
         // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-        http_response_code(500); 
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
 
       $lastInsertId = intval($GAME_PDO->lastInsertId()); // idを取得
@@ -273,9 +261,8 @@
         
         if (!$result) {
           // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-          http_response_code(500);
           $GAME_PDO->rollBack();
-          exit;
+          responseError(500);
         }
       }
 
@@ -469,8 +456,7 @@
       // 入力値検証
       // 受け取ったデータにidがなければ400(Bad Request)を返して処理を中断
       if (!validatePOST('id', ['non-empty', 'natural-number'])) {
-        http_response_code(400); 
-        exit;
+        responseError(400);
       }
 
       // DBから削除対象のメッセージを取得
@@ -489,22 +475,19 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       $data = $statement->fetch();
     
       if (!$data) {
         // 実行結果の取得に失敗した場合は404(Not Found)を返し処理を中断
-        http_response_code(404); 
-        exit;
+        responseError(404); 
       }
 
       if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $data['ENo'] != $_SESSION['ENo']) {
         // 削除しようとしているのがゲーム管理者ではなく、削除対象の投稿者が削除者と異なる場合403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
       
       // 対象の投稿を削除状態に
@@ -523,15 +506,13 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
     } else if ($_POST['action'] == 'subscribe') {
       // 購読処理の場合
       if ($room['official'] || $room['subscribing']) {
         // 対象が公式トークルーム、あるいはすでに購読している場合は400(Bad Request)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
       
       // 購読処理を行う
@@ -552,8 +533,7 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       $room['subscribing'] = true;
@@ -561,8 +541,7 @@
       // 購読解除処理の場合
       if (!$room['subscribing']) {
         // 未購読の場合は400(Bad Request)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
       
       // 購読解除処理を行う
@@ -580,15 +559,13 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       $room['subscribing'] = false;
     } else {
       // 以上のアクションのどれでもない場合400(Bad Request)を返し処理を中断
-      http_response_code(400); 
-      exit;
+      responseError(400);
     }
   }
 
@@ -800,8 +777,7 @@
 
   if (!$result) {
     // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500); 
   }
 
   $messages = $statement->fetchAll();

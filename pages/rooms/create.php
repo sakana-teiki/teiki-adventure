@@ -13,8 +13,7 @@
       !validatePOST('summary',     [             'single-line', 'disallow-special-chars', 'disallow-space-only'], $GAME_CONFIG['ROOM_SUMMARY_MAX_LENGTH'])     ||
       !validatePOST('tags',        [             'single-line'])
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // DB登録処理
@@ -44,9 +43,8 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // DBへの登録に失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     $lastInsertId = intval($GAME_PDO->lastInsertId()); // 登録されたidを取得
@@ -77,9 +75,8 @@
     $result = $statement->execute();
 
     if (!$result) {
-      http_response_code(500); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     // 登録されたRNoの取得
@@ -98,9 +95,8 @@
     $room   = $statement->fetch();
 
     if (!$result || !$room) {
-      http_response_code(500); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
-      $GAME_PDO->rollBack();
-      exit;
+      $GAME_PDO->rollBack(); // 失敗あるいは結果が存在しない場合は500(Internal Server Error)を返してロールバックし、処理を中断
+      responseError(500);
     }
 
     // タグの登録
@@ -122,9 +118,8 @@
       $result = $statement->execute();
       
       if (!$result) {
-        http_response_code(500);
         $GAME_PDO->rollBack();
-        exit;
+        responseError(500);
       }
     }
 

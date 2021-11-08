@@ -7,9 +7,8 @@
 
   $result = $statement->execute();
 
-  if (!$result) { // 失敗した場合は500(Internal Server Error)を返してロールバックし、処理を中断
-    http_response_code(500);
-    exit;
+  if (!$result) { // 失敗した場合は500(Internal Server Error)を返して処理を中断
+    responseError(500);
   }
 
   $tables = $statement->fetchAll();
@@ -28,8 +27,7 @@
     if (
       !isset($_POST['initialize_key']) // 受け取ったデータに初期化キーがない
     ) {
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
     
     // クライアント側のハッシュ化と同様のハッシュ化処理
@@ -40,8 +38,7 @@
   
     // ハッシュ化された初期化キーがサーバー側のものと一致しなければ403(Forbidden)を返し処理を中断
     if ($_POST['initialize_key'] !== $initializeKey) {
-      http_response_code(403);
-      exit;
+      responseError(403);
     }
 
     // 問題なければ初期化を行う

@@ -1,7 +1,7 @@
 </head>
 <body>
 <?php if ($GAME_LOGGEDIN_AS_ADMINISTRATOR) { ?>
-  <div style="position:fixed; right:10px; top:10px; pointer-events:none; background: #c2193e; padding: 10px 20px; color: white; font-weight: bold; border-radius: 8px;">管理者モード</div>
+  <div style="position:fixed; right:10px; top:10px; pointer-events:none; background: #c2193e; padding: 10px 20px; color: white; font-weight: bold; border-radius: 8px;">管理者モード<?= $GAME_MAINTENANCE ? ' / メンテナンス中' : '' ?></div>
 <?php } ?>
 <header>
   <section id="title">

@@ -7,8 +7,7 @@
   // POSTリクエスト時の処理
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_POST['category'])) { // 受け取ったデータにカテゴリがない場合は400(Bad Request)を返し処理を中断
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
 
     // カテゴリごとに処理を振り分け
@@ -42,8 +41,7 @@
         !validatePOST('notification_webhook_faved',          ['non-empty', 'boolean']) ||
         !validatePOST('notification_webhook_direct_message', ['non-empty', 'boolean'])
       ) {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
 
       // キャラクター情報のアップデート
@@ -79,8 +77,7 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       http_response_code(200); // ここまで全てOKなら200を返して処理を終了
@@ -92,8 +89,7 @@
         !validatePOST('currentPassword', ['non-empty']) ||
         !validatePOST('newPassword',     ['non-empty'])
       ) {
-        http_response_code(400);
-        exit;
+        responseError(400);
       }
 
       // キャラクターデータを取得
@@ -113,14 +109,12 @@
 
       if (!$result || !$data) {
         // SQLの実行やデータの取得に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       if (!password_verify($_POST['currentPassword'], $data['password'])) {
         // パスワードの照合を行い合致しない場合は403(Forbidden)を返し処理を中断
-        http_response_code(403);
-        exit;
+        responseError(403);
       }
 
       // 新しいパスワードのサーバー側ハッシュ化
@@ -143,8 +137,7 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       http_response_code(200); // ここまで全てOKなら200を返して処理を終了
@@ -167,8 +160,7 @@
 
       if (!$result) {
         // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
-        http_response_code(500); 
-        exit;
+        responseError(500);
       }
 
       // セッションの破棄
@@ -179,8 +171,7 @@
       exit;
     } else {
       // カテゴリーが上記のどれでもない場合400(Bad Request)を返し処理を終了
-      http_response_code(400);
-      exit;
+      responseError(400);
     }
   }
   
@@ -209,11 +200,10 @@
 
   if (!$result || !$character) {
     // SQLの実行や実行結果の取得に失敗した場合は500(Internal Server Error)を返し処理を中断
-    http_response_code(500); 
-    exit;
+    responseError(500);
   }
 
-  $PAGE_SETTING['TITLE'] = '設定';
+  $PAGE_SETTING['TITLE'] = 'ゲーム設定';
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
@@ -223,7 +213,7 @@
   if ($_SERVER['REQUEST_METHOD'] == 'GET') { // GETリクエスト時の処理
 ?>
 
-<h1>設定</h1>
+<h1>ゲーム設定</h1>
 
 <p>
   各項目カテゴリごとに設定を行ってください。<br>

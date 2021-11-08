@@ -9,8 +9,8 @@
 - jQuery/CSSリセットを使用する。その他の前提リソースは必然性がなければ導入しない。
 
 ## 動作環境
-- PHP 5.4.0以上
-- MySQLもしくはMariaDB（バージョン調査中）
+- PHP 7.4以上
+- MySQL 5.7以上もしくはMariaDB 10.2以上
 - mod_rewriteが使用可能なApache 2.4.0以上
 - 最新のChrome / Firefox / Edge / Android Chrome / PC Safari / iOS Safari
 
