@@ -72,7 +72,7 @@
 
     $statement->execute();
 
-    http_response_code(200); // ここまで終了したら200(OK)を返して処理を終了
+    header('Location:'.$GAME_CONFIG['URI'].'thread?id='.$_POST['thread'], true, 302); // スレッドをリロード
     exit;
   }
 
@@ -324,9 +324,19 @@
 
   <div id="error-message-area"></div>
 
-  <div class="button-wrapper">
-    <button id="send-button" class="button">送信</button>
-  </div>
+  <form id="form" method="post">
+    <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
+    <input type="hidden" name="thread" value="<?=$_GET['id']?>">
+    <input id="input-hidden-title" type="hidden" name="title">
+    <input id="input-hidden-name" type="hidden" name="name">
+    <input id="input-hidden-message" type="hidden" name="message">
+    <input id="input-hidden-secret" type="hidden" name="secret">
+    <input id="input-hidden-password" type="hidden" name="password">
+
+    <div class="button-wrapper">
+      <button id="send-button" class="button">送信</button>
+    </div>
+  </form>
 </div>
 <script src="<?=$GAME_CONFIG['URI']?>scripts/jssha-sha256.js"></script>
 <script>
@@ -377,7 +387,7 @@
     }
   });
 
-  $('#send-button').on('click', function() {
+  $('#form').submit(function(){
     // 各種の値を取得
     var inputName     = $('#input-name').val();
     var inputMessage  = $('#input-message').val();
@@ -388,29 +398,35 @@
     // 名前が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputName) {
       showErrorMessage('名前が入力されていません');
-      return;
+      return false;
     }
     // 名前が長すぎる場合エラーメッセージを表示して処理を中断
     if (inputName.length > <?=$GAME_CONFIG['THREAD_NAME_MAX_LENGTH']?>) {
       showErrorMessage('名前が長すぎます');
-      return;
+      return false;
     }
 
     // 本文が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputMessage) {
       showErrorMessage('本文が入力されていません');
-      return;
+      return false;
     }
     // 本文が長すぎる場合エラーメッセージを表示して処理を中断
     if (inputMessage.length > <?=$GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH']?>) {
       showErrorMessage('本文が長すぎます');
-      return;
+      return false;
     }
 
     // 編集パスワードが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputPassword) {
       showErrorMessage('編集パスワードが入力されていません');
-      return;
+      return false;
+    }
+
+    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
+    if (waitingResponse == true) {
+      alert("送信中です。しばらくお待ち下さい。");
+      return false;
     }
 
     // 現在のパスワードのハッシュ化
@@ -421,27 +437,13 @@
       hashedPassword = shaObj.getHash("HEX");
     }
 
-    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
-    if (waitingResponse == true) {
-      alert("送信中です。しばらくお待ち下さい。");
-      return;
-    }
+    // 送信
+    $('#input-hidden-name').val(inputName);
+    $('#input-hidden-message').val(inputMessage);
+    $('#input-hidden-secret').val(inputSecret);
+    $('#input-hidden-password').val(hashedPassword);
 
     waitingResponse = true; // レスポンス待ち状態をONに
-
-    $.post(location.href, { // このページのURLにPOST送信
-      thread:   '<?=$_GET['id']?>',
-      name:     inputName,
-      message:  inputMessage,
-      secret:   inputSecret,
-      password: hashedPassword
-    }).done(function() {
-      location.reload(); // 成功したらページをリロード
-    }).fail(function() { 
-      showErrorMessage('処理中にエラーが発生しました'); // エラーが発生した場合エラーメッセージを表示
-    }).always(function() {
-      waitingResponse = false;  // 接続終了後はレスポンス待ち状態を解除
-    });
   });
 </script>
 

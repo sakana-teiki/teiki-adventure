@@ -117,7 +117,7 @@
     $_SESSION['token']         = $token;            // セッションにCSRFトークンを設定
     $_SESSION['administrator'] = false;             // セッションに管理者ステータスを設定
 
-    http_response_code(200); // ここまで全てOKなら200を返して処理を終了
+    header('Location:'.$GAME_CONFIG['URI'].'home', true, 302); // ホームにリダイレクト
     exit;
   }
 
@@ -133,11 +133,6 @@
 
 </style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
-
-<?php
-  if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    // GETリクエスト時の処理
-?>
 
 <section>
   <h2>利用規約</h2>
@@ -184,9 +179,15 @@
 
   <div id="error-message-area"></div>
 
-  <div class="button-wrapper">
-    <button id="signup-button" class="button">登録</button>
-  </div>
+  <form id="form" method="post">
+    <input id="input-hidden-name" type="hidden" name="name">
+    <input id="input-hidden-nickname" type="hidden" name="nickname">
+    <input id="input-hidden-password" type="hidden" name="password">
+
+    <div class="button-wrapper">
+      <button class="button">登録</button>
+    </div>
+  </form>
 </section>
 <script src="<?=$GAME_CONFIG['URI']?>scripts/jssha-sha256.js"></script>
 <script>
@@ -205,7 +206,7 @@
     );
   }
 
-　$('#signup-button').on('click', function() {
+  $('#form').submit(function(){
     // 各種の値を取得
     var inputName     = $('#input-name').val();
     var inputNickname = $('#input-nickname').val();
@@ -216,45 +217,51 @@
     // フルネームが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputName) {
       showErrorMessage('フルネームが入力されていません');
-      return;
+      return false;
     }
     // フルネームが長すぎる場合エラーメッセージを表示して処理を中断
     if (inputName.length > <?=$GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']?>) {
       showErrorMessage('フルネームが長すぎます');
-      return;
+      return false;
     }
 
     // 短縮名が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputNickname) {
       showErrorMessage('短縮名が入力されていません');
-      return;
+      return false;
     }
     // 短縮名が長すぎる場合エラーメッセージを表示して処理を中断
     if (inputNickname.length > <?=$GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH']?>) {
       showErrorMessage('短縮名が長すぎます');
-      return;
+      return false;
     }
 
     // パスワードが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputPassword) {
       showErrorMessage('パスワードが入力されていません');
-      return;
+      return false;
     }
     // パスワードが短すぎる場合エラーメッセージを表示して処理を中断
     if (inputPassword.length < <?=$GAME_CONFIG['PASSWORD_MIN_LENGTH']?>) {
       showErrorMessage('パスワードが短すぎます');
-      return;
+      return false;
     }
 
     // パスワード再入力が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputConfirm) {
       showErrorMessage('パスワード再入力が入力されていません');
-      return;
+      return false;
     }
     // 再入力したパスワードが一致しない場合エラーメッセージを表示して処理を中断
     if (inputPassword != inputConfirm) {
       showErrorMessage('パスワードと再入力の内容が一致しません');
-      return;
+      return false;
+    }
+
+    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
+    if (waitingResponse == true) {
+      alert("送信中です。しばらくお待ち下さい。");
+      return false;
     }
 
     // パスワードのハッシュ化
@@ -266,29 +273,11 @@
     }
 
     // 送信
-    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
-    if (waitingResponse == true) {
-      alert("送信中です。しばらくお待ち下さい。");
-      return;
-    }
+    $('#input-hidden-name').val(inputName);
+    $('#input-hidden-nickname').val(inputNickname);
+    $('#input-hidden-password').val(hashedPassword);
 
     waitingResponse = true; // レスポンス待ち状態をONに
-    $.post(location.href, { // このページのURLにPOST送信
-      name:     inputName,
-      nickname: inputNickname,
-      password: hashedPassword
-    }).done(function() {
-      location.href = '<?=$GAME_CONFIG['HOME_URI']?>'; // ホームにリダイレクト
-    }).fail(function() { 
-      showErrorMessage('登録処理中にエラーが発生しました'); // エラーが発生した場合エラーメッセージを表示
-    }).always(function() {
-      waitingResponse = false;  // 接続終了後はレスポンス待ち状態を解除
-    });
   });
 </script>
-
-<?php
-  } 
-?>
-
 <?php require GETENV('GAME_ROOT').'/components/footer.php'; ?>

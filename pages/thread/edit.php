@@ -94,8 +94,13 @@
         responseError(500); 
       }
 
-      http_response_code(200); // ここまで全てOKなら200を返して処理を終了
-      exit;
+      if ($_POST['state'] == 'deleted') {
+        header('Location:'.$GAME_CONFIG['URI'].'board?board='.$thread['board'], true, 302); // 削除なら該当の掲示板にリダイレクト
+        exit;
+      } else {
+        header('Location:'.$GAME_CONFIG['URI'].'thread?id='.$_POST['target'], true, 302); // 削除でないなら編集したスレッドにリダイレクト
+        exit;
+      }
     } else if (isset($_POST['type']) && $_POST['type'] == 'response') {
       // 送信タイプがresponseの場合の処理
       // 入力値検証
@@ -172,7 +177,7 @@
       $statement->bindParam(':target',  $_POST['target']);
       $statement->bindParam(':name',    $_POST['name']);
       $statement->bindParam(':message', $_POST['message']);
-      $statement->bindValue(':deleted', $_POST['state'] == 'deleted');
+      $statement->bindValue(':deleted', $_POST['state'] == 'deleted', PDO::PARAM_BOOL);
 
       $result = $statement->execute();
 
@@ -181,7 +186,7 @@
         responseError(500);
       }
 
-      http_response_code(200); // ここまで全てOKなら200を返して処理を終了
+      header('Location:'.$GAME_CONFIG['URI'].'thread?id='.$response['thread'], true, 302); // 編集したスレッドにリダイレクト
       exit;
     } else {
       // どちらでもない場合400(Bad Request)を返して処理を中断
@@ -314,9 +319,21 @@
 
   <div id="error-message-area"></div>
 
-  <div class="button-wrapper">
-    <button id="send-button" class="button">編集</button>
-  </div>
+  <form id="form" method="post">
+    <input type="hidden" name="type" value="<?=$editType?>">
+    <input type="hidden" name="target" value="<?=$data['id']?>">
+    <input id="input-hidden-state" type="hidden" name="state">
+<?php if ($editType == 'thread') { ?>
+    <input id="input-hidden-title" type="hidden" name="title">
+<?php } ?>
+    <input id="input-hidden-name" type="hidden" name="name">
+    <input id="input-hidden-message" type="hidden" name="message">
+    <input id="input-hidden-password" type="hidden" name="password">
+
+    <div class="button-wrapper">
+      <button class="button">編集</button>
+    </div>
+  </form>
 </section>
 
 <script src="<?=$GAME_CONFIG['URI']?>scripts/jssha-sha256.js"></script>
@@ -336,7 +353,7 @@
     );
   }
 
-  $('#send-button').on('click', function() {
+  $('#form').submit(function(){
     // 各種の値を取得
     var inputState    = $('#input-state').val();
 <?php if ($editType == 'thread') { ?>
@@ -351,44 +368,50 @@
     // タイトルが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputTitle) {
       showErrorMessage('タイトルが入力されていません');
-      return;
+      return false;
     }
     // タイトルが長すぎる場合エラーメッセージを表示して処理を中断
     if (inputTitle.length > <?=$GAME_CONFIG['THREAD_TITLE_MAX_LENGTH']?>) {
       showErrorMessage('タイトルが長すぎます');
-      return;
+      return false;
     }
 
 <?php } ?>
     // 名前が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputName) {
       showErrorMessage('名前が入力されていません');
-      return;
+      return false;
     }
     // 名前が長すぎる場合エラーメッセージを表示して処理を中断
     if (inputName.length > <?=$GAME_CONFIG['THREAD_NAME_MAX_LENGTH']?>) {
       showErrorMessage('名前が長すぎます');
-      return;
+      return false;
     }
 
     // 本文が入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputMessage) {
       showErrorMessage('本文が入力されていません');
-      return;
+      return false;
     }
     // 本文が長すぎる場合エラーメッセージを表示して処理を中断
     if (inputMessage.length > <?=$GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH']?>) {
       showErrorMessage('本文が長すぎます');
-      return;
+      return false;
     }
 
 <?php if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR) { ?>
     // 編集パスワードが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputPassword) {
       showErrorMessage('編集パスワードが入力されていません');
-      return;
+      return false;
     }
 <?php } ?>
+
+    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
+    if (waitingResponse == true) {
+      alert("送信中です。しばらくお待ち下さい。");
+      return false;
+    }
 
     // パスワードのハッシュ化
     var hashedPassword = inputPassword + hashSalt; // ソルティング
@@ -398,39 +421,16 @@
       hashedPassword = shaObj.getHash("HEX");
     }
 
-    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
-    if (waitingResponse == true) {
-      alert("送信中です。しばらくお待ち下さい。");
-      return;
-    }
+    // 送信
+    $('#input-hidden-state').val(inputState);
+<?php if ($editType == 'thread') { ?>
+    $('#input-hidden-title').val(inputTitle);
+<?php } ?>
+    $('#input-hidden-name').val(inputName);
+    $('#input-hidden-message').val(inputMessage);
+    $('#input-hidden-password').val(hashedPassword);
 
     waitingResponse = true; // レスポンス待ち状態をONに
-
-    $.post(location.href, { // このページのURLにPOST送信
-      type:     '<?=$editType?>',
-      target:   <?=$data['id']?>,
-      state:   inputState,
-<?php if ($editType == 'thread') { ?>
-      title:    inputTitle,
-<?php } ?>
-      name:     inputName,
-      message:  inputMessage,
-      password: hashedPassword
-    }).done(function() { // 完了した場合
-<?php if ($editType == 'thread') { ?>
-      if (inputState == 'deleted') {
-        location.href = '<?=$GAME_CONFIG['URI']?>board?board=<?=$data['board']?>'; // 削除の場合掲示板にリダイレクト
-      } else {
-        location.href = '<?=$GAME_CONFIG['URI']?>thread?id=<?=$data['id']?>'; // 削除でない場合スレッドにリダイレクト
-      }
-<?php } else if ($editType == 'response') { ?>
-      location.href = '<?=$GAME_CONFIG['URI']?>thread?id=<?=$data['thread']?>'; // スレッドにリダイレクト
-<?php } ?>
-    }).fail(function() { 
-      showErrorMessage('処理中にエラーが発生しました'); // エラーが発生した場合エラーメッセージを表示
-    }).always(function() {
-      waitingResponse = false;  // 接続終了後はレスポンス待ち状態を解除
-    });
   });
 </script>
 

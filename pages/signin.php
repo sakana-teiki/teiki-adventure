@@ -55,7 +55,7 @@
     $_SESSION['token'] = $data['token'];                 // セッションにCSRFトークンを設定
     $_SESSION['administrator'] = $data['administrator']; // セッションに管理者ステータスを設定
 
-    http_response_code(200); // ここまで全てOKなら200を返して処理を終了
+    header('Location:'.$GAME_CONFIG['URI'].'home', true, 302); // ホームにリダイレクト
     exit;
   }
 
@@ -85,9 +85,14 @@
 
   <div id="error-message-area"></div>
   
-  <div class="button-wrapper">
-    <button id="signin-button" class="button">ログイン</button>
-  </div>
+  <form id="form" method="post">
+    <input id="input-hidden-eno" type="hidden" name="eno">
+    <input id="input-hidden-password" type="hidden" name="password">
+
+    <div class="button-wrapper">
+      <button class="button">ログイン</button>
+    </div>
+  </form>
 </section>
 <script src="<?=$GAME_CONFIG['URI']?>scripts/jssha-sha256.js"></script>
 <script>
@@ -106,7 +111,7 @@
     );
   }
 
-　$('#signin-button').on('click', function() {
+  $('#form').submit(function(){
     // 各種の値を取得
     var inputENo      = $('#input-eno').val();
     var inputPassword = $('#input-password').val();
@@ -115,24 +120,30 @@
     // フルネームが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputENo) {
       showErrorMessage('ENoが入力されていません');
-      return;
+      return false;
     }
     // ENoの入力形式が正しくない場合エラーメッセージを表示して処理を中断
     // (数として解釈不能、整数でない)
     if (Number(inputENo) == NaN || !Number.isInteger(Number(inputENo))) {
       showErrorMessage('ENoの入力形式が正しくありません');
-      return;
+      return false;
     }
 
     // パスワードが入力されていない場合エラーメッセージを表示して処理を中断
     if (!inputPassword) {
       showErrorMessage('パスワードが入力されていません');
-      return;
+      return false;
     }
     // パスワードが短すぎる場合エラーメッセージを表示して処理を中断
     if (inputPassword.length < <?=$GAME_CONFIG['PASSWORD_MIN_LENGTH']?>) {
       showErrorMessage('パスワードが短すぎます');
-      return;
+      return false;
+    }
+
+    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
+    if (waitingResponse == true) {
+      alert("送信中です。しばらくお待ち下さい。");
+      return false;
     }
 
     // パスワードのハッシュ化
@@ -144,23 +155,10 @@
     }
 
     // 送信
-    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
-    if (waitingResponse == true) {
-      alert("送信中です。しばらくお待ち下さい。");
-      return;
-    }
+    $('#input-hidden-eno').val(inputENo);
+    $('#input-hidden-password').val(hashedPassword);
 
     waitingResponse = true; // レスポンス待ち状態をONに
-    $.post(location.href, { // このページのURLにPOST送信
-      eno:      Number(inputENo),
-      password: hashedPassword
-    }).done(function() {
-      location.href = '<?=$GAME_CONFIG['HOME_URI']?>'; // ホームにリダイレクト
-    }).fail(function() { 
-      showErrorMessage('ログインに失敗しました'); // エラーが発生した場合エラーメッセージを表示
-    }).always(function() {
-      waitingResponse = false;  // 接続終了後はレスポンス待ち状態を解除
-    });
   });
 </script>
 
