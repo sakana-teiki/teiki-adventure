@@ -11,7 +11,7 @@
       responseError(400);
     }
 
-    // キャラクターのアイコン上限の付与
+    // 指定キャラクターの削除フラグをtrueに
     $statement = $GAME_PDO->prepare("
       UPDATE
         `characters`
