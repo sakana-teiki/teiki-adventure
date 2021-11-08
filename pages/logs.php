@@ -140,7 +140,7 @@
         <?php
           $directory = strval(floor($log['id']/10000) + 1); // ディレクトリ名を計算
         ?>
-        <a href="<?=$GAME_CONFIG['URI']?>/logs/<?=$directory.'/'.$log['id'].'.html'?>" target="_blank"><?= $log['title'] ?></a>
+        <a href="<?=$GAME_CONFIG['URI']?>logs/<?=$directory.'/'.$log['id'].'.html'?>" target="_blank"><?= $log['title'] ?></a>
       </td>
       <td class="leader">
         <a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$log['leader']?>">

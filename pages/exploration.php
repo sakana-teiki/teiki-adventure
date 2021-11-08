@@ -358,7 +358,7 @@
   <h2>探索結果</h2>
 
   <p>
-    <?=$stage['title']?>を探索しました。ログは<a href="<?=$GAME_CONFIG['URI']?>/logs/<?=$directory.'/'.$lastInsertId.'.html'?>" target="_blank">こちら</a>よりアクセスできます。
+    <?=$stage['title']?>を探索しました。ログは<a href="<?=$GAME_CONFIG['URI']?>logs/<?=$directory.'/'.$lastInsertId.'.html'?>" target="_blank">こちら</a>よりアクセスできます。
   </p>
 </section>
 <?php } ?>
