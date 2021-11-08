@@ -22,6 +22,11 @@
     exit;
   }
 
+  // キャッシュの無効化
+  header('Cache-Control:no-store,no-cache,must-revalidate,max-age=0');
+  header('Cache-Control:post-check=0,pre-check=0', FALSE);
+  header('Pragma:no-cache');
+
   // セッションの開始
   ini_set('session.gc_maxlifetime' , $GAME_CONFIG['SESSION_LIFETIME']); // セッションの有効時間を指定
   ini_set('session.cookie_lifetime', $GAME_CONFIG['SESSION_LIFETIME']); // クッキーの有効時間を指定
