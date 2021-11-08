@@ -1,5 +1,7 @@
 SetEnv GAME_ROOT "C:\xampp\htdocs\teiki"
 
+Options -Indexes
+
 ErrorDocument 400 /teiki/error-pages/400.html
 ErrorDocument 403 /teiki/error-pages/403.html
 ErrorDocument 404 /teiki/error-pages/404.html
