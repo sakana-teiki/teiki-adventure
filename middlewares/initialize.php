@@ -33,26 +33,52 @@
   $GAME_LOGGEDIN = isset($_SESSION['ENo']); // ログインしているかどうか
   $GAME_LOGGEDIN_AS_ADMINISTRATOR = isset($_SESSION['administrator']) && $_SESSION['administrator']; // 管理者としてログインしているかどうか
 
-  // メンテナンス状態の取得
+  // メンテナンス状態及びキャラクターの削除状態の取得
   $statement = $GAME_PDO->prepare("
     SELECT
-      `maintenance`
+      `maintenance`,
+      IFNULL((SELECT `deleted` FROM `characters` WHERE `ENo` = :ENo), false) AS `deleted`
     FROM
       `game_status`;
   ");
+
+  $statement->bindParam(':ENo', $_SESSION['ENo']);
   
   $result     = $statement->execute();
   $gameStatus = $statement->fetch();
 
   if (!$result || !$gameStatus) {
-    $GAME_MAINTENANCE = false;
-  } else {
-    $GAME_MAINTENANCE = $gameStatus['maintenance'];
+    // SQLの実行に失敗した場合
+
+    // まだ初期化が行われていないだけかチェック
+    // 全テーブルを取得
+    $statement = $GAME_PDO->prepare("SHOW TABLES;");
+    $result = $statement->execute();
+
+    if (!$result) { // これにも失敗した場合は500(Internal Server Error)を返して処理を中断
+      responseError(500);
+    }
+
+    $tables = $statement->fetchAll();
+
+    if (!$tables) { // テーブルがないならまだ初期化が行われていないだけのため適切な値をセットして処理を続行
+      $gameStatus = array(
+        'maintenance' => false,
+        'deleted'     => false
+      );      
+    } else {
+      responseError(500); // ではない場合は不明なエラーのため500(Internal Server Error)を返して中断
+    }
   }
 
-  // メンテナンス中なら503を表示して中断
+  if ($gameStatus['deleted']) {
+    header('Location:'.$GAME_CONFIG['URI'].'signout', true, 302); // キャラクターが削除されていた場合はログアウトページにリダイレクト
+  }
+
+  $GAME_MAINTENANCE = $gameStatus['maintenance'];
+  
   if (!$GAME_LOGGEDIN_AS_ADMINISTRATOR && $GAME_MAINTENANCE) {
-    responseError(503);
+    responseError(503); // 管理者以外ははメンテナンス中なら503(Service Unavailable)を表示して中断
   }
 
 ?>
