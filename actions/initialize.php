@@ -69,7 +69,7 @@
       `tradable`       BOOLEAN      NOT NULL,
       `usable`         BOOLEAN      NOT NULL,
       `relinquishable` BOOLEAN      NOT NULL,
-      `createable`     BOOLEAN      NOT NULL,
+      `creatable`      BOOLEAN      NOT NULL,
       `category`       ENUM('material', 'consumable') NOT NULL,
       
       PRIMARY KEY (`id`),
