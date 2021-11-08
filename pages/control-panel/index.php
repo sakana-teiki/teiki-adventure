@@ -23,6 +23,7 @@
   <h2>キャラクターデータ変更</h2>
   <a href="<?=$GAME_CONFIG['URI']?>control-panel/character/icon-limit">アイコン上限付与</a><br>
   <a href="<?=$GAME_CONFIG['URI']?>control-panel/character/password">パスワード再発行</a><br>
+  <a href="<?=$GAME_CONFIG['URI']?>control-panel/character/delete">指定キャラクター削除</a><br>
 
   <h2>マスタデータ</h2>
   <a href="<?=$GAME_CONFIG['URI']?>control-panel/master/export">エクスポート</a><br>
