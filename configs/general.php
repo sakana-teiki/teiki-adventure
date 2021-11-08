@@ -44,6 +44,7 @@ $GAME_CONFIG['TITLE_TEMPLATE'] = ' | Teiki Adventure'; // ページタイトル�
 $GAME_CONFIG['CHARACTER_LIST_ITEMS_PER_PAGE'] = 100; // キャラクターリストページで1ページあたりに表示するキャラクター数を指定します。
 $GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE']      = 30;  // トークルーム一覧ページで1ページあたりに表示するトークルーム数を指定します。
 $GAME_CONFIG['ROOM_MESSAGES_PER_PAGE']        = 20;  // トークルームで1ページあたりに表示するメッセージ数を指定します。
+$GAME_CONFIG['EXPLORATION_LOGS_PER_PAGE']     = 20;  // 探索ログで1ページあたりに表示するログ数を指定します。
 $GAME_CONFIG['THREADS_PER_PAGE']              = 50;  // 掲示板で1ページあたりに表示するスレッド数を指定します。
 $GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE']      = 50;  // 個別のダイレクトメッセージで1ページあたりに表示するダイレクトメッセージ数を指定します。
 $GAME_CONFIG['ANNOUNCEMENTS_LIMIT']           = 5;   // お知らせ画面を表示した際のデフォルトのお知らせの表示件数を指定します。
