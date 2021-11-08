@@ -8,7 +8,7 @@
     require GETENV('GAME_ROOT').'/actions/import_master.php';
 
     // 完了したらリロードさせる
-    header("Location: ".$GAME_CONFIG['ABSOLUTE_URI'].'control-panel/master/import');
+    header("Location: ".$GAME_CONFIG['URI'].'control-panel/master/import');
   }
 
   $PAGE_SETTING['TITLE'] = 'マスタデータインポート';

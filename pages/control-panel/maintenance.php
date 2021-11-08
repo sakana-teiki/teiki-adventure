@@ -28,7 +28,7 @@
     }
 
     // 完了したらリロードさせる
-    header("Location: ".$GAME_CONFIG['ABSOLUTE_URI'].'control-panel/maintenance');
+    header("Location: ".$GAME_CONFIG['URI'].'control-panel/maintenance');
   }
 
   $PAGE_SETTING['TITLE'] = 'メンテナンス切り替え';

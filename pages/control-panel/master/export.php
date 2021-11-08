@@ -8,7 +8,7 @@
     require GETENV('GAME_ROOT').'/actions/export_master.php';
 
     // 完了したらリロードさせる
-    header("Location: ".$GAME_CONFIG['ABSOLUTE_URI'].'control-panel/master/export');
+    header("Location: ".$GAME_CONFIG['URI'].'control-panel/master/export');
   }
 
   $PAGE_SETTING['TITLE'] = 'マスタデータエクスポート';
