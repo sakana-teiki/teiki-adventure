@@ -14,10 +14,6 @@ $GAME_CONFIG['IDENTIFIER_LENGTH']   = 8;              // スレッドの発言ID
 $GAME_CONFIG['CLIENT_HASH_STRETCH'] = 100;            // ハッシュ化する際のストレッチ回数を指定します。
 $GAME_CONFIG['CLIENT_HASH_SALT']    = 'xBjaS2EXACQy'; // ハッシュ化する際のsaltを指定します。本番環境では別の十分な強度の文字列に変更してください。注意：JavaScriptのシングルクォーテーション内に展開されます。これによりどのような影響があるかがわからない場合は記号は設定しないでください。
 
-//セッション関連
-$GAME_CONFIG['SESSION_NAME']     = 'teiki_session';      // セッション名を指定します。 
-$GAME_CONFIG['SESSION_LIFETIME'] = 60 * 60 * 24 * 7 * 2; // セッション及びクッキーの有効時間を秒数で設定します。
-
 //ユーザー入力値関連
 $GAME_CONFIG['CHARACTER_NAME_MAX_LENGTH']     = 16;   // 名前の最長の長さを指定します。
 $GAME_CONFIG['CHARACTER_NICKNAME_MAX_LENGTH'] = 8;    // 愛称の最長の長さ及びトークルームでの名前の最長の長さを指定します。

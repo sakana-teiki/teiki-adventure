@@ -29,9 +29,17 @@
 
   // セッションの開始
   ini_set('session.gc_maxlifetime' , $GAME_CONFIG['SESSION_LIFETIME']); // セッションの有効時間を指定
-  ini_set('session.cookie_lifetime', $GAME_CONFIG['SESSION_LIFETIME']); // クッキーの有効時間を指定
-  session_cache_limiter('private_no_expire'); // フォーム再送信の確認が出ないようにする
-  session_name($GAME_CONFIG['SESSION_NAME']); // セッション名を指定 
+  session_save_path($GAME_CONFIG['SESSION_PATH']); // セッションの保存先を指定
+  session_name($GAME_CONFIG['SESSION_NAME']);      // セッション名を指定
+  session_cache_limiter('private_no_expire');      // フォーム再送信の確認が出ないようにする
+
+  session_set_cookie_params(
+    $GAME_CONFIG['SESSION_LIFETIME'], // クッキーの有効期間を指定
+    $GAME_CONFIG['URI'], // クッキーの有効ディレクトリを公開ディレクトリ以下に限定
+    null, // クッキーの有効ドメインはデフォルトのまま
+    null, // セキュア接続でもクッキーは有効
+    true  // JavaScript上からクッキーにアクセスできないように
+  );
 
   session_start();
 
