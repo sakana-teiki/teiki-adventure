@@ -23,10 +23,7 @@
   // POSTの場合
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 入力値検証
-    // 以下の条件のうちいずれかを満たせば403(Forbidden)を返し処理を中断
-    if (
-      !isset($_POST['initialize_key']) // 受け取ったデータに初期化キーがない
-    ) {
+    if (!isset($_POST['initialize_key'])) {
       responseError(400);
     }
     
@@ -45,10 +42,7 @@
     $ACTION_INITIALIZE['skip_confirm'] = true;
     require GETENV('GAME_ROOT').'/actions/initialize.php';
 
-    // セッションの削除
-    $_SESSION = array();
-
-    // 処理を終了
+    header('Location:'.$GAME_CONFIG['TOP_URI'], true, 302); // TOPへリダイレクト
     exit;
   }
 
@@ -66,16 +60,19 @@
   <section class="form">
     <div class="form-title">初期化キー</div>
     <div class="form-description" style="color: red; font-weight: bold;">
-      初期化キーを入力してデータ初期化を押すと、DB内の全てのデータを初期化します。<br>
-      初期化したデータは戻せないため注意してください。<br>
-      初期化を行ったクライアント以外のセッションデータは残留しているため、必要な場合はセッションの削除も行ってください。
+      初期化キーを入力してデータ初期化を押すと、全てのデータを初期化します。<br>
+      初期化したデータは戻せないため注意してください。
     </div>
     <input id="input-initialize-key" class="form-input" type="password" placeholder="初期化キー">
   </section>
   
-  <div class="button-wrapper">
-    <button id="signin-button" class="button">データ初期化</button>
-  </div>
+  <form id="form" method="post">
+    <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
+    <input id="input-hidden-initialize-key" type="hidden" name="initialize_key">
+  
+    <div class="button-wrapper">
+      <button id="signin-button" class="button">データ初期化</button>
+    </div>
 </section>
 
 <script src="<?=$GAME_CONFIG['URI']?>scripts/jssha-sha256.js"></script>
@@ -105,6 +102,12 @@
       return;
     }
 
+    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
+    if (waitingResponse == true) {
+      alert("送信中です。しばらくお待ち下さい。");
+      return;
+    }
+
     // 初期化キーのハッシュ化
     var hashedInitializeKey = inputInitializeKey + hashSalt; // ソルティング
     for (var i = 0; i < hashStretch; i++) { // ストレッチング
@@ -114,25 +117,9 @@
     }
 
     // 送信
-    // レスポンス待ち中に再度送信しようとした場合アラートを表示して処理を中断
-    if (waitingResponse == true) {
-      alert("送信中です。しばらくお待ち下さい。");
-      return;
-    }
+    $('#input-hidden-initialize-key').val(hashedInitializeKey);
 
     waitingResponse = true; // レスポンス待ち状態をONに
-    $.post(location.href, { // このページのURLにPOST送信
-<?php if ($tables) { ?>
-      csrf_token: '<?=$_SESSION['token']?>',
-<?php } ?>
-      initialize_key: hashedInitializeKey
-    }).done(function() {
-      location.href = '<?=$GAME_CONFIG['TOP_URI']?>'; // トップにリダイレクト
-    }).fail(function() { 
-      showErrorMessage('初期化できませんでした'); // エラーが発生した場合エラーメッセージを表示
-    }).always(function() {
-      waitingResponse = false;  // 接続終了後はレスポンス待ち状態を解除
-    });
   });
 </script>
 

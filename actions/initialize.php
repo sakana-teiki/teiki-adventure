@@ -552,8 +552,27 @@
     }
   }
 
-  require_once GETENV('GAME_ROOT').'/actions/import_master.php';
+  // セッションの破棄
+  // セッションファイル一覧を削除
+  $sessionFiles = glob(dirname(__DIR__).'/sessions/sess_*');
   
+  if ($sessionFiles === false) {
+    echo "セッションファイル一覧の取得時にエラーが発生しました。";
+    exit;
+  }
+
+  // セッションファイルを削除
+  foreach($sessionFiles as $file) {
+    $result = unlink($file);
+
+    if (!$result) {
+      echo "セッションファイルの削除時にエラーが発生しました。";
+      exit;
+    }
+  }
+
+  // マスタデータの読み込み
+  require_once GETENV('GAME_ROOT').'/actions/import_master.php';
+
   echo "初期化が完了しました。";
-  echo "セッションデータは残留しているため、必要な場合はセッションの削除も行ってください。";
 ?>
