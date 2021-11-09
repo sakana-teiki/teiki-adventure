@@ -147,7 +147,7 @@
 
   $items = $statement->fetchAll();
   
-  $PAGE_SETTING['TITLE'] = 'ショップ';
+  $PAGE_SETTING['TITLE'] = 'アイテムショップ';
 
 ?>
 <?php require GETENV('GAME_ROOT').'/components/header.php'; ?>
@@ -222,7 +222,7 @@
 </style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
-<h1>ショップ</h1>
+<h1>アイテムショップ</h1>
 
 <div class="money">
   所持金:<?=$character['money']?>G
