@@ -1,6 +1,6 @@
 <?php
-  require_once GETENV('GAME_ROOT').'/configs/environment.php';
-  require_once GETENV('GAME_ROOT').'/configs/general.php';
+  require_once dirname(__DIR__).'/configs/environment.php';
+  require_once dirname(__DIR__).'/configs/general.php';
   
   $GAME_PDO = new PDO('mysql:dbname='.$GAME_CONFIG['MYSQL_DBNAME'].';host='.$GAME_CONFIG['MYSQL_HOST'].':'.$GAME_CONFIG['MYSQL_PORT'], $GAME_CONFIG['MYSQL_USERNAME'], $GAME_CONFIG['MYSQL_PASSWORD']);
 
@@ -20,7 +20,7 @@
     global $GAME_PDO;
     
     // マスタデータの読み込み
-    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/datas/'.$table.'.json');
+    $mastersJson = file_get_contents(dirname(__DIR__).'/masters/datas/'.$table.'.json');
     $masters = json_decode($mastersJson, true);
 
     // トランザクション開始
@@ -101,7 +101,7 @@
     global $GAME_PDO;
 
     // マスタデータの読み込み
-    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/datas/'.$table.'.json');
+    $mastersJson = file_get_contents(dirname(__DIR__).'/masters/datas/'.$table.'.json');
     $masters = json_decode($mastersJson, true);
 
     // トランザクション開始
