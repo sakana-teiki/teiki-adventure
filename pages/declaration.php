@@ -95,26 +95,33 @@
 
 <h1>行動宣言</h1>
 
-<form id="form" method="post">
-  <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
-
+<section>
   <h2>行動内容</h2>
-    
-  <section class="form">
-    <div class="form-title">日記（<?=$GAME_CONFIG['DIARY_MAX_LENGTH']?>文字まで）</div>
-    <div class="form-description">
-      日記はプロフィールと同様の書式で装飾することができます。<br>
-      詳しくはルールブックを確認してください。
+  
+<?php if (!$gameStatus['update_status']) { ?>
+  <p>
+    更新が未確定のため行動宣言を行えません。更新確定を今しばらくお待ち下さい。
+  </p>  
+<?php } else { ?>
+  <form id="form" method="post">
+    <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
+    <section class="form">
+      <div class="form-title">日記（<?=$GAME_CONFIG['DIARY_MAX_LENGTH']?>文字まで）</div>
+      <div class="form-description">
+        日記はプロフィールと同様の書式で装飾することができます。<br>
+        詳しくはルールブックを確認してください。
+      </div>
+      <textarea id="input-diary" name="diary" class="form-textarea" placeholder="日記"><?=htmlspecialchars($declaration['diary'])?></textarea>
+    </section>
+
+    <div id="error-message-area"></div>
+
+    <div class="button-wrapper">
+      <button class="button" type="submit">反映</button>
     </div>
-    <textarea id="input-diary" name="diary" class="form-textarea" placeholder="日記"><?=htmlspecialchars($declaration['diary'])?></textarea>
-  </section>
-
-  <div id="error-message-area"></div>
-
-  <div class="button-wrapper">
-    <button class="button" type="submit">反映</button>
-  </div>
-</form>
+  </form>
+<?php } ?>
+</section>
 
 <script>
   var waitingResponse = false; // レスポンス待ちかどうか（多重送信防止）
