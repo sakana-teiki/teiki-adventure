@@ -1,7 +1,7 @@
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>announcements"><div class="sidemenu-button">お知らせ</div></a>
 <?php if ($GAME_LOGGEDIN) { ?>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>notifications"><div class="sidemenu-button">通知</div></a>
-<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>declaration"><div class="sidemenu-button">宣言</div></a>
+<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>declaration"><div class="sidemenu-button">行動宣言</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>exploration"><div class="sidemenu-button">探索</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>logs"><div class="sidemenu-button">探索ログ</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>items"><div class="sidemenu-button">アイテム</div></a>

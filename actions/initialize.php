@@ -235,8 +235,9 @@
       `nth`   INT UNSIGNED NOT NULL,
       `diary` TEXT         NOT NULL,
 
+      PRIMARY KEY (`id`),
       FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
-      PRIMARY KEY (`id`)
+      UNIQUE (`ENo`, `nth`)
     );
 
     CREATE TABLE `characters_results` (
@@ -244,8 +245,9 @@
       `ENo`   INT          NOT NULL,
       `nth`   INT UNSIGNED NOT NULL,
 
+      PRIMARY KEY (`id`),
       FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
-      PRIMARY KEY (`id`)
+      UNIQUE (`ENo`, `nth`)
     );
     
     CREATE TABLE `rooms` (
@@ -262,7 +264,7 @@
     
       PRIMARY KEY (`id`),
       FOREIGN KEY (`administrator`) REFERENCES `characters`(`ENo`),
-      UNIQUE(`RNo`),
+      UNIQUE (`RNo`),
       INDEX (`last_posted_at`)
     );
     

@@ -22,6 +22,7 @@ $GAME_CONFIG['CHARACTER_PROFILE_MAX_LENGTH']  = 2000; // キャラクターの�
 $GAME_CONFIG['CHARACTER_TAG_MAX']             = 16;   // キャラクターのタグの数の最大を指定します。
 $GAME_CONFIG['CHARACTER_TAG_MAX_LENGTH']      = 16;   // キャラクターのタグの最大の長さを指定します。
 $GAME_CONFIG['CHARACTER_ICON_MAX']            = 30;   // キャラクターの設定できるアイコンの最大数を指定します。
+$GAME_CONFIG['DIARY_MAX_LENGTH']              = 4000; // 日記の最長の長さを指定します。
 $GAME_CONFIG['ROOM_TITLE_MAX_LENGTH']         = 16;   // トークルームのタイトルの最長の長さを指定します。
 $GAME_CONFIG['ROOM_SUMMARY_MAX_LENGTH']       = 40;   // トークルームのサマリーの最長の長さを指定します。
 $GAME_CONFIG['ROOM_DESCRIPTION_MAX_LENGTH']   = 2000; // トークルームの説明文の最長の長さを指定します。
