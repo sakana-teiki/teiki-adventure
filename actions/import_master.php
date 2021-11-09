@@ -20,7 +20,7 @@
     global $GAME_PDO;
     
     // マスタデータの読み込み
-    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/'.$table.'.json');
+    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/datas/'.$table.'.json');
     $masters = json_decode($mastersJson, true);
 
     // トランザクション開始
@@ -101,7 +101,7 @@
     global $GAME_PDO;
 
     // マスタデータの読み込み
-    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/'.$table.'.json');
+    $mastersJson = file_get_contents(GETENV('GAME_ROOT').'/masters/datas/'.$table.'.json');
     $masters = json_decode($mastersJson, true);
 
     // トランザクション開始

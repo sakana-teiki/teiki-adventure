@@ -24,7 +24,7 @@
 
   <p>
     エクスポートボタンを押すと現在のマスタの内容をJSON形式で書き出します。<br>
-    書き出したマスタはmasters/exports内に出力されます。
+    書き出したマスタはmasters/datas/exports内に出力されます。
   </p>
 
   <form id="form" method="post">

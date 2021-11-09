@@ -47,11 +47,11 @@
         }
 
         // exportsディレクトリがなければ作成
-        if (!file_exists(GETENV('GAME_ROOT').'/masters/exports/')) {
-          mkdir(GETENV('GAME_ROOT').'/masters/exports/'); 
+        if (!file_exists(GETENV('GAME_ROOT').'/masters/datas/exports/')) {
+          mkdir(GETENV('GAME_ROOT').'/masters/datas/exports/'); 
         }
         
-        file_put_contents(GETENV('GAME_ROOT').'/masters/exports/'.$table.'.json', json_encode($masters, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_SH);
+        file_put_contents(GETENV('GAME_ROOT').'/masters/datas/exports/'.$table.'.json', json_encode($masters, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_SH);
         echo $table.'の出力が完了しました。';
       }
     } else {
