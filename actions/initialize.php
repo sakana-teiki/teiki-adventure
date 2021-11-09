@@ -224,6 +224,7 @@
       `number` INT UNSIGNED NOT NULL,
       
       PRIMARY KEY (`id`),
+      FOREIGN KEY (`ENo`)  REFERENCES `characters`(`ENo`),
       FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`),
       UNIQUE (`ENo`, `item`)
     );
@@ -234,6 +235,7 @@
       `nth`   INT UNSIGNED NOT NULL,
       `diary` TEXT         NOT NULL,
 
+      FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
       PRIMARY KEY (`id`)
     );
 
@@ -242,6 +244,7 @@
       `ENo`   INT          NOT NULL,
       `nth`   INT UNSIGNED NOT NULL,
 
+      FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
       PRIMARY KEY (`id`)
     );
     
