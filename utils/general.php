@@ -10,7 +10,7 @@
 */
 function responseError($statusCode) {
   http_response_code($statusCode);
-  include GETENV('GAME_ROOT').'/error-pages/'.$statusCode.'.html';
+  include GETENV('GAME_ROOT').'/error-pages/'.$statusCode.'.php';
   exit;
 }
 

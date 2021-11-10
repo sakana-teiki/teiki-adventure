@@ -116,6 +116,23 @@ ul {
   padding: 0 10px;
 }
 
+.button-link-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-link-wrapper > a {
+  display: inline-block;
+  text-decoration: none;
+  color: #444;
+  padding: 6px 24px;
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 4px;
+}
+
 .button-wrapper {
   width: 100%;
   display: flex;

@@ -6,8 +6,8 @@
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>logs"><div class="sidemenu-button">探索ログ</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>items"><div class="sidemenu-button">アイテム</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>shop"><div class="sidemenu-button">アイテムショップ</div></a>
-<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>trade"><div class="sidemenu-button">アイテム送付</div></a>
-<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>market"><div class="sidemenu-button">フリーマーケット</div></a>
+<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>trade"><div class="sidemenu-button">アイテムトレード</div></a>
+<!--<a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>market"><div class="sidemenu-button">フリーマーケット</div></a> v1.0.0対応 -->
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>room"><div class="sidemenu-button">全体トークルーム</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>rooms"><div class="sidemenu-button">トークルーム一覧</div></a>
 <a class="sidemenu-button-link" href="<?=$GAME_CONFIG['URI']?>rooms/create"><div class="sidemenu-button">トークルーム作成</div></a>

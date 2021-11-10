@@ -2,11 +2,11 @@ SetEnv GAME_ROOT "C:\xampp\htdocs\teiki"
 
 Options -Indexes
 
-ErrorDocument 400 /teiki/error-pages/400.html
-ErrorDocument 403 /teiki/error-pages/403.html
-ErrorDocument 404 /teiki/error-pages/404.html
-ErrorDocument 500 /teiki/error-pages/500.html
-ErrorDocument 503 /teiki/error-pages/503.html
+ErrorDocument 400 /teiki/error-pages/400.php
+ErrorDocument 403 /teiki/error-pages/403.php
+ErrorDocument 404 /teiki/error-pages/404.php
+ErrorDocument 500 /teiki/error-pages/500.php
+ErrorDocument 503 /teiki/error-pages/503.php
 
 RewriteEngine On
 

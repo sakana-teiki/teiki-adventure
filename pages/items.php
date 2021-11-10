@@ -200,7 +200,7 @@
     }
   }
 
-
+  // 所持しているアイテムを取得
   $statement = $GAME_PDO->prepare("
     SELECT
       `items_master_data`.`item_id`,

@@ -414,6 +414,8 @@
       `state` ENUM('sale', 'sold', 'cancelled') NOT NULL DEFAULT 'sale',
       
       PRIMARY KEY (`id`),
+      FOREIGN KEY (`seller`)      REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`buyer`)       REFERENCES `characters`(`ENo`),
       FOREIGN KEY (`sell_item`)   REFERENCES `items_master_data`(`item_id`),
       FOREIGN KEY (`demand_item`) REFERENCES `items_master_data`(`item_id`)
     );
@@ -423,11 +425,15 @@
       `master`      INT          NOT NULL,
       `target`      INT          NOT NULL,
       `item`        INT UNSIGNED,
-      `item_number` INT UNSIGNED NOT NULL,
-      `state` ENUM('trading', 'finished', 'cancelled_by_master', 'cancelled_by_target') NOT NULL,
+      `number`      INT UNSIGNED NOT NULL,
+      `sended_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      `state` ENUM('trading', 'finished', 'declined') NOT NULL,
       
       PRIMARY KEY (`id`),
-      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`)
+      FOREIGN KEY (`master`) REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`target`) REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`item`)   REFERENCES `items_master_data`(`item_id`)
     );
 
     CREATE TABLE `exploration_logs` (

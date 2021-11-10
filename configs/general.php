@@ -46,6 +46,7 @@ $GAME_CONFIG['THREADS_PER_PAGE']              = 50;  // 掲示板で1ページ�
 $GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE']      = 50;  // 個別のダイレクトメッセージで1ページあたりに表示するダイレクトメッセージ数を指定します。
 $GAME_CONFIG['ANNOUNCEMENTS_LIMIT']           = 5;   // お知らせ画面を表示した際のデフォルトのお知らせの表示件数を指定します。
 $GAME_CONFIG['NOTIFICATIONS_LIMIT']           = 50;  // 通知画面を表示した際の通知の表示件数を指定します。
+$GAME_CONFIG['TRADE_HISTORIES_LIMIT']         = 50;  // トレード履歴の表示件数を指定します。
 
 //通知関連
 $GAME_CONFIG['DISCORD_NOTIFICATION_PREFIX'] = 'Teiki Adventure / '; // Discord通知の先頭に共通で付ける文言を指定します。
