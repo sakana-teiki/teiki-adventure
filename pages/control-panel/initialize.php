@@ -39,7 +39,6 @@
     }
 
     // 問題なければ初期化を行う
-    $ACTION_INITIALIZE['skip_confirm'] = true;
     require GETENV('GAME_ROOT').'/actions/initialize.php';
 
     header('Location:'.$GAME_CONFIG['TOP_URI'], true, 302); // TOPへリダイレクト
@@ -55,8 +54,6 @@
 <h1>データ初期化</h1>
 
 <section>
-  <div id="error-message-area"></div>
-
   <section class="form">
     <div class="form-title">初期化キー</div>
     <div class="form-description" style="color: red; font-weight: bold;">
@@ -65,13 +62,15 @@
     </div>
     <input id="input-initialize-key" class="form-input" type="password" placeholder="初期化キー">
   </section>
+    
+  <div id="error-message-area"></div>
   
   <form id="form" method="post">
     <input type="hidden" name="csrf_token" value="<?=$_SESSION['token']?>">
     <input id="input-hidden-initialize-key" type="hidden" name="initialize_key">
   
     <div class="button-wrapper">
-      <button id="signin-button" class="button">データ初期化</button>
+      <button class="button">データ初期化</button>
     </div>
 </section>
 
@@ -92,7 +91,7 @@
     );
   }
 
-　$('#signin-button').on('click', function() {
+  $('#form').submit(function() {
     // 各種の値を取得
     var inputInitializeKey = $('#input-initialize-key').val();
   

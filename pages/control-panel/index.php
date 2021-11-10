@@ -18,6 +18,10 @@
   <a href="<?=$GAME_CONFIG['URI']?>control-panel/ap/status">自動AP配布設定切り替え</a><br>
   
   <h2>更新関連</h2>
+  <a href="<?=$GAME_CONFIG['URI']?>control-panel/update/update">更新/再更新</a><br>
+  <a href="<?=$GAME_CONFIG['URI']?>control-panel/update/determine">更新確定</a><br>
+
+  <h2>AP関連</h2>
   <a href="<?=$GAME_CONFIG['URI']?>control-panel/ap/distribute">AP配布</a><br>
 
   <h2>通知関連</h2>
