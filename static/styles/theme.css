@@ -47,6 +47,10 @@ hr {
   border-top: 1px solid lightgray;
 }
 
+p {
+  padding: 0 20px;
+}
+
 h1 {
   display: block;
   background: #444;
