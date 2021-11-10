@@ -7,8 +7,8 @@
 
 // 環境設定
 // 開発環境か本番環境かを指定します。開発環境であれば'development'、本番環境であれば'production'を指定します。
-$GAME_CONFIG['ENVIRONMENT'] = 'development';
-//$GAME_CONFIG['ENVIRONMENT'] = 'production';
+$GAME_CONFIG['ENVIRONMENT'] = 'development'; // 開発環境ではこちらを有効化
+//$GAME_CONFIG['ENVIRONMENT'] = 'production'; // 本番環境ではこちらを有効化
 
 // URL設定
 $GAME_CONFIG['ABSOLUTE_URI'] = 'http://localhost/teiki/'; // ゲームが公開されるURIをプロトコルから指定します。
