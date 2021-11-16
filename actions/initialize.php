@@ -400,7 +400,8 @@
       `yield` INT UNSIGNED NOT NULL,
 
       PRIMARY KEY (`id`),
-      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`)
+      FOREIGN KEY (`item`) REFERENCES `items_master_data`(`item_id`),
+      UNIQUE (`item`)
     );
 
     CREATE TABLE `flea_markets` (

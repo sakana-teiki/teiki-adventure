@@ -228,6 +228,7 @@
 
     // アイテムの取得処理
     foreach ($dropItemsWhenCleared as $item) {
+      // キャラクターの所持アイテム数をアップデート
       $statement = $GAME_PDO->prepare("
         INSERT INTO `characters_items` (
           `ENo`,
@@ -244,6 +245,29 @@
       ");
   
       $statement->bindParam(':ENo',  $_SESSION['ENo']);
+      $statement->bindParam(':item', $item['item']);
+  
+      $result = $statement->execute();
+  
+      if (!$result) {
+        $GAME_PDO->rollBack();
+        responseError(500); // DBへの登録に失敗した場合は500(Internal Server Error)を返して処理を中断
+      }
+
+      // アイテムの排出量をアップデート
+      $statement = $GAME_PDO->prepare("
+        INSERT INTO `items_yield` (
+          `item`,
+          `yield`
+        ) VALUES (
+          :item,
+          1
+        )
+
+        ON DUPLICATE KEY UPDATE
+          `yield` = `yield` + 1
+      ");
+  
       $statement->bindParam(':item', $item['item']);
   
       $result = $statement->execute();

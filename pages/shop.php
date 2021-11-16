@@ -96,6 +96,30 @@
       responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
     }
 
+    // アイテムの排出量の更新
+    $statement = $GAME_PDO->prepare("
+      INSERT INTO `items_yield` (
+        `item`,
+        `yield`
+      ) VALUES (
+        :item,
+        :number
+      )
+
+      ON DUPLICATE KEY UPDATE
+        `yield` = `yield` + :number
+    ");
+  
+    $statement->bindParam(':item',   $_POST['item'],   PDO::PARAM_INT);
+    $statement->bindParam(':number', $_POST['number'], PDO::PARAM_INT);
+  
+    $result = $statement->execute();
+  
+    if (!$result) {
+      $GAME_PDO->rollBack();
+      responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
+    }
+
     // ここまで全て成功した場合はコミット
     $GAME_PDO->commit();
   }
