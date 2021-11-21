@@ -9,7 +9,7 @@
       $ENGINES_EXPLORATION['stage']['title'] string
       ステージのタイトルです。
 
-      $ENGINES_EXPLORATION['stage']['text']
+      $ENGINES_EXPLORATION['stage']['text'] string
       ステージのテキストです。
 
     $ENGINES_EXPLORATION['drop_items'] array

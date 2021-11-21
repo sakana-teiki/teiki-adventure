@@ -34,6 +34,11 @@
       }
     }
 
+    // パーティの最大人数を超えていれば400(Bad Request)を返して処理を中断
+    if ($GAME_CONFIG['PARTY_MEMBERS_MAX'] < count($memberENos)) {
+      responseError(400);
+    }
+
     // 連れ出そうとしているキャラクターにお気に入りしていないキャラクターがいないか検証
 
     // お気に入りしているキャラクターのENo群を取得
@@ -247,7 +252,7 @@
       SELECT
         `enemy`
       FROM
-        `story_stages_master_data_enemies`
+        `exploration_stages_master_data_enemies`
       WHERE
         `stage` = :stage;
     ");
@@ -812,31 +817,31 @@
     </section>
   </section>
 
-  <section>
-    <h2>パーティメンバー選択</h2>
-    <div class="form-description">
-      連れ出すパーティメンバーを選択します。<br>
-      お気に入りしているキャラクターの中から選択することができます。<br>
-      パーティーメンバーはあなたを含めて最大<?=$GAME_CONFIG['PARTY_MEMBERS_MAX']?>人までです。
-    </div>
-    <div class="form-title">
-      パーティメンバー（クリックで選択キャンセル）
-    </div>
+<section>
+  <h2>パーティメンバー選択</h2>
+  <div class="form-description">
+    連れ出すパーティメンバーを選択します。<br>
+    お気に入りしているキャラクターの中から選択することができます。<br>
+    パーティーメンバーはあなたを含めて最大<?=$GAME_CONFIG['PARTY_MEMBERS_MAX']?>人までです。
+  </div>
+  <div class="form-title">
+    パーティメンバー（クリックで選択キャンセル）
+  </div>
 
-    <div id="selected-characters-area"></div>
-    
-    <br>
+  <div id="selected-characters-area"></div>
+  
+  <br>
 
-    <div class="form-title">
-      連れ出せるキャラクター（クリックで選択）
-    </div>
+  <div class="form-title">
+    連れ出せるキャラクター（クリックで選択）
+  </div>
 
 <?php if (!$selectableCharacters) { ?>
-    <div class="form-description">
-      お気に入りしているキャラクターがいません。<br>
-      お気に入りはキャラクター一覧からキャラクターページにアクセスし<br>
-      「お気に入りする」ボタンをクリックすることで行なえます。
-    </div>
+  <div class="form-description">
+    お気に入りしているキャラクターがいません。<br>
+    お気に入りはキャラクター一覧からキャラクターページにアクセスし<br>
+    「お気に入りする」ボタンをクリックすることで行なえます。
+  </div>
 <?php } else { ?>
   <section id="selectable-characters-area">
 <?php foreach ($selectableCharacters as $selectableCharacter) { ?>
@@ -876,7 +881,7 @@
 <?php } ?>
   </section>
 <?php } ?>
-  </section>
+</section>
 
 <br>
 
@@ -903,8 +908,6 @@
     $('#selected-characters-area > .selectable-character').each(function(i, element){
       selectedENos.push($(element).data().eno);
     });
-
-    console.log(selectedENos);
 
     return selectedENos;
   }
@@ -965,7 +968,6 @@
     }
 
     // 送信
-
     $('#members').val(JSON.stringify(getSelectedCharacterENos())); // 連れ出しキャラクターをJSON化されたENoの配列として#membersに設定
 
     // レスポンス待ちをONに

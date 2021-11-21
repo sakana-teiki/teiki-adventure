@@ -39,6 +39,8 @@
       `characters_results`,
       `characters_declarations_skills`,
       `characters_declarations_battle_lines`,
+      `characters_declarations_icons`,
+      `characters_declarations_members`,
       `characters_declarations`,
       `characters_skills`,
       `characters_battle_lines`,
@@ -417,9 +419,33 @@
       UNIQUE (`ENo`, `nth`)
     );
 
+    CREATE TABLE `characters_declarations_members` (
+      `id`     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`    INT          NOT NULL,
+      `nth`    INT UNSIGNED NOT NULL,
+      `member` INT          NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`ENo`)    REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`member`) REFERENCES `characters`(`ENo`),
+      UNIQUE (`ENo`, `nth`, `member`)
+    );
+
+    CREATE TABLE `characters_declarations_icons` (
+      `id`   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`  INT          NOT NULL,
+      `nth`  INT UNSIGNED NOT NULL,
+      `name` TEXT         NOT NULL,
+      `url`  TEXT         NOT NULL,
+    
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`)
+    );
+
     CREATE TABLE `characters_declarations_battle_lines` (
       `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `declaration`   INT UNSIGNED NOT NULL,
+      `ENo`           INT          NOT NULL,
+      `nth`           INT UNSIGNED NOT NULL,
       `start`         TEXT         NOT NULL,
       `dodge`         TEXT         NOT NULL,
       `dodged`        TEXT         NOT NULL,
@@ -436,21 +462,21 @@
       `lose`          TEXT         NOT NULL,
 
       PRIMARY KEY (`id`),
-      FOREIGN KEY (`declaration`) REFERENCES `characters_declarations`(`id`),
-      UNIQUE (`declaration`)
+      FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
+      UNIQUE (`ENo`, `nth`)
     );
 
     CREATE TABLE `characters_declarations_skills` (
-      `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `declaration` INT UNSIGNED NOT NULL,
-      `skill`       INT UNSIGNED NOT NULL,
-      `name`        TEXT         NOT NULL,
-      `icon`        INT UNSIGNED NOT NULL,
-      `lines`       TEXT         NOT NULL,
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`   INT          NOT NULL,
+      `nth`   INT UNSIGNED NOT NULL,
+      `skill` INT UNSIGNED NOT NULL,
+      `lines` TEXT         NOT NULL,
 
       PRIMARY KEY (`id`),
-      FOREIGN KEY (`declaration`) REFERENCES `characters_declarations`(`id`),
-      FOREIGN KEY (`skill`)       REFERENCES `skills_master_data`(`skill_id`)
+      FOREIGN KEY (`ENo`)   REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`),
+      UNIQUE (`ENo`, `nth`)
     );
 
     CREATE TABLE `characters_results` (
