@@ -72,16 +72,29 @@ $GAME_CONFIG['PUBLIC_ROOMS'] = array( // 初期化を行った際に作られる
 
 //マスタデータ関連
 $GAME_CONFIG['MASTER_DATA_TABLES'] = [ // マスタデータを指定しているテーブルです。これにより指定されたテーブルはマスタデータインポートエクスポートで入出力されるようになります。
+  'skills_master_data',
+  'enemies_master_data',
+  'enemies_master_data_battle_lines',
+  'enemies_master_data_skills',
   'items_master_data',
   'items_master_data_effects',
   'exploration_stages_master_data',
-  'exploration_stages_master_data_drop_items'
+  'exploration_stages_master_data_enemies',
+  'exploration_stages_master_data_drop_items',
+  'story_stages_master_data',
+  'story_stages_master_data_enemies'
 ];
 
-$GAME_CONFIG['MASTER_DATA_TABLES_CONTAINS_FOREIGN_KEY'] = array( // マスタデータを指定しているテーブルのうち外部キー制約により指定されるテーブル及び外部キー制約の対象となるキーです。これにより指定されたテーブルはマスタデータインポート時にforeign_keyを主キーとしてUPSERT形式でロードされるようになります。
+$GAME_CONFIG['MASTER_DATA_TABLES_CONTAINS_FOREIGN_KEY'] = array( // マスタデータを指定しているテーブルのうち、マスタデータ外のテーブルにて外部キー制約により指定されるテーブル及び外部キー制約の対象となるキーです。これにより指定されたテーブルはマスタデータインポート時にforeign_keyを主キーとしてUPSERT形式でロードされるようになります。
+  array('name' => 'skills_master_data',             'foreign_key' => 'skill_id'),
+  array('name' => 'enemies_master_data',            'foreign_key' => 'enemy_id'),
   array('name' => 'items_master_data',              'foreign_key' => 'item_id'),
-  array('name' => 'exploration_stages_master_data', 'foreign_key' => 'stage_id')
+  array('name' => 'exploration_stages_master_data', 'foreign_key' => 'stage_id'),
+  array('name' => 'story_stages_master_data',       'foreign_key' => 'stage_id')
 );
+
+// 戦闘設定
+$GAME_CONFIG['PARTY_MEMBERS_MAX'] = 5; // パーティーメンバーの最大人数を指定します。
 
 //その他
 $GAME_CONFIG['TOP_URI']    = $GAME_CONFIG['URI'].'';       // トップページのURIを指定します。ログアウト、登録解除した際のリダイレクト先及びログアウト状態でタイトルをクリックした際の遷移先になります。

@@ -2,6 +2,8 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
+  require GETENV('GAME_ROOT').'/utils/parser.php';
+
   // 現在のページ
   // pageの指定があればその値-1、指定がなければ0
   // インデックス値のように扱いたいため内部的には受け取った値-1をページとします。
@@ -16,17 +18,25 @@
     SELECT
       `exploration_logs`.`id`,
       `exploration_stages_master_data`.`title`,
-      `exploration_logs`.`leader`,
-      `characters_icons`.`url` AS `leader_icon`,
+      GROUP_CONCAT(
+        `exploration_logs_members`.`member`,
+        '\n',
+        IFNULL((SELECT `url` FROM `characters_icons` WHERE `characters_icons`.`ENo` = `exploration_logs_members`.`member` LIMIT 1), '')
+        
+        SEPARATOR '\n'
+      ) as `members`,
+      `exploration_logs`.`result`,
       `exploration_logs`.`timestamp`
     FROM
       `exploration_logs`
-    LEFT JOIN
-      `characters_icons` ON `characters_icons`.`ENo` = `exploration_logs`.`leader`
     JOIN
       `exploration_stages_master_data` ON `exploration_stages_master_data`.`stage_id` = `exploration_logs`.`stage`
+    JOIN
+      `exploration_logs_members` ON `exploration_logs_members`.`log` = `exploration_logs`.`id`
     WHERE
       `exploration_logs`.`leader` = :ENo
+    GROUP BY
+    	`exploration_logs`.`id`
     ORDER BY
       `exploration_logs`.`id` DESC
     LIMIT
@@ -54,6 +64,13 @@
     // 取得件数が足りなければ次のページなしとする
     $existsNext = false;
   }
+
+  // 結果表示用
+  $resultText = array(
+    'win'  => '勝利',
+    'lose' => '敗北',
+    'even' => '引分'
+  );
   
   $PAGE_SETTING['TITLE'] = '探索ログ';
 
@@ -65,6 +82,7 @@
   border-collapse: collapse;
   margin: 0 auto;
   font-size: 15px;
+  width: 100%;
 }
 
 .logs th {
@@ -86,16 +104,16 @@
 
 .logs th:nth-child(2), .logs td:nth-child(2) {
   text-align: center;
-  width: 400px;
 }
 
 .logs th:nth-child(3), .logs td:nth-child(3) {
   text-align: center;
+  width: 300px;
 }
 
 .logs th:nth-child(4), .logs td:nth-child(4) {
   text-align: center;
-  width: 200px;
+  width: 100px;
 }
 
 .logs th:nth-child(5), .logs td:nth-child(5) {
@@ -107,6 +125,10 @@
   text-decoration: none;
   font-weight: bold;
   color: #444;
+}
+
+.icon-links {
+  display: flex;
 }
 
 </style>
@@ -125,7 +147,7 @@
     <tr>
       <th>No.</th>
       <th>探索先</th>
-      <th>リーダー</th>
+      <th>メンバー</th>
       <th>探索時刻</th>
       <th>結果</th>
     </tr>
@@ -142,26 +164,28 @@
         ?>
         <a href="<?=$GAME_CONFIG['URI']?>logs/<?=$directory.'/'.$log['id'].'.html'?>" target="_blank"><?= $log['title'] ?></a>
       </td>
-      <td class="leader">
-        <a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$log['leader']?>">
-          <?php
-            $COMPONENT_ICON['src'] = $log['leader_icon'];
-            include GETENV('GAME_ROOT').'/components/icon.php';
-          ?>
-        </a>
-      </td>
-      <!--<td class="party">
-        <div class="characters-wrapper">
-          <a href="" target="_blank">
-            <character-icon/>
+      <td class="party">
+        <div class="icon-links">
+<?php 
+  $members = parseMemberIconsResult($log['members']);
+  foreach($members as $member) {
+?>
+          <a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$member['ENo']?>">
+            <?php
+              $COMPONENT_ICON['src'] = $member['icon'];
+              include GETENV('GAME_ROOT').'/components/icon.php';
+            ?>
           </a>
+<?php
+  }
+?>
         </div>
-      </td>-->
+      </td>
       <td>
         <?= $log['timestamp'] ?>
       </td>
       <td>
-        <span>完了</span>
+        <span><?=$resultText[$log['result']]?></span>
       </td>
     </tr>
 <?php } ?>

@@ -1,0 +1,22 @@
+[
+    {
+        "enemy": "1",
+        "skill": "1",
+        "lines": ""
+    },
+    {
+        "enemy": "2",
+        "skill": "3",
+        "lines": ""
+    },
+    {
+        "enemy": "3",
+        "skill": "7",
+        "lines": ""
+    },
+    {
+        "enemy": "3",
+        "skill": "8",
+        "lines": ""
+    }
+]

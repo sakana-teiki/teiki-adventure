@@ -3,6 +3,28 @@
 // SQLの実行結果を使いやすい形にパースするための関数群です。
 
 /**
+* 探索ログのメンバーをGROUP_CONCATで取得した際の結果を連想配列の配列の形に整形します。
+* 
+* @param string $iconsResult iconsをGROUP_CONCATで取得した際の結果となる文字列です。
+* @return array ENoとiconをキーに持つ連想配列の配列
+*/
+function parseMemberIconsResult($iconsResult) {
+  if (!$iconsResult) { // 受け取った値が空なら空の連想配列を返す
+    return array();
+  }
+
+  $iconsResultRows = explode("\n", $iconsResult);
+
+  $icons = array();
+  $cnt = count($iconsResultRows);
+  for ($i = 0; $i < $cnt; $i += 2) {
+    $icons[] = array('ENo' => $iconsResultRows[$i], 'icon' => $iconsResultRows[$i+1]);
+  }
+
+  return $icons;
+}
+
+/**
 * iconsをGROUP_CONCATで取得した際の結果を連想配列の配列の形に整形します。
 * 
 * @param string $iconsResult iconsをGROUP_CONCATで取得した際の結果となる文字列です。

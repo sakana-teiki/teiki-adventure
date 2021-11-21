@@ -19,6 +19,7 @@
   // 外部キーの対象となっているテーブルはその外部キーの参照を行っているテーブルを削除しないと削除できないため、CREATEの時とは逆の順序で実行します。
   $statement = $GAME_PDO->prepare("
     DROP TABLE IF EXISTS
+      `exploration_logs_members`,
       `exploration_logs`,
       `trades`,
       `flea_markets`,
@@ -34,7 +35,11 @@
       `rooms_tags`,
       `rooms`,
       `characters_results`,
+      `characters_declarations_skills`,
+      `characters_declarations_battle_lines`,
       `characters_declarations`,
+      `characters_skills`,
+      `characters_battle_lines`,
       `characters_items`,
       `characters_blocks`,
       `characters_mutes`,
@@ -44,10 +49,19 @@
       `characters_tags`,
       `characters`,
       `game_status`,
+      `story_stages_master_data_enemies`,
+      `story_stages_master_data`,
       `exploration_stages_master_data_drop_items`,
+      `exploration_stages_master_data_enemies`,
       `exploration_stages_master_data`,
       `items_master_data_effects`,
-      `items_master_data`;
+      `items_master_data`,
+      `enemies_master_data_skills`,
+      `enemies_master_data_battle_lines`,
+      `enemies_master_data`,
+      `skills_master_data_skill_effects_elements`,
+      `skills_master_data_skill_effects`,
+      `skills_master_data`;
   ");
 
   $result = $statement->execute();
@@ -59,6 +73,95 @@
 
   // テーブルの作成
   $statement = $GAME_PDO->prepare("
+    CREATE TABLE `skills_master_data` (
+      `id`                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `skill_id`              INT UNSIGNED NOT NULL,
+      `name`                  TEXT         NOT NULL,
+      `cost`                  INT          NOT NULL,
+      `condition`             TEXT         NOT NULL,
+      `condition_value`       INT          NOT NULL,
+      `trigger`               TEXT         NOT NULL,
+      `rate_numerator`        INT UNSIGNED NOT NULL,
+      `rate_denominator`      INT UNSIGNED NOT NULL,
+      `effects`               TEXT         NOT NULL,
+      `type`                  ENUM('active', 'passive') NOT NULL,
+      `required_status`       ENUM('ATK', 'DEX', 'MND', 'AGI', 'DEF'),
+      `required_status_value` INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      UNIQUE(`skill_id`)
+    );
+
+    CREATE TABLE `skills_master_data_skill_effects` (
+      `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `skill`           INT UNSIGNED NOT NULL,
+      `target`          TEXT         NOT NULL,
+      `target_value`    INT          NOT NULL,
+      `condition`       TEXT         NOT NULL,
+      `condition_value` INT          NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
+    );
+
+    CREATE TABLE `skills_master_data_skill_effects_elements` (
+      `id`      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `effect`  INT UNSIGNED NOT NULL,
+      `element` TEXT         NOT NULL,
+      `value`   INT          NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`effect`) REFERENCES `skills_master_data_skill_effects`(`id`)
+    );
+
+    CREATE TABLE `enemies_master_data` (
+      `id`       INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `enemy_id` INT UNSIGNED NOT NULL,
+      `name`     TEXT         NOT NULL,
+      `ATK`      INT UNSIGNED NOT NULL,
+      `DEX`      INT UNSIGNED NOT NULL,
+      `MND`      INT UNSIGNED NOT NULL,
+      `AGI`      INT UNSIGNED NOT NULL,
+      `DEF`      INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      UNIQUE(`enemy_id`)
+    );
+
+    CREATE TABLE `enemies_master_data_battle_lines` (
+      `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `enemy`         INT UNSIGNED NOT NULL,
+      `start`         TEXT         NOT NULL,
+      `dodge`         TEXT         NOT NULL,
+      `dodged`        TEXT         NOT NULL,
+      `healed`        TEXT         NOT NULL,
+      `healed_own`    TEXT         NOT NULL,
+      `normal_attack` TEXT         NOT NULL,
+      `defeat`        TEXT         NOT NULL,
+      `killed`        TEXT         NOT NULL,
+      `killed_ally`   TEXT         NOT NULL,
+      `critical`      TEXT         NOT NULL,
+      `criticaled`    TEXT         NOT NULL,
+      `win`           TEXT         NOT NULL,
+      `even`          TEXT         NOT NULL,
+      `lose`          TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`),
+      UNIQUE (`enemy`)
+    );
+
+    CREATE TABLE `enemies_master_data_skills` (
+      `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `enemy` INT UNSIGNED NOT NULL,
+      `skill` INT UNSIGNED NOT NULL,
+      `lines` TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`),
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
+    );
+
     CREATE TABLE `items_master_data` (
       `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `item_id`        INT UNSIGNED NOT NULL,
@@ -98,6 +201,16 @@
       UNIQUE(`stage_id`)
     );
 
+    CREATE TABLE `exploration_stages_master_data_enemies` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `stage` INT UNSIGNED NOT NULL,
+      `enemy` INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`stage`) REFERENCES `exploration_stages_master_data`(`stage_id`),
+      FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`)
+    );
+
     CREATE TABLE `exploration_stages_master_data_drop_items` (
       `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `stage`            INT UNSIGNED NOT NULL,
@@ -108,6 +221,29 @@
       PRIMARY KEY (`id`),
       FOREIGN KEY (`item`)  REFERENCES `items_master_data`(`item_id`),
       FOREIGN KEY (`stage`) REFERENCES `exploration_stages_master_data`(`stage_id`)
+    );
+
+    CREATE TABLE `story_stages_master_data` (
+      `id`        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `stage_id`  INT UNSIGNED NOT NULL,
+      `nth`       INT UNSIGNED NOT NULL,
+      `title`     TEXT         NOT NULL,
+      `pre_text`  TEXT         NOT NULL,
+      `post_text` TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      UNIQUE(`stage_id`),
+      UNIQUE(`nth`)
+    );
+
+    CREATE TABLE `story_stages_master_data_enemies` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `stage` INT UNSIGNED NOT NULL,
+      `enemy` INT UNSIGNED NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`stage`) REFERENCES `story_stages_master_data`(`stage_id`),
+      FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`)
     );
 
     CREATE TABLE `game_status` (
@@ -150,7 +286,7 @@
       `notification_webhook_new_arrival`    BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_faved`          BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_direct_message` BOOLEAN   NOT NULL DEFAULT true,
-      `notifications_last_checked_at`    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+      `notifications_last_checked_at`       TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 
       PRIMARY KEY (`id`),
       UNIQUE(`ENo`)
@@ -229,15 +365,90 @@
       UNIQUE (`ENo`, `item`)
     );
 
+    CREATE TABLE `characters_battle_lines` (
+      `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`           INT          NOT NULL,
+      `start`         TEXT         NOT NULL,
+      `dodge`         TEXT         NOT NULL,
+      `dodged`        TEXT         NOT NULL,
+      `healed`        TEXT         NOT NULL,
+      `healed_own`    TEXT         NOT NULL,
+      `normal_attack` TEXT         NOT NULL,
+      `defeat`        TEXT         NOT NULL,
+      `killed`        TEXT         NOT NULL,
+      `killed_ally`   TEXT         NOT NULL,
+      `critical`      TEXT         NOT NULL,
+      `criticaled`    TEXT         NOT NULL,
+      `win`           TEXT         NOT NULL,
+      `even`          TEXT         NOT NULL,
+      `lose`          TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
+      UNIQUE (`ENo`)
+    );
+
+    CREATE TABLE `characters_skills` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `ENo`   INT          NOT NULL,
+      `skill` INT UNSIGNED NOT NULL,
+      `lines` TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`ENo`)   REFERENCES `characters`(`ENo`),
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
+    );
+
     CREATE TABLE `characters_declarations` (
       `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `ENo`   INT          NOT NULL,
       `nth`   INT UNSIGNED NOT NULL,
       `diary` TEXT         NOT NULL,
+      `ATK`   INT UNSIGNED,
+      `DEX`   INT UNSIGNED,
+      `MND`   INT UNSIGNED,
+      `AGI`   INT UNSIGNED,
+      `DEF`   INT UNSIGNED,
 
       PRIMARY KEY (`id`),
       FOREIGN KEY (`ENo`) REFERENCES `characters`(`ENo`),
       UNIQUE (`ENo`, `nth`)
+    );
+
+    CREATE TABLE `characters_declarations_battle_lines` (
+      `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `declaration`   INT UNSIGNED NOT NULL,
+      `start`         TEXT         NOT NULL,
+      `dodge`         TEXT         NOT NULL,
+      `dodged`        TEXT         NOT NULL,
+      `healed`        TEXT         NOT NULL,
+      `healed_own`    TEXT         NOT NULL,
+      `normal_attack` TEXT         NOT NULL,
+      `defeat`        TEXT         NOT NULL,
+      `killed`        TEXT         NOT NULL,
+      `killed_ally`   TEXT         NOT NULL,
+      `critical`      TEXT         NOT NULL,
+      `criticaled`    TEXT         NOT NULL,
+      `win`           TEXT         NOT NULL,
+      `even`          TEXT         NOT NULL,
+      `lose`          TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`declaration`) REFERENCES `characters_declarations`(`id`),
+      UNIQUE (`declaration`)
+    );
+
+    CREATE TABLE `characters_declarations_skills` (
+      `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `declaration` INT UNSIGNED NOT NULL,
+      `skill`       INT UNSIGNED NOT NULL,
+      `name`        TEXT         NOT NULL,
+      `icon`        INT UNSIGNED NOT NULL,
+      `lines`       TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`declaration`) REFERENCES `characters_declarations`(`id`),
+      FOREIGN KEY (`skill`)       REFERENCES `skills_master_data`(`skill_id`)
     );
 
     CREATE TABLE `characters_results` (
@@ -358,8 +569,8 @@
       `updated_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `last_posted_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `administrator`  BOOLEAN      NOT NULL DEFAULT false,
-      `board` ENUM('community', 'trade', 'bug') NOT NULL,
-      `state` ENUM('open', 'closed', 'deleted') NOT NULL DEFAULT 'open',
+      `board`          ENUM('community', 'trade', 'bug') NOT NULL,
+      `state`          ENUM('open', 'closed', 'deleted') NOT NULL DEFAULT 'open',
 
       PRIMARY KEY (`id`),
       INDEX (`last_posted_at`),
@@ -412,7 +623,7 @@
       `sell_item_number`   INT UNSIGNED NOT NULL,
       `demand_item`        INT UNSIGNED,
       `demand_item_number` INT UNSIGNED NOT NULL,
-      `state` ENUM('sale', 'sold', 'cancelled') NOT NULL DEFAULT 'sale',
+      `state`              ENUM('sale', 'sold', 'cancelled') NOT NULL DEFAULT 'sale',
       
       PRIMARY KEY (`id`),
       FOREIGN KEY (`seller`)      REFERENCES `characters`(`ENo`),
@@ -442,10 +653,21 @@
       `leader`    INT          NOT NULL,
       `stage`     INT UNSIGNED NOT NULL,
       `timestamp` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `result`    ENUM('win', 'lose', 'even') NOT NULL,
       
       PRIMARY KEY (`id`),
       FOREIGN KEY (`leader`) REFERENCES `characters`(`ENo`),
       FOREIGN KEY (`stage`)  REFERENCES `exploration_stages_master_data`(`stage_id`)
+    );
+
+    CREATE TABLE `exploration_logs_members` (
+      `id`     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `log`    INT UNSIGNED NOT NULL,
+      `member` INT          NOT NULL,
+      
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`log`)    REFERENCES `exploration_logs`(`id`),
+      FOREIGN KEY (`member`) REFERENCES `characters`(`ENo`)
     );
   ");
 
