@@ -42,7 +42,7 @@
 
     // 入力値検証2
     // 各アイコンについて以下の条件のうちいずれかを満たすものがあれば400(Bad Request)を返し処理を中断
-    for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX']; $i++) {
+    for ($i = 0; $i < $GAME_CONFIG['CHARACTER_ICON_MAX']; $i++) {
       if (
         !isset($_POST['icon-'.$i.'-name']) || // 受け取ったデータに名前がない
         !isset($_POST['icon-'.$i.'-url'])     // 受け取ったデータにURLがない
@@ -180,7 +180,7 @@
     }
 
     // アイコンの登録
-    for ($i = 0; $i < $GAME_CONFIG['ICONS_MAX'] + $additionalIcons['additional_icons']; $i++) {
+    for ($i = 0; $i < $GAME_CONFIG['CHARACTER_ICON_MAX'] + $additionalIcons['additional_icons']; $i++) {
       // 名前もURLも登録されていない項目は処理を飛ばす
       if (strlen($_POST['icon-'.$i.'-name']) == 0 && strlen($_POST['icon-'.$i.'-url']) == 0) {
         continue;
