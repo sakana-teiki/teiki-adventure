@@ -1,6 +1,8 @@
 <?php
-  require_once dirname(__DIR__).'/configs/environment.php';
-  require_once dirname(__DIR__).'/configs/general.php';
+  putenv('GAME_ROOT='.dirname(__DIR__));
+  
+  require_once GETENV('GAME_ROOT').'/configs/environment.php';
+  require_once GETENV('GAME_ROOT').'/configs/general.php';
   
   $GAME_PDO = new PDO('mysql:dbname='.$GAME_CONFIG['MYSQL_DBNAME'].';host='.$GAME_CONFIG['MYSQL_HOST'].':'.$GAME_CONFIG['MYSQL_PORT'], $GAME_CONFIG['MYSQL_USERNAME'], $GAME_CONFIG['MYSQL_PASSWORD']);
 
@@ -72,15 +74,15 @@
 
     ob_start(); // PHPの実行結果をバッファに出力するように
 
-    require dirname(__DIR__).'/engines/story.php'; // 探索ログエンジンを呼び出し
+    require GETENV('GAME_ROOT').'/engines/story.php'; // 探索ログエンジンを呼び出し
 
     $log = ob_get_contents(); // バッファから実行結果を取得
     ob_end_clean(); // バッファへの出力を終了
 
     // 結果の保存
     // ディレクトリがなければ作成
-    if (!file_exists(dirname(__DIR__).'/static/results/'.$target_nth.'/')) {
-      $result = mkdir(dirname(__DIR__).'/static/results/'.$target_nth.'/', 0644, true);
+    if (!file_exists(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/')) {
+      $result = mkdir(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/', 0644, true);
 
       if (!$result) {
         echo '保存ディレクトリの作成に失敗しました。処理を終了します。';
@@ -89,7 +91,7 @@
     }
 
     // 結果を書き出し    
-    $result = file_put_contents(dirname(__DIR__).'/static/results/'.$target_nth.'/'.$declaration['ENo'].'.html', $log, LOCK_SH);
+    $result = file_put_contents(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/'.$declaration['ENo'].'.html', $log, LOCK_SH);
 
     if (!$result) {
       echo '結果の書き出しに失敗しました。処理を終了します。';

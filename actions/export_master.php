@@ -1,6 +1,8 @@
 <?php
-  require_once dirname(__DIR__).'/configs/environment.php';
-  require_once dirname(__DIR__).'/configs/general.php';
+  putenv('GAME_ROOT='.dirname(__DIR__));
+  
+  require_once GETENV('GAME_ROOT').'/configs/environment.php';
+  require_once GETENV('GAME_ROOT').'/configs/general.php';
   
   $GAME_PDO = new PDO('mysql:dbname='.$GAME_CONFIG['MYSQL_DBNAME'].';host='.$GAME_CONFIG['MYSQL_HOST'].':'.$GAME_CONFIG['MYSQL_PORT'], $GAME_CONFIG['MYSQL_USERNAME'], $GAME_CONFIG['MYSQL_PASSWORD']);
 
@@ -47,11 +49,11 @@
         }
 
         // exportsディレクトリがなければ作成
-        if (!file_exists(dirname(__DIR__).'/masters/datas/exports/')) {
-          mkdir(dirname(__DIR__).'/masters/datas/exports/'); 
+        if (!file_exists(GETENV('GAME_ROOT').'/masters/datas/exports/')) {
+          mkdir(GETENV('GAME_ROOT').'/masters/datas/exports/'); 
         }
         
-        file_put_contents(dirname(__DIR__).'/masters/datas/exports/'.$table.'.json', json_encode($masters, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_SH);
+        file_put_contents(GETENV('GAME_ROOT').'/masters/datas/exports/'.$table.'.json', json_encode($masters, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_SH);
         echo $table.'の出力が完了しました。';
       }
     } else {

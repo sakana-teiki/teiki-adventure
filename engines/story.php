@@ -7,7 +7,7 @@
     行動宣言の日記の内容です。
   */
 
-  require_once dirname(__DIR__).'/utils/decoration.php';
+  require_once GETENV('GAME_ROOT').'/utils/decoration.php';
 ?>
 <!DOCTYPE html>
 <html lang="ja">
