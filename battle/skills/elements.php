@@ -1,5 +1,7 @@
 <?php
 
+require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+
 // 対象に攻撃を行うスキルエレメント
 class AttackElement extends Element {
   function resolve(Unit $target) {

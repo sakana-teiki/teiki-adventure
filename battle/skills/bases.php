@@ -181,7 +181,7 @@ class SkillEffect {
   
     $elementTexts = [];
     foreach ($this->elements as $element) {
-      $elementsTexts[] = $element->text();
+      $elementTexts[] = $element->text();
     }
 
     $text .= implode('&', $elementTexts);
@@ -226,10 +226,10 @@ class Condition {
 -------------------------------------------------------------------------------------------------*/
 
 class Skill {
-  protected string    $name;         // スキル名
-  protected array     $skillEffects; // 発動するスキルエフェクト群
-  protected Unit      $unit;         // スキル所持者
-  protected Battle    $battle;       // バトル環境
+  protected string $name;         // スキル名
+  protected array  $skillEffects; // 発動するスキルエフェクト群
+  protected Unit   $unit;         // スキル所持者
+  protected Battle $battle;       // バトル環境
 
   function __construct(string $name, array $skillEffectDatas) {
     $this->name = $name;
@@ -321,7 +321,7 @@ class ActiveSkill extends Skill {
   function getDescription() {
     $skillEffectTexts = [];
     foreach ($this->skillEffects as $skillEffect) {
-      $skilEffectTexts[] = $skillEffect->text();      
+      $skillEffectTexts[] = $skillEffect->text();      
     }
 
     return array(
@@ -364,7 +364,7 @@ class PassiveSkill extends Skill {
   function getDescription() {
     $skillEffectTexts = [];
     foreach ($this->skillEffects as $skillEffect) {
-      $skilEffectTexts[] = $skillEffect->text();      
+      $skillEffectTexts[] = $skillEffect->text();      
     }
 
     $triggerNames = array(

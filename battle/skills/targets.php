@@ -1,5 +1,7 @@
 <?php
 
+require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+
 // 自身をターゲットとして返す
 class OwnTarget extends Target {
   function resolve() {
@@ -31,7 +33,7 @@ class SomeEnemyTarget extends Target {
   }
 
   function text() {
-    return 1 < $value ? "敵{$value}" : "敵";
+    return 1 < $this->value ? "敵{$this->value}" : "敵";
   }
 }
 
@@ -55,7 +57,7 @@ class SomeWeakenedAllyTarget extends Target {
   }
 
   function text() {
-    return 1 < $value ? "弱味{$value}" : "弱味";
+    return 1 < $this->value ? "弱味{$this->value}" : "弱味";
   }
 }
 

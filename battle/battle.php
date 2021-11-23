@@ -1,11 +1,11 @@
 <?php
 require GETENV('GAME_ROOT').'/configs/battle.php';
 
-require GETENV('GAME_ROOT').'/battle/skills/bases.php';
-require GETENV('GAME_ROOT').'/battle/skills/conditions.php';
-require GETENV('GAME_ROOT').'/battle/skills/effect-conditions.php';
-require GETENV('GAME_ROOT').'/battle/skills/elements.php';
-require GETENV('GAME_ROOT').'/battle/skills/targets.php';
+require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+require_once GETENV('GAME_ROOT').'/battle/skills/conditions.php';
+require_once GETENV('GAME_ROOT').'/battle/skills/effect-conditions.php';
+require_once GETENV('GAME_ROOT').'/battle/skills/elements.php';
+require_once GETENV('GAME_ROOT').'/battle/skills/targets.php';
 
 // 各ユニットを管理するクラス
 class Unit {

@@ -1,5 +1,7 @@
 <?php 
 
+require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+
 // 常時発動可能
 class Always extends Condition {
   function resolve() {
@@ -18,7 +20,7 @@ class PerActions extends Condition {
   }
   
   function text() {
-    return "{$value}行動毎";
+    return "{$this->value}行動毎";
   }
 }
 

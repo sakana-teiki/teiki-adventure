@@ -1,5 +1,7 @@
 <?php
 
+require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+
 // SPがMSPの指定の%以上なら
 class SpRemain extends EffectCondition {
   function resolve() {
