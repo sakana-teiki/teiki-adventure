@@ -62,6 +62,7 @@
       `items_master_data`,
       `enemies_master_data_skills`,
       `enemies_master_data_battle_lines`,
+      `enemies_master_data_icons`,
       `enemies_master_data`,
       `skills_master_data_skill_effects_elements`,
       `skills_master_data_skill_effects`,
@@ -132,6 +133,16 @@
       UNIQUE(`enemy_id`)
     );
 
+    CREATE TABLE `enemies_master_data_icons` (
+      `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      `enemy` INT UNSIGNED NOT NULL,
+      `name`  TEXT         NOT NULL,
+      `url`   TEXT         NOT NULL,
+
+      PRIMARY KEY (`id`),
+      FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`)
+    );
+
     CREATE TABLE `enemies_master_data_battle_lines` (
       `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `enemy`         INT UNSIGNED NOT NULL,
@@ -163,7 +174,8 @@
 
       PRIMARY KEY (`id`),
       FOREIGN KEY (`enemy`) REFERENCES `enemies_master_data`(`enemy_id`),
-      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`),
+      UNIQUE(`enemy`, `skill`)
     );
 
     CREATE TABLE `items_master_data` (
@@ -400,13 +412,15 @@
 
       PRIMARY KEY (`id`),
       FOREIGN KEY (`ENo`)   REFERENCES `characters`(`ENo`),
-      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
+      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`),
+      UNIQUE(`ENo`, `skill`)
     );
 
     CREATE TABLE `characters_declarations` (
       `id`    INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `ENo`   INT          NOT NULL,
       `nth`   INT UNSIGNED NOT NULL,
+      `name`  TEXT         NOT NULL,
       `diary` TEXT         NOT NULL,
       `ATK`   INT UNSIGNED,
       `DEX`   INT UNSIGNED,
@@ -476,7 +490,7 @@
       PRIMARY KEY (`id`),
       FOREIGN KEY (`ENo`)   REFERENCES `characters`(`ENo`),
       FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`),
-      UNIQUE (`ENo`, `nth`)
+      UNIQUE (`ENo`, `nth`, `skill`)
     );
 
     CREATE TABLE `characters_results` (

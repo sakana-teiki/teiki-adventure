@@ -230,6 +230,7 @@ class Skill {
   protected array  $skillEffects; // 発動するスキルエフェクト群
   protected Unit   $unit;         // スキル所持者
   protected Battle $battle;       // バトル環境
+  protected string $lines;        // スキル発動時のセリフ
 
   function __construct(string $name, array $skillEffectDatas) {
     $this->name = $name;
@@ -259,8 +260,15 @@ class Skill {
     }
   }
 
+  // 初期化処理 スキル発動時のセリフを設定する プロフィール画面などで扱いやすいようにセリフについては分離している
+  function setLines(string $lines) {
+    $this->lines = $lines;
+  }
+
   // スキル実行
   function execute() {
+    $this->unit->speechDialog($this->lines); // スキルセリフを発話させる
+
     foreach ($this->skillEffects as $skillEffect) {
       $skillEffect->resolve();
     }

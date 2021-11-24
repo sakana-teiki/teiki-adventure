@@ -109,14 +109,17 @@
     $GAME_PDO->beginTransaction();
     
     // 宣言状況の作成あるいは反映
+    // nameカラムは更新処理時に確定させるためここでは空文字列
     $statement = $GAME_PDO->prepare("
       INSERT INTO `characters_declarations` (
         `ENo`,
         `nth`,
+        `name`,
         `diary`
       ) VALUES (
         :ENo,
         :nth,
+        '',
         :diary
       )
 

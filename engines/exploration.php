@@ -252,6 +252,40 @@
     .log-body {
       padding: 20px;
     }
+
+    .dialog {
+      display: flex;
+      border: 1px solid lightgray;
+      padding: 4px;
+      border-radius: 4px;
+      margin: 8px 8px 8px 0;
+      width: 400px;
+    }
+
+    .dialog-icon-area {
+      margin: 4px;
+      width: 60px;
+      height: 60px;
+    }
+
+    .dialog-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    .dialog-body {
+      margin: 4px;
+    }
+
+    .name {
+      font-weight: bold;
+      color: #666;
+    }
+
+    .dialog-message {
+      margin-top: 4px;
+      font-size: 14px;
+    }
   </style>
   </head>
   <body>

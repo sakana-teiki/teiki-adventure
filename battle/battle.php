@@ -1,6 +1,8 @@
 <?php
 require GETENV('GAME_ROOT').'/configs/battle.php';
 
+require_once GETENV('GAME_ROOT').'/utils/validation.php';
+
 require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
 require_once GETENV('GAME_ROOT').'/battle/skills/conditions.php';
 require_once GETENV('GAME_ROOT').'/battle/skills/effect-conditions.php';
@@ -20,6 +22,8 @@ class Unit {
   private array  $effects;       // 状態異常の残りターン数群
   private array  $activeSkills;  // アクティブスキル
   private array  $passiveSkills; // パッシブスキル
+  private array  $icons;         // 設定されているアイコン
+  private array  $battleLines;   // 設定されている戦闘セリフ
 
   private int   $hp;     // 現在HP
   private int   $sp;     // 現在SP
@@ -28,10 +32,12 @@ class Unit {
   private array $status; // ステータス
 
   // 初期化処理1
-  function __construct(string $name, array $status, array $skillDatas) {
-    // 名前とステータスの設定
-    $this->name   = htmlspecialchars($name); // 名前のエスケープ
-    $this->status = $status;
+  function __construct(string $name, array $status, array $skillDatas, array $icons, array $battleLines) {
+    // 各種代入するだけで設定できる値の設定
+    $this->name        = htmlspecialchars($name); // 名前のエスケープ
+    $this->status      = $status;
+    $this->icons       = $icons;
+    $this->battleLines = $battleLines;
 
     // HP/SPの設定
     $this->mhp =
@@ -58,33 +64,39 @@ class Unit {
 
     foreach ($skillDatas as $skillData) {
       if ($skillData['type'] === 'active') {
-        $this->activeSkills[] = new ActiveSkill(
+        $skill = new ActiveSkill(
           $skillData['name'],
           $skillData['cost'],
           $skillData['condition'],
           $skillData['condition_value'],
           $skillData['effects']
         );
+        $skill->setLines($skillData['lines']);
+        $this->activeSkills[] = $skill;
       } else if ($skillData['type'] === 'passive') {
-        $this->passiveSkills[] = new PassiveSkill(
+        $skill = new PassiveSkill(
           $skillData['name'],
           $skillData['trigger'],
           $skillData['rate_numerator'],
           $skillData['rate_denominator'],
           $skillData['effects']
         );
+        $skill->setLines($skillData['lines']);
+        $this->passiveSkills[] = $skill;
       }
     }
 
     // アクティブスキルの末尾に通常攻撃を登録
-    $this->activeSkills[] = new ActiveSkill(
+    $normalAttack = new ActiveSkill(
       '通常攻撃',
       '0',
       'Always',
       0,
       json_decode('[{"target": "SomeEnemyTarget", "elements": [{"value": 30, "element": "AttackElement"}], "condition": "", "dodgeable": true, "target_value": 1, "condition_value": 0}]')
     );
-    
+    $normalAttack->setLines($this->battleLines['normal_attack']);
+    $this->activeSkills[] = $normalAttack;
+
     // 状態異常の初期化
     $this->effects = array(
       'poison' => 0
@@ -212,6 +224,8 @@ class Unit {
     if (mt_rand(1, 100) <= $dodgeRate) {
       // 回避成功時、メッセージを表示しtrueを返す
       $this->battle->log('<div class="result">'.$this->name.'は攻撃を回避した！</div>');
+      $this->dispatchDialog('dodge');       // 回避時の戦闘セリフを発話させる
+      $attacker->dispatchDialog('dodged');  // 攻撃者の被回避時の戦闘セリフを発話させる
       $this->dispatchPassiveSkill('dodge'); // 回避時スキルを発動させる
       return true;
     } else {
@@ -226,8 +240,11 @@ class Unit {
     $damage      = mt_rand(floor($basicDamage * 0.8), floor($basicDamage * 1.2)); // ダメージ量 基礎ダメージ×0.8 ～ 基礎ダメージ×1.2
 
     $this->battle->log('<div class="result">');
+
+    $isCritical = false;
     if (mt_rand(1, 100) <= $attacker->dex()) { // 攻撃者のDEX%の確率でクリティカル
       $this->battle->log('クリティカル！');
+      $isCritical = true;
       $damage *= 2; // クリティカル時はダメージを2倍に
     }
 
@@ -241,6 +258,17 @@ class Unit {
 
     $this->hp -= $damage;
     $this->battle->log($this->name.'は<span class="damage'.$damageRank.'">'.$damage.'</span>点のダメージを受けた！(現在HP：'.$this->hp.')</div>');
+
+    if ($isCritical) {
+      $attacker->dispatchDialog('critical'); // クリティカルなら攻撃者の攻撃クリティカル時の戦闘セリフを発話させる
+      $this->dispatchDialog('criticaled');   // クリティカルなら被クリティカル時の戦闘セリフを発話させる
+    }
+
+    // この攻撃によりHPが0以下になったなら（＝攻撃後のHPが－(ダメージ量-1)～0の範囲なら）攻撃者の敵のHPを0以下にした時の戦闘セリフを発話させる
+    if (-($damage-1) <= $this->hp && $this->hp <= 0) {
+      $attacker->dispatchDialog('defeat');
+    }
+
     $this->gainHate($damage * $attacker->def(), $attacker); // 「受けたダメージ×攻撃者のDEF」分ヘイトを蓄積する
     $this->dispatchPassiveSkill('attacked'); // 被攻撃時スキルを発動させる
   }
@@ -257,8 +285,13 @@ class Unit {
     }
     $actualHealed = $this->hp - $formarHp; // 実際の回復量を計算
 
-    $this->battle->log("{$this->name}はHPが{$actualHealed}点回復した！(現在HP：{$this->hp})");
     $this->battle->log('<div class="result">'.$this->name.'はHPが<span class="heal">'.$actualHealed.'</span>点回復した！(現在HP:'.$this->hp.')');
+
+    if ($this->id() === $healer->id()) {
+      $this->dispatchDialog('healed_own'); // 自身による回復なら自身の回復による被回復時の戦闘セリフを発話させる
+    } else {
+      $this->dispatchDialog('healed');     // そうでないなら被回復時の戦闘セリフを発話させる
+    }
   }
 
   function gainAgi(int $potency) {
@@ -270,6 +303,66 @@ class Unit {
   function gainPoison(int $turn) {
     $this->effect['poison'] += $turn;
     $this->battle->log('<div class="result">'.$this->name.'は毒を'.$turn.'ターン分受けた！</div>');
+  }
+
+  // 発言を行う
+  function speechDialog(string $lines) {
+    if ($lines === '') return; // 設定されている発言内容が空なら発言を行わない
+
+    $lineOptions = explode('###', $lines);               // 発言候補
+    $line        = $lineOptions[array_rand($lineOptions)]; // 発言候補の中から一つランダムに選択して発言とする
+
+    if ($line === '') return; // 選ばれたものが空文字列なら発言を行わない
+
+    $dialogBuilder = '<section class="dialog">'; // HTML構築用
+
+    // アイコン書式があった場合アイコンを付与
+    // /番号/発言内容
+    if (preg_match('/^\/([1-9][0-9]*)\/(.+)$/', $line, $matches)) {
+      $iconNumber = $matches[1]; // アイコン番号
+      $line       = $matches[2]; // 発言部分のみ取り出したものを$lineに再設定
+
+      if (isset($this->icons[intval($iconNumber)-1]) && $this->icons[intval($iconNumber)-1]['url'] != '') {
+        // アイコン書式で指定されている番号が存在し、それが空文字列でないならアイコンを付与
+        $dialogBuilder .= '<div class="dialog-icon-area"><img class="dialog-icon" src="'.htmlspecialchars($this->icons[intval($iconNumber)-1]['url']).'"></div>';
+      }
+    }
+
+    $dialogBuilder .= '<div class="dialog-body">';
+    $dialogBuilder .= '<div class="name">';
+
+    // 名前変更書式があった場合それを発言名とする
+    // 名前@発言内容
+    if (preg_match('/^(.+?)@(.+)$/', $line, $matches)) {
+      $name = $matches[1]; // 名前
+      $line = $matches[2]; // 発言部分のみ取り出したものを$lineに再設定
+
+      $dialogBuilder .= htmlspecialchars($name);
+    } else {
+      $dialogBuilder .= $this->name; // 名前変更書式がなかった場合ユニット名を発言名とする コンストラクタでエスケープしているのでこちらはエスケープ不要
+    }
+
+    $dialogBuilder .= '</div>';
+    $dialogBuilder .= '<div class="dialog-message">';
+
+    // エスケープ後、改行書式を適用
+    // <br>で改行
+    $line = htmlspecialchars($line);
+    $line = str_replace('&lt;br&gt;', '<br>', $line); // <br>だけエスケープされたものを戻す
+
+    $dialogBuilder .= $line;
+
+    $dialogBuilder .= '</div>';
+    $dialogBuilder .= '</div>';
+    $dialogBuilder .= '</section>';
+
+    // ここまで構築できたらログに書き込み
+    $this->battle->log($dialogBuilder);
+  }
+
+  // 指定トリガーの発言を行う
+  function dispatchDialog(string $trigger) {
+    $this->speechDialog($this->battleLines[$trigger]);
   }
 
   // 指定トリガーのパッシブスキルを発動する
@@ -343,6 +436,13 @@ class Unit {
     if ($this->isLiving && $this->hp <= 0) { 
       $this->isLiving = false;
       $this->battle->log('<div class="result">'.$this->name.'は倒れた……</div>');
+
+      $this->dispatchDialog('killed'); // 戦闘離脱時の戦闘セリフを発話させる
+      
+      $livingAllies = $this->battle->getLivingAllies($this->id());
+      foreach ($livingAllies as $livingAlly) {
+        $this->dispatchDialog('killed_ally'); // 味方が戦闘離脱時の戦闘セリフを発話させる
+      }
     }
   }
 }
@@ -437,6 +537,23 @@ class Battle {
     return $this->extractLiving($this->getEnemies($unitId));
   }
 
+  // 指定トリガーの発言を行う　生きているユニットのみ発言を行うが第2引数にtrueを指定すると生死を問わず発言する
+  function dispatchDialog(string $trigger, bool $enableKilledUnits = false) {
+    if ($enableKilledUnits) {
+      $units = $this->units;            // 生死を問わないフラグがtrueなら全てのユニットを対象に
+    } else {
+      $units = $this->getLivingUnits(); // 生死を問わないフラグがfalseなら生きているユニットだけを対象に
+    }
+
+    // AGI降順に並び替え
+    $unitsSortByAgi = $this->sortUnitsByAgi($this->getLivingUnits());
+
+    // その順番で発言を行わせる
+    foreach ($unitsSortByAgi as $unit) {
+      $unit->dispatchDialog($trigger);
+    }
+  }
+
   // 指定トリガーのパッシブスキルを発動する
   function dispatchPassiveSkill(string $trigger) {
     // 生きているユニットを取得してAGI降順に並び替え
@@ -478,6 +595,7 @@ class Battle {
     $this->log('<section class="battle-start">');
     $this->log('<div class="battle-start-call">BATTLE START</div>');
     $this->log('<section class="actions">');
+    $this->dispatchDialog('start'); // 戦闘開始時の戦闘セリフを発話させる
     $this->dispatchPassiveSkill('start'); // 戦闘開始時スキルを発動させる
     $this->log('</section>');
     $this->log('</section>');
@@ -574,10 +692,13 @@ class Battle {
 
         if ($judge === 'win') {
           $this->log('戦闘に勝利した！');
+          $this->dispatchDialog('win'); // 勝利時の戦闘セリフを発話させる
         } else if ($judge == 'lose') {
-          $this->log('戦闘に敗北した……');
+          $this->log('戦闘に敗北した……');    
+          $this->dispatchDialog('lose'); // 敗北時の戦闘セリフを発話させる
         } else {
           $this->log('決着がつかなかった……');
+          $this->dispatchDialog('even'); // 引き分け時の戦闘セリフを発話させる
         }
 
         $this->result = $judge;

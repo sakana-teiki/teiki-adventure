@@ -68,18 +68,23 @@
 
   $declarations = $statement->fetchAll();
 
+  // トランザクション開始
+  $GAME_PDO->beginTransaction();
+
   // 再更新でないなら現時点の各種宣言状況・ステータス等を保管
   if ($gameStatus['update_status']) {
+
     // 現時点のステータスを記録
     $statement = $GAME_PDO->prepare("
       UPDATE
         `characters_declarations`
       SET
-        `characters_declarations`.`ATK` = (SELECT `ATK` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
-        `characters_declarations`.`DEX` = (SELECT `DEX` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
-        `characters_declarations`.`MND` = (SELECT `MND` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
-        `characters_declarations`.`AGI` = (SELECT `AGI` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
-        `characters_declarations`.`DEF` = (SELECT `DEF` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`)
+        `characters_declarations`.`name` = (SELECT `nickname` FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
+        `characters_declarations`.`ATK`  = (SELECT `ATK`      FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
+        `characters_declarations`.`DEX`  = (SELECT `DEX`      FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
+        `characters_declarations`.`MND`  = (SELECT `MND`      FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
+        `characters_declarations`.`AGI`  = (SELECT `AGI`      FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`),
+        `characters_declarations`.`DEF`  = (SELECT `DEF`      FROM `characters` WHERE `characters`.`ENo` = `characters_declarations`.`ENo`)
       WHERE
         `nth` = :nth;
     ");
@@ -89,6 +94,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo 'ステータスの記録に失敗しました。処理を終了します。';
       exit;
     }
@@ -120,6 +126,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo 'アイコンの記録に失敗しました。処理を終了します。';
       exit;
     }
@@ -175,6 +182,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo '戦闘セリフの記録に失敗しました。処理を終了します。';
       exit;
     }
@@ -206,6 +214,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo 'スキルの記録に失敗しました。処理を終了します。';
       exit;
     }
@@ -230,6 +239,7 @@
   $stage  = $statement->fetch();
 
   if (!$result || !$stage) {
+    $GAME_PDO->rollBack();
     echo 'ステージの取得に失敗しました。処理を終了します。';
     exit;
   }
@@ -253,6 +263,7 @@
   $enemieDatas = $statement->fetchAll();
 
   if (!$result || !$enemieDatas) {
+    $GAME_PDO->rollBack();
     echo 'ステージに出現する敵の取得に失敗しました。処理を終了します。';
     exit;
   }
@@ -269,20 +280,20 @@
         `enemies_master_data`.`MND`,
         `enemies_master_data`.`AGI`,
         `enemies_master_data`.`DEF`,
-        IFNULL(`enemies_master_data_battle_lines`.`start`, '')         AS `start_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`dodge`, '')         AS `dodge_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`dodged`, '')        AS `dodged_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`healed`, '')        AS `healed_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`healed_own`, '')    AS `healed_own_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`normal_attack`, '') AS `normal_attack_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`defeat`, '')        AS `defeat_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`killed`, '')        AS `killed_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`killed_ally`, '')   AS `killed_ally_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`critical`, '')      AS `critical_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`criticaled`, '')    AS `criticaled_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`win`, '')           AS `win_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`even`, '')          AS `even_lines`,
-        IFNULL(`enemies_master_data_battle_lines`.`lose`, '')          AS `lose_lines`
+        IFNULL(`enemies_master_data_battle_lines`.`start`, '')         AS `lines_start`,
+        IFNULL(`enemies_master_data_battle_lines`.`dodge`, '')         AS `lines_dodge`,
+        IFNULL(`enemies_master_data_battle_lines`.`dodged`, '')        AS `lines_dodged`,
+        IFNULL(`enemies_master_data_battle_lines`.`healed`, '')        AS `lines_healed`,
+        IFNULL(`enemies_master_data_battle_lines`.`healed_own`, '')    AS `lines_healed_own`,
+        IFNULL(`enemies_master_data_battle_lines`.`normal_attack`, '') AS `lines_normal_attack`,
+        IFNULL(`enemies_master_data_battle_lines`.`defeat`, '')        AS `lines_defeat`,
+        IFNULL(`enemies_master_data_battle_lines`.`killed`, '')        AS `lines_killed`,
+        IFNULL(`enemies_master_data_battle_lines`.`killed_ally`, '')   AS `lines_killed_ally`,
+        IFNULL(`enemies_master_data_battle_lines`.`critical`, '')      AS `lines_critical`,
+        IFNULL(`enemies_master_data_battle_lines`.`criticaled`, '')    AS `lines_criticaled`,
+        IFNULL(`enemies_master_data_battle_lines`.`win`, '')           AS `lines_win`,
+        IFNULL(`enemies_master_data_battle_lines`.`even`, '')          AS `lines_even`,
+        IFNULL(`enemies_master_data_battle_lines`.`lose`, '')          AS `lines_lose`
       FROM
         `enemies_master_data`
       LEFT JOIN
@@ -297,9 +308,50 @@
     $enemy  = $statement->fetch();
 
     if (!$result || !$enemy) {
+      $GAME_PDO->rollBack();
       echo '敵のステータス/戦闘時セリフの取得に失敗しました。処理を終了します。';
       exit;
     }
+
+    // 戦闘セリフは1つのキーとしてまとめる
+    $enemy['battleLines'] = array(
+      'start'         => $enemy['lines_start'],
+      'dodge'         => $enemy['lines_dodge'],
+      'dodged'        => $enemy['lines_dodged'],
+      'healed'        => $enemy['lines_healed'],
+      'healed_own'    => $enemy['lines_healed_own'],
+      'normal_attack' => $enemy['lines_normal_attack'],
+      'defeat'        => $enemy['lines_defeat'],
+      'killed'        => $enemy['lines_killed'],
+      'killed_ally'   => $enemy['lines_killed_ally'],
+      'critical'      => $enemy['lines_critical'],
+      'criticaled'    => $enemy['lines_criticaled'],
+      'win'           => $enemy['lines_win'],
+      'even'          => $enemy['lines_even'],
+      'lose'          => $enemy['lines_lose']
+    );
+
+    // 敵のアイコン情報を取得
+    $statement = $GAME_PDO->prepare("
+      SELECT
+        `name`,
+        `url`
+      FROM
+        `enemies_master_data_icons`
+      WHERE
+        `enemy` = :enemy;
+    ");
+
+    $statement->bindParam(':enemy', $enemyData['enemy'], PDO::PARAM_INT);
+
+    $result = $statement->execute();
+
+    if (!$result) {
+      $GAME_PDO->rollBack();
+      responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
+    }
+
+    $enemy['icons'] = $statement->fetchAll();
 
     // 敵のスキル情報を取得
     $statement = $GAME_PDO->prepare("
@@ -327,6 +379,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo '敵のスキル情報の取得に失敗しました。処理を終了します。';
       exit;
     }
@@ -375,7 +428,6 @@
   // 行動宣言ごとに処理
   foreach ($declarations as $declaration) {
     // 行動内容に応じた結果の生成
-
     // メンバーの取得
     $statement = $GAME_PDO->prepare("
       SELECT
@@ -383,7 +435,8 @@
       FROM
         `characters_declarations_members`
       WHERE
-        `ENo` = :ENo AND `nth` = :nth;
+        `ENo` = :ENo AND
+        `nth` = :nth;
     ");
 
     $statement->bindParam(':ENo', $declaration['ENo'], PDO::PARAM_INT);
@@ -392,6 +445,7 @@
     $result = $statement->execute();
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo 'メンバーの取得に失敗しました。処理を終了します。';
       exit;
     }
@@ -407,50 +461,121 @@
     // メンバー情報の取得
     $members = [];
     foreach ($memberENos as $memberENo) {
-      // メンバーとなるキャラクターのステータスと戦闘時セリフを取得
+      // メンバーとなるキャラクターのステータスを取得
       $statement = $GAME_PDO->prepare("
         SELECT
-          `characters`.`nickname` AS `name`,
-          `characters`.`ATK`,
-          `characters`.`DEX`,
-          `characters`.`MND`,
-          `characters`.`AGI`,
-          `characters`.`DEF`,
-          IFNULL(`characters_battle_lines`.`start`, '')         AS `start_lines`,
-          IFNULL(`characters_battle_lines`.`dodge`, '')         AS `dodge_lines`,
-          IFNULL(`characters_battle_lines`.`dodged`, '')        AS `dodged_lines`,
-          IFNULL(`characters_battle_lines`.`healed`, '')        AS `healed_lines`,
-          IFNULL(`characters_battle_lines`.`healed_own`, '')    AS `healed_own_lines`,
-          IFNULL(`characters_battle_lines`.`normal_attack`, '') AS `normal_attack_lines`,
-          IFNULL(`characters_battle_lines`.`defeat`, '')        AS `defeat_lines`,
-          IFNULL(`characters_battle_lines`.`killed`, '')        AS `killed_lines`,
-          IFNULL(`characters_battle_lines`.`killed_ally`, '')   AS `killed_ally_lines`,
-          IFNULL(`characters_battle_lines`.`critical`, '')      AS `critical_lines`,
-          IFNULL(`characters_battle_lines`.`criticaled`, '')    AS `criticaled_lines`,
-          IFNULL(`characters_battle_lines`.`win`, '')           AS `win_lines`,
-          IFNULL(`characters_battle_lines`.`even`, '')          AS `even_lines`,
-          IFNULL(`characters_battle_lines`.`lose`, '')          AS `lose_lines`
+          `name`,
+          `ATK`,
+          `DEX`,
+          `MND`,
+          `AGI`,
+          `DEF`
         FROM
-          `characters`
-        LEFT JOIN
-          `characters_battle_lines` ON `characters_battle_lines`.`ENo` = `characters`.`ENo`
+          `characters_declarations`
         WHERE
-          `characters`.`ENo` = :ENo AND `deleted` = false;
+          `ENo` = :ENo AND
+          `nth` = :nth;
       ");
   
-      $statement->bindParam(':ENo', $memberENo, PDO::PARAM_INT);
+      $statement->bindParam(':ENo', $memberENo,  PDO::PARAM_INT);
+      $statement->bindParam(':nth', $target_nth, PDO::PARAM_INT);
   
       $result = $statement->execute();
   
       if (!$result) {
+        $GAME_PDO->rollBack();
         responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
       }
   
       $member = $statement->fetch();
   
       if (!$member) {
+        $GAME_PDO->rollBack();
         responseError(404); // キャラクターの取得に失敗した場合は404(Not Found)を返して処理を中断
       }
+
+      // メンバーとなるキャラクターの戦闘セリフを取得
+      $statement = $GAME_PDO->prepare("
+        SELECT
+          `start`,
+          `dodge`,
+          `dodged`,
+          `healed`,
+          `healed_own`,
+          `normal_attack`,
+          `defeat`,
+          `killed`,
+          `killed_ally`,
+          `critical`,
+          `criticaled`,
+          `win`,
+          `even`,
+          `lose`
+        FROM
+          `characters_declarations_battle_lines`
+        WHERE
+          `ENo` = :ENo AND
+          `nth` = :nth;
+      ");
+  
+      $statement->bindParam(':ENo', $memberENo,  PDO::PARAM_INT);
+      $statement->bindParam(':nth', $target_nth, PDO::PARAM_INT);
+  
+      $result = $statement->execute();
+  
+      if (!$result) {
+        $GAME_PDO->rollBack();
+        responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
+      }
+  
+      $battleLines = $statement->fetch();
+  
+      if ($battleLines) {
+        // 戦闘セリフの設定があればそれを$memberに設定
+        $member['battleLines'] = $battleLines;
+      } else {
+        // なければそれぞれ空文字列を設定
+        $member['battleLines'] = array(
+          'start'         => '',
+          'dodge'         => '',
+          'dodged'        => '',
+          'healed'        => '',
+          'healed_own'    => '',
+          'normal_attack' => '',
+          'defeat'        => '',
+          'killed'        => '',
+          'killed_ally'   => '',
+          'critical'      => '',
+          'criticaled'    => '',
+          'win'           => '',
+          'even'          => '',
+          'lose'          => ''
+        );
+      }
+
+      // メンバーとなるキャラクターのアイコン情報を取得
+      $statement = $GAME_PDO->prepare("
+        SELECT
+          `name`,
+          `url`
+        FROM
+          `characters_declarations_icons`
+        WHERE
+          `ENo` = :ENo AND
+          `nth` = :nth;
+      ");
+  
+      $statement->bindParam(':ENo', $memberENo,  PDO::PARAM_INT);
+      $statement->bindParam(':nth', $target_nth, PDO::PARAM_INT);
+  
+      $result = $statement->execute();
+  
+      if (!$result) {
+        $GAME_PDO->rollBack();
+        responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
+      }
+  
+      $member['icons'] = $statement->fetchAll();
   
       // メンバーとなるキャラクターのスキル情報を取得
       $statement = $GAME_PDO->prepare("
@@ -464,20 +589,23 @@
           `skills_master_data`.`rate_denominator`,
           `skills_master_data`.`effects`,
           `skills_master_data`.`type`,
-          `characters_skills`.`lines`
+          `characters_declarations_skills`.`lines`
         FROM
-          `characters_skills`
+          `characters_declarations_skills`
         JOIN
-          `skills_master_data` ON `skills_master_data`.`skill_id` = `characters_skills`.`skill`
+          `skills_master_data` ON `skills_master_data`.`skill_id` = `characters_declarations_skills`.`skill`
         WHERE
-          `characters_skills`.`ENo` = :ENo;
+          `characters_declarations_skills`.`ENo` = :ENo AND
+          `characters_declarations_skills`.`nth` = :nth;
       ");
-  
-      $statement->bindParam(':ENo', $memberENo, PDO::PARAM_INT);
+    
+      $statement->bindParam(':ENo', $memberENo,  PDO::PARAM_INT);
+      $statement->bindParam(':nth', $target_nth, PDO::PARAM_INT);
   
       $result = $statement->execute();
   
       if (!$result) {
+        $GAME_PDO->rollBack();
         responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
       }
   
@@ -504,7 +632,7 @@
         'DEF' => $ally['DEF']
       );
 
-      $allyUnits[] = new Unit($ally['name'], $status, $ally['skills']);
+      $allyUnits[] = new Unit($ally['name'], $status, $ally['skills'], $ally['icons'], $ally['battleLines']);
     }
 
     // 敵チームの戦闘ユニット群を生成
@@ -518,7 +646,7 @@
         'DEF' => $enemy['DEF']
       );
 
-      $enemyUnits[] = new Unit($enemy['name'], $status, $enemy['skills']);
+      $enemyUnits[] = new Unit($enemy['name'], $status, $enemy['skills'], $enemy['icons'], $enemy['battleLines']);
     }
 
     $battle    = new Battle($allyUnits, $enemyUnits);
@@ -541,6 +669,7 @@
       $result = mkdir(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/', 0644, true);
 
       if (!$result) {
+        $GAME_PDO->rollBack();
         echo '保存ディレクトリの作成に失敗しました。処理を終了します。';
         exit;
       }
@@ -550,6 +679,7 @@
     $result = file_put_contents(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/'.$declaration['ENo'].'.html', $log, LOCK_SH);
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo '結果の書き出しに失敗しました。処理を終了します。';
       exit;
     }
@@ -568,9 +698,13 @@
     $result = $statement->execute();  
 
     if (!$result) {
+      $GAME_PDO->rollBack();
       echo 'ゲームステータスのアップデートに失敗しました。';
       exit;
     }
   }
+
+  // ここまで全て成功した場合はコミット
+  $GAME_PDO->commit();
   
 ?>
