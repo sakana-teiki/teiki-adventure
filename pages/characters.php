@@ -95,6 +95,10 @@
   margin: 0 20px;
 }
 
+.character-list-icon {
+  flex-shrink: 0;
+}
+
 .character-list li {
   border-bottom: 1px solid lightgray;
   display: flex;
@@ -104,6 +108,7 @@
 
 .character-list-profile {
   padding-left: 10px;
+  width: 100%;
 }
 
 .character-list-profile-link {
@@ -128,6 +133,23 @@
   color: gray;
 }
 
+.character-list-statuses {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid lightgray;
+}
+
+.character-list-status {
+  display: flex;
+  margin: 0 20px 4px 0;
+}
+
+.character-list-status-name {
+  font-weight: bold;
+  color: #555;
+  margin-right: 10px;
+}
+
 </style>
 <?php require GETENV('GAME_ROOT').'/components/header_end.php'; ?>
 
@@ -150,10 +172,12 @@
 <ul class="character-list">
 <?php foreach ($characters as $character) { ?>
   <li>
-    <?php
-      $COMPONENT_ICON['src'] = $character['icon'];
-      include GETENV('GAME_ROOT').'/components/icon.php';
-    ?>
+    <div class="character-list-icon">
+      <?php
+        $COMPONENT_ICON['src'] = $character['icon'];
+        include GETENV('GAME_ROOT').'/components/icon.php';
+      ?>
+    </div>
     <div class="character-list-profile">
       <div class="character-list-info">
         <a class="character-list-profile-link" href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$character['ENo']?>">
@@ -171,6 +195,48 @@
         <?php
           }
         ?>
+      </div>
+      <div class="character-list-statuses">
+        <div class="character-list-status">
+          <div class="character-list-status-name">
+            ATK
+          </div>
+          <div class="character-list-status-value">
+            <?=$character['ATK']?>
+          </div>
+        </div>
+        <div class="character-list-status">
+          <div class="character-list-status-name">
+            DEX
+          </div>
+          <div class="character-list-status-value">
+            <?=$character['DEX']?>
+          </div>
+        </div>
+        <div class="character-list-status">
+          <div class="character-list-status-name">
+            MND
+          </div>
+          <div class="character-list-status-value">
+            <?=$character['MND']?>
+          </div>
+        </div>
+        <div class="character-list-status">
+          <div class="character-list-status-name">
+            AGI
+          </div>
+          <div class="character-list-status-value">
+            <?=$character['AGI']?>
+          </div>
+        </div>
+        <div class="character-list-status">
+          <div class="character-list-status-name">
+            DEF
+          </div>
+          <div class="character-list-status-value">
+            <?=$character['DEF']?>
+          </div>
+        </div>
       </div>
       <div class="character-list-summary">
         <?=htmlspecialchars($character['summary'])?>
