@@ -6,6 +6,9 @@
   $COMPONENT_CHARACTER_PROFILE['type']:string
   キャラクタープロフィールの表示タイプを'home'、'profile'のいずれかで指定します。
 
+  $COMPONENT_CHARACTER_PROFILE['ENo']:int|string
+  キャラクターのENoです。
+
   $COMPONENT_CHARACTER_PROFILE['profile_images']:array
   プロフィール画像の配列を指定します。
 
@@ -30,6 +33,12 @@
 
   $COMPONENT_CHARACTER_PROFILE['skills']:array
   設定しているスキルの配列です。Skillクラスのオブジェクトの形で受け取ります。
+
+  $COMPONENT_CHARACTER_PROFILE['declarations']:array
+  定期更新において宣言を行っていた回の配列です。以下の構造を取ります。
+
+    $COMPONENT_CHARACTER_PROFILE['declarations'][$i]['nth']
+    定期更新において宣言を行っていた回です。
 */
 
   require_once GETENV('GAME_ROOT').'/utils/decoration.php';
@@ -88,6 +97,15 @@
     </section>
   </section>
 </section>
+
+<?php if ($COMPONENT_CHARACTER_PROFILE['declarations']) { ?>
+<section class="profile-declarations">
+  <h2>更新結果</h2>
+  <?php foreach ($COMPONENT_CHARACTER_PROFILE['declarations'] as $declaration) { ?>
+    <a class="profile-declaration-link" href="<?=$GAME_CONFIG['URI']?>results/<?=$declaration['nth']?>/<?=$COMPONENT_CHARACTER_PROFILE['ENo']?>.html" target="_blank">第<?=$declaration['nth']?>回</a>
+  <?php } ?>
+</section>
+<?php } ?>
 
 <section class="profile-tags">
   <h2>タグ</h2>

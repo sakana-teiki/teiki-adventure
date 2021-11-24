@@ -367,6 +367,28 @@
     }
   }
 
+  // 定期更新のログが存在している回を取得（宣言が行われており、ゲームステータスのnext_update_nth未満のものはログが存在しているのでそれを対象とする）
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `nth`
+    FROM
+      `characters_declarations`
+    WHERE
+      `ENo` = :ENo AND
+      `nth` < (SELECT `next_update_nth` FROM `game_status`);
+  ");
+
+  $statement->bindParam(':ENo', $target);
+
+  $result = $statement->execute();
+
+  if (!$result) {
+    // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
+    responseError(500);
+  }
+  
+  $declarations = $statement->fetchAll();
+
   $PAGE_SETTING['TITLE'] = 'ENo.'.$data['ENo'].' '.$data['name'];
 
 ?>
@@ -452,6 +474,7 @@
 // ブロックされていない場合にのみプロフィールを表示
 if (!isset($relation) || !$relation['blocked']) {
   $COMPONENT_CHARACTER_PROFILE['type']           = 'profile';
+  $COMPONENT_CHARACTER_PROFILE['ENo']            = $data['ENo'];
   $COMPONENT_CHARACTER_PROFILE['profile_images'] = array_filter(explode("\n", $data['profile_images']), "strlen");
   $COMPONENT_CHARACTER_PROFILE['ATK']            = $data['ATK'];
   $COMPONENT_CHARACTER_PROFILE['DEX']            = $data['DEX'];
@@ -462,6 +485,7 @@ if (!isset($relation) || !$relation['blocked']) {
   $COMPONENT_CHARACTER_PROFILE['profile']        = $data['profile'];
   $COMPONENT_CHARACTER_PROFILE['icons']          = parseIconsResult($data['icons']);
   $COMPONENT_CHARACTER_PROFILE['skills']         = $skills;
+  $COMPONENT_CHARACTER_PROFILE['declarations']   = $declarations;
 
   include GETENV('GAME_ROOT').'/components/character_profile.php';
 } else {
