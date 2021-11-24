@@ -847,6 +847,33 @@
     }
   }
 
+  // 再帰的にディレクトリの中身を削除する関数
+  function recursiveRemove($directory) {
+    $paths = glob($directory.'/*');
+
+    foreach ($paths as $path) {
+      if (is_dir($path)){
+        recursiveRemove($path); // ディレクトリのパスだったなら自身を呼び出す
+      } else {
+        unlink($path);          // ディレクトリのパスでない（＝ファイルだった）ならファイルを削除
+      }
+    }
+
+    rmdir($directory); // 自身を削除
+  }
+
+  // ログの削除
+  $logDirectories = glob(GETENV('GAME_ROOT').'/static/logs/*', GLOB_ONLYDIR);
+  foreach ($logDirectories as $directory) {
+    recursiveRemove($directory);
+  }
+  
+  // 定期更新の結果を削除
+  $resultDirectories = glob(GETENV('GAME_ROOT').'/static/results/*', GLOB_ONLYDIR);
+  foreach ($resultDirectories as $directory) {
+    recursiveRemove($directory);
+  }
+
   // マスタデータの読み込み
   require_once GETENV('GAME_ROOT').'/actions/import_master.php';
 
