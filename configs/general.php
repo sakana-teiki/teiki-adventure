@@ -39,16 +39,17 @@ $GAME_CONFIG['THREAD_MESSAGE_MAX_LENGTH']     = 2000; // スレッド・スレ�
 $GAME_CONFIG['TITLE_TEMPLATE'] = ' | Teiki Adventure'; // ページタイトルに共通でつける文言を指定します。
 
 //表示要素数関連
-$GAME_CONFIG['CHARACTER_LIST_ITEMS_PER_PAGE'] = 100; // キャラクターリストページで1ページあたりに表示するキャラクター数を指定します。
-$GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE']      = 30;  // トークルーム一覧ページで1ページあたりに表示するトークルーム数を指定します。
-$GAME_CONFIG['ROOM_MESSAGES_PER_PAGE']        = 20;  // トークルームで1ページあたりに表示するメッセージ数を指定します。
-$GAME_CONFIG['EXPLORATION_LOGS_PER_PAGE']     = 20;  // 探索ログで1ページあたりに表示するログ数を指定します。
-$GAME_CONFIG['THREADS_PER_PAGE']              = 50;  // 掲示板で1ページあたりに表示するスレッド数を指定します。
-$GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE']      = 50;  // 個別のダイレクトメッセージで1ページあたりに表示するダイレクトメッセージ数を指定します。
-$GAME_CONFIG['ANNOUNCEMENTS_LIMIT']           = 5;   // お知らせ画面を表示した際のデフォルトのお知らせの表示件数を指定します。
-$GAME_CONFIG['NOTIFICATIONS_LIMIT']           = 50;  // 通知画面を表示した際の通知の表示件数を指定します。
-$GAME_CONFIG['TRADE_HISTORIES_LIMIT']         = 50;  // トレード履歴の表示件数を指定します。
-$GAME_CONFIG['FLEA_MARKET_ITEMS_PER_PAGE']    = 30;  // フリーマーケットページで1ページあたりに表示する出品数を指定します。
+$GAME_CONFIG['CHARACTER_LIST_ITEMS_PER_PAGE']   = 100; // キャラクターリストページで1ページあたりに表示するキャラクター数を指定します。
+$GAME_CONFIG['CHARACTER_SEARCH_ITEMS_PER_PAGE'] = 100; // キャラクター検索ページで1ページあたりに表示するキャラクター数を指定します。
+$GAME_CONFIG['ROOM_LIST_ITEMS_PER_PAGE']        = 30;  // トークルーム一覧ページで1ページあたりに表示するトークルーム数を指定します。
+$GAME_CONFIG['ROOM_MESSAGES_PER_PAGE']          = 20;  // トークルームで1ページあたりに表示するメッセージ数を指定します。
+$GAME_CONFIG['EXPLORATION_LOGS_PER_PAGE']       = 20;  // 探索ログで1ページあたりに表示するログ数を指定します。
+$GAME_CONFIG['THREADS_PER_PAGE']                = 50;  // 掲示板で1ページあたりに表示するスレッド数を指定します。
+$GAME_CONFIG['DIRECT_MESSAGES_PER_PAGE']        = 50;  // 個別のダイレクトメッセージで1ページあたりに表示するダイレクトメッセージ数を指定します。
+$GAME_CONFIG['ANNOUNCEMENTS_LIMIT']             = 5;   // お知らせ画面を表示した際のデフォルトのお知らせの表示件数を指定します。
+$GAME_CONFIG['NOTIFICATIONS_LIMIT']             = 50;  // 通知画面を表示した際の通知の表示件数を指定します。
+$GAME_CONFIG['TRADE_HISTORIES_LIMIT']           = 50;  // トレード履歴の表示件数を指定します。
+$GAME_CONFIG['FLEA_MARKET_ITEMS_PER_PAGE']      = 30;  // フリーマーケットページで1ページあたりに表示する出品数を指定します。
 
 //通知関連
 $GAME_CONFIG['DISCORD_NOTIFICATION_PREFIX'] = 'Teiki Adventure / '; // Discord通知の先頭に共通で付ける文言を指定します。

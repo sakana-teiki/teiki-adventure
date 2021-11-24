@@ -788,17 +788,17 @@
   <h2>検索条件</h2>
   
   <label>
-    出品者ENo:
+    出品者ENo
     <input class="search-input" type="number" name="seller" value="<?=htmlspecialchars($seller)?>" min="1">
   </label>
     
   <label>
-    出品アイテム:
+    出品アイテム
     <input class="search-input" type="text" name="sell" value="<?=htmlspecialchars($sell)?>">
   </label>
     
   <label>
-    希望アイテム:
+    希望アイテム
     <input class="search-input" type="text" name="demand" value="<?=htmlspecialchars($demand)?>">
   </label>
 
