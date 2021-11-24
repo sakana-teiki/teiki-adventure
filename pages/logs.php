@@ -212,9 +212,9 @@
 </form>
 
 <section class="pagelinks next-prev-pagelinks">
-  <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?page=<?=$page+1-1?>">前のページ</a></div>
+  <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?target=<?=htmlspecialchars($target)?>&mode=<?=htmlspecialchars($mode)?>&page=<?=$page+1-1?>">前のページ</a></div>
   <span class="next-prev-pagelinks-page">ページ<?=$page+1?></span>
-  <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?page=<?=$page+1+1?>">次のページ</a></div>
+  <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?target=<?=htmlspecialchars($target)?>&mode=<?=htmlspecialchars($mode)?>&page=<?=$page+1-1?>">次のページ</a></div>
 </section>
 
 <table class="logs">
@@ -268,9 +268,9 @@
 </table>
 
 <section class="pagelinks next-prev-pagelinks">
-  <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?page=<?=$page+1-1?>">前のページ</a></div>
+  <div><a class="pagelink<?= 0 < $page   ? '' : ' next-prev-pagelinks-invalid'?>" href="?target=<?=htmlspecialchars($target)?>&mode=<?=htmlspecialchars($mode)?>&page=<?=$page+1-1?>">前のページ</a></div>
   <span class="next-prev-pagelinks-page">ページ<?=$page+1?></span>
-  <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?page=<?=$page+1+1?>">次のページ</a></div>
+  <div><a class="pagelink<?= $existsNext ? '' : ' next-prev-pagelinks-invalid'?>" href="?target=<?=htmlspecialchars($target)?>&mode=<?=htmlspecialchars($mode)?>&page=<?=$page+1-1?>">次のページ</a></div>
 </section>
 
 <?php require GETENV('GAME_ROOT').'/components/footer.php'; ?>
