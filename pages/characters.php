@@ -24,12 +24,10 @@
       `characters`.`MND`,
       `characters`.`AGI`,
       `characters`.`DEF`,
-      `characters_icons`.`url` AS `icon`,
+      IFNULL((SELECT `url` FROM `characters_icons` WHERE `characters_icons`.`ENo` = `characters`.`ENo` LIMIT 1), '') AS `icon`,
       IFNULL(GROUP_CONCAT(DISTINCT `characters_tags`.`tag` ORDER BY `characters_tags`.`id` SEPARATOR ' '), '') AS `tags`
     FROM
       `characters`
-    LEFT JOIN
-      `characters_icons` ON `characters`.`ENo` = `characters_icons`.`ENo`
     LEFT JOIN
       `characters_tags`  ON `characters`.`ENo` = `characters_tags`.`ENo`
     WHERE
@@ -43,8 +41,7 @@
       `characters`.`DEX`,
       `characters`.`MND`,
       `characters`.`AGI`,
-      `characters`.`DEF`,
-      `characters_icons`.`url`;
+      `characters`.`DEF`;
   ");
 
   $statement->bindValue(':ENoMin', $page * 100 + 1);
