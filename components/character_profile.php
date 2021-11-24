@@ -27,6 +27,9 @@
 
   $COMPONENT_CHARACTER_PROFILE['icons']:array
   アイコンの配列を指定します。utils/parser.phpのparseIconsResultの結果の形式で受け取ります。
+
+  $COMPONENT_CHARACTER_PROFILE['skills']:array
+  設定しているスキルの配列です。Skillクラスのオブジェクトの形で受け取ります。
 */
 
   require_once GETENV('GAME_ROOT').'/utils/decoration.php';
@@ -70,41 +73,18 @@
     </table>
 
     <section class="profile-skills">
+<?php
+  foreach ($COMPONENT_CHARACTER_PROFILE['skills'] as $skill) {
+    $desc = $skill->getDescription();
+?>
       <section class="profile-skill">
         <div class="profile-skill-prop">
-          <div class="profile-skill-name">スキル1</div>
-          <div class="profile-skill-cond">スキル発動条件</div>
+          <div class="profile-skill-name"><?=$desc['name']?></div>
+          <div class="profile-skill-cond"><?=$desc['cond']?></div>
         </div>
-        <div class="profile-skill-effect">スキル効果</div>
+        <div class="profile-skill-effect"><?=$desc['desc']?></div>
       </section>
-      <section class="profile-skill">
-        <div class="profile-skill-prop">
-          <div class="profile-skill-name">スキル2</div>
-          <div class="profile-skill-cond">スキル発動条件</div>
-        </div>
-        <div class="profile-skill-effect">スキル効果</div>
-      </section>
-      <section class="profile-skill">
-        <div class="profile-skill-prop">
-          <div class="profile-skill-name">スキル3</div>
-          <div class="profile-skill-cond">スキル発動条件</div>
-        </div>
-        <div class="profile-skill-effect">スキル効果</div>
-      </section>
-      <section class="profile-skill">
-        <div class="profile-skill-prop">
-          <div class="profile-skill-name">スキル4</div>
-          <div class="profile-skill-cond">スキル発動条件</div>
-        </div>
-        <div class="profile-skill-effect">スキル効果</div>
-      </section>
-      <section class="profile-skill">
-        <div class="profile-skill-prop">
-          <div class="profile-skill-name">スキル5</div>
-          <div class="profile-skill-cond">スキル発動条件</div>
-        </div>
-        <div class="profile-skill-effect">スキル効果</div>
-      </section>
+<?php } ?>
     </section>
   </section>
 </section>

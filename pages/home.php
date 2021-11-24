@@ -4,7 +4,13 @@
 
   require_once GETENV('GAME_ROOT').'/utils/parser.php';
 
-  // DBから値を取得
+  require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/conditions.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/effect-conditions.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/elements.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/targets.php';
+
+  // プロフィールデータを取得
   $statement = $GAME_PDO->prepare("
     SELECT
       `ENo`,
@@ -38,6 +44,59 @@
 
   $icons = parseIconsResult($data['icons']);
 
+  // 設定しているスキルを取得
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `skills_master_data`.`name`,
+      `skills_master_data`.`cost`,
+      `skills_master_data`.`condition`,
+      `skills_master_data`.`condition_value`,
+      `skills_master_data`.`trigger`,
+      `skills_master_data`.`rate_numerator`,
+      `skills_master_data`.`rate_denominator`,
+      `skills_master_data`.`effects`,
+      `skills_master_data`.`type`
+    FROM
+      `characters_skills`
+    JOIN
+      `skills_master_data` ON `skills_master_data`.`skill_id` = `characters_skills`.`skill`
+    WHERE
+      `ENo` = :ENo;
+  ");
+
+  $statement->bindParam(':ENo', $_SESSION['ENo']);
+
+  $result = $statement->execute();
+
+  if (!$result) {
+    // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
+    responseError(500);
+  }
+  
+  $skillDatas = $statement->fetchAll();
+
+  // スキルデータをテキストとして取得しやすいようクラス化
+  $skills = array();
+  foreach ($skillDatas as $skillData) {
+    if ($skillData['type'] === 'active') {
+      $skills[] = new ActiveSkill(
+        $skillData['name'],
+        $skillData['cost'],
+        $skillData['condition'],
+        $skillData['condition_value'],
+        json_decode($skillData['effects'])
+      );
+    } else if ($skillData['type'] === 'passive') {
+      $skills[] = new PassiveSkill(
+        $skillData['name'],
+        $skillData['trigger'],
+        $skillData['rate_numerator'],
+        $skillData['rate_denominator'],
+        json_decode($skillData['effects'])
+      );
+    }
+  }
+
   $PAGE_SETTING['TITLE'] = 'ホーム';
 
 ?>
@@ -58,6 +117,7 @@
   $COMPONENT_CHARACTER_PROFILE['tags']           = array_filter(explode(' ', $data['tags']), "strlen");
   $COMPONENT_CHARACTER_PROFILE['profile']        = $data['profile'];
   $COMPONENT_CHARACTER_PROFILE['icons']          = parseIconsResult($data['icons']);
+  $COMPONENT_CHARACTER_PROFILE['skills']         = $skills;
 
   include GETENV('GAME_ROOT').'/components/character_profile.php';
 ?>

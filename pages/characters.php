@@ -136,7 +136,6 @@
 .character-list-statuses {
   display: flex;
   width: 100%;
-  border-bottom: 1px solid lightgray;
 }
 
 .character-list-status {

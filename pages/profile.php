@@ -4,6 +4,12 @@
   require_once GETENV('GAME_ROOT').'/utils/validation.php';
   require_once GETENV('GAME_ROOT').'/utils/notification.php';
 
+  require_once GETENV('GAME_ROOT').'/battle/skills/bases.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/conditions.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/effect-conditions.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/elements.php';
+  require_once GETENV('GAME_ROOT').'/battle/skills/targets.php';
+
   // GET以外の場合のみ認証を必要とする
   if ($_SERVER['REQUEST_METHOD'] != 'GET') {
     require GETENV('GAME_ROOT').'/middlewares/verification.php';
@@ -308,6 +314,59 @@
     }
   }
 
+  // 設定しているスキルを取得
+  $statement = $GAME_PDO->prepare("
+    SELECT
+      `skills_master_data`.`name`,
+      `skills_master_data`.`cost`,
+      `skills_master_data`.`condition`,
+      `skills_master_data`.`condition_value`,
+      `skills_master_data`.`trigger`,
+      `skills_master_data`.`rate_numerator`,
+      `skills_master_data`.`rate_denominator`,
+      `skills_master_data`.`effects`,
+      `skills_master_data`.`type`
+    FROM
+      `characters_skills`
+    JOIN
+      `skills_master_data` ON `skills_master_data`.`skill_id` = `characters_skills`.`skill`
+    WHERE
+      `ENo` = :ENo;
+  ");
+
+  $statement->bindParam(':ENo', $target);
+
+  $result = $statement->execute();
+
+  if (!$result) {
+    // SQLの実行に失敗した場合は500(Internal Server Error)を返し処理を中断
+    responseError(500);
+  }
+  
+  $skillDatas = $statement->fetchAll();
+
+  // スキルデータをテキストとして取得しやすいようクラス化
+  $skills = array();
+  foreach ($skillDatas as $skillData) {
+    if ($skillData['type'] === 'active') {
+      $skills[] = new ActiveSkill(
+        $skillData['name'],
+        $skillData['cost'],
+        $skillData['condition'],
+        $skillData['condition_value'],
+        json_decode($skillData['effects'])
+      );
+    } else if ($skillData['type'] === 'passive') {
+      $skills[] = new PassiveSkill(
+        $skillData['name'],
+        $skillData['trigger'],
+        $skillData['rate_numerator'],
+        $skillData['rate_denominator'],
+        json_decode($skillData['effects'])
+      );
+    }
+  }
+
   $PAGE_SETTING['TITLE'] = 'ENo.'.$data['ENo'].' '.$data['name'];
 
 ?>
@@ -402,6 +461,7 @@ if (!isset($relation) || !$relation['blocked']) {
   $COMPONENT_CHARACTER_PROFILE['tags']           = array_filter(explode(' ', $data['tags']), "strlen");
   $COMPONENT_CHARACTER_PROFILE['profile']        = $data['profile'];
   $COMPONENT_CHARACTER_PROFILE['icons']          = parseIconsResult($data['icons']);
+  $COMPONENT_CHARACTER_PROFILE['skills']         = $skills;
 
   include GETENV('GAME_ROOT').'/components/character_profile.php';
 } else {
