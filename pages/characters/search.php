@@ -61,11 +61,20 @@
     $tagStatement = ' `tags` like :tag ';
   }
 
-  // スキル名に応じた条件分を指定
+  // スキル名に応じた条件文を指定
   if ($skill === '') {
     $skillStatement = ' true ';
   } else {
     $skillStatement = ' `skills` like :skill ';
+  }
+
+  // 絞り込みに応じた条件文を指定
+  if ($mode === 'default') {
+    $modeStatement = ' true ';
+  } else if ($mode === 'fav') {
+    $modeStatement = ' `characters`.`ENo` IN (SELECT `cf`.`faved` FROM `characters_favs` AS `cf` WHERE `cf`.`faver` = :ENo) ';
+  } else if ($mode === 'faved') {
+    $modeStatement = ' `characters`.`ENo` IN (SELECT `cf`.`faver` FROM `characters_favs` AS `cf` WHERE `cf`.`faved` = :ENo) ';
   }
 
   // 並び順に応じた条件文を指定
@@ -111,7 +120,8 @@
     WHERE
       `characters`.`administrator` = false AND
       `characters`.`deleted`       = false AND 
-      ".$nameStatement."
+      ".$nameStatement." AND
+      ".$modeStatement."
     GROUP BY
       `characters`.`ENo`,
       `characters`.`nickname`,
@@ -133,9 +143,10 @@
   $statement->bindValue(':offset', $page * $GAME_CONFIG['CHARACTER_SEARCH_ITEMS_PER_PAGE'], PDO::PARAM_INT);
   $statement->bindValue(':number', $GAME_CONFIG['CHARACTER_SEARCH_ITEMS_PER_PAGE'] + 1,     PDO::PARAM_INT);
 
-  if ($name  !== '') $statement->bindValue(':name',  '%'.$name.'%');
-  if ($tag   !== '') $statement->bindValue(':tag',   '%'.$tag.'%');
-  if ($skill !== '') $statement->bindValue(':skill', '%'.$skill.'%');
+  if ($name  !== '')        $statement->bindValue(':name',  '%'.$name.'%');
+  if ($tag   !== '')        $statement->bindValue(':tag',   '%'.$tag.'%');
+  if ($skill !== '')        $statement->bindValue(':skill', '%'.$skill.'%');
+  if ($mode  !== 'default') $statement->bindValue(':ENo',    $_SESSION['ENo']);
 
   $result = $statement->execute();
 
