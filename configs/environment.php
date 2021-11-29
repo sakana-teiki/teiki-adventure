@@ -26,6 +26,6 @@ $GAME_CONFIG['INITIALIZE_KEY'] = 'init'; // ゲームデータの初期化に使
 
 // セッション設定
 $GAME_CONFIG['SESSION_NAME']     = 'teiki_session';                  // セッション名を指定します。 
-$GAME_CONFIG['SESSION_LIFETIME'] = strtotime('14day', 0);            // セッション及びクッキーの有効時間を秒数で設定します。
+$GAME_CONFIG['SESSION_LIFETIME'] = 60 * 60 * 24 * 14;                // セッション及びクッキーの有効時間を秒数で設定します。
 $GAME_CONFIG['SESSION_PATH']     = GETENV('GAME_ROOT').'/sessions/'; // セッションの保存先を指定します。
 ?>
