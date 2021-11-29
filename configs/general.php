@@ -76,6 +76,7 @@ $GAME_CONFIG['PUBLIC_ROOMS'] = array( // 初期化を行った際に作られる
 $GAME_CONFIG['MASTER_DATA_TABLES'] = [ // マスタデータを指定しているテーブルです。これにより指定されたテーブルはマスタデータインポートエクスポートで入出力されるようになります。
   'skills_master_data',
   'enemies_master_data',
+  'enemies_master_data_icons',
   'enemies_master_data_battle_lines',
   'enemies_master_data_skills',
   'items_master_data',

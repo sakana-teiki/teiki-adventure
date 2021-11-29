@@ -23,7 +23,7 @@
         responseError(400);
       }
 
-      if ($_POST['target'] == $SESSION['ENo']) {
+      if ($_POST['target'] == $_SESSION['ENo']) {
         responseError(400); // 自分自身に送付しようとしていた場合は400(Forbidden)を返して処理を中断
       }
 
@@ -144,6 +144,70 @@
         responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
       }
 
+      // 送付先の通知情報を取得
+      $statement = $GAME_PDO->prepare("
+        SELECT
+          `notification_trade`,
+          `notification_webhook_trade`,
+          `webhook`
+        FROM
+          `characters`
+        WHERE
+          `ENo` = :ENo;
+      ");
+
+      $statement->bindParam(':ENo', $_POST['target'], PDO::PARAM_INT);
+
+      $result = $statement->execute();
+      $target = $statement->fetch();
+
+      if (!$result || !$target) {
+        $GAME_PDO->rollBack();
+        responseError(500); // 結果の取得に失敗した場合は500(Internal Server Error)を返して処理を中断
+      }
+
+      if ($target['notification_trade']) {
+        // 送付先のアイテムトレード通知が有効なら通知を作成
+        $statement = $GAME_PDO->prepare("
+          INSERT INTO `notifications` (
+            `ENo`,
+            `type`,
+            `target`,
+            `message`
+          ) VALUES (
+            :ENo,
+            'trade_start',
+            :target,
+            ''
+          );
+        ");
+  
+        $statement->bindParam(':ENo',    $target['ENo']);
+        $statement->bindParam(':target', $_POST['id']);
+  
+        $result = $statement->execute();
+      }
+
+      if ($target['webhook'] && $target['notification_webhook_trade']) {
+        // 送付先のWebhookが入力されており、Discordのアイテムトレード通知が有効なら通知を送信
+        // 自分自身のニックネームを取得
+        $statement = $GAME_PDO->prepare("
+          SELECT
+            `characters`.`nickname`
+          FROM
+            `characters`
+          WHERE
+            `ENo` = :user;
+        ");
+  
+        $statement->bindParam(':user', $_SESSION['ENo']);
+  
+        $result = $statement->execute();
+        $nickname = $statement->fetch();
+  
+        notifyDiscord($target['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'からアイテムが送付されました。 '.$GAME_CONFIG['ABSOLUTE_URI'].'trade');
+      }
+
       // ここまで全て成功した場合はコミット
       $GAME_PDO->commit();
     } else if ($_POST['type'] == 'accept') {
@@ -156,11 +220,15 @@
       // トランザクション開始
       $GAME_PDO->beginTransaction();
 
-      // 対象のトレード情報を取得、同時にこれが自分に送られたアイテムか、送付元のキャラクターが削除されていないか、既に終了したトレードでないかを判定
+      // 対象のトレード情報と通知情報を取得、同時にこれが自分に送られたアイテムか、送付元のキャラクターが削除されていないか、既に終了したトレードでないかを判定
       $statement = $GAME_PDO->prepare("
         SELECT
           `trades`.`item`,
-          `trades`.`number`
+          `trades`.`number`,
+          `characters`.`ENo` AS `master`,
+          `characters`.`notification_trade`,
+          `characters`.`notification_webhook_trade`,
+          `characters`.`webhook`
         FROM
           `trades`
         JOIN
@@ -228,6 +296,48 @@
         $GAME_PDO->rollBack();
         responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
       }
+
+      if ($trade['notification_trade']) {
+        // 送付元のアイテムトレード通知が有効なら通知を作成
+        $statement = $GAME_PDO->prepare("
+          INSERT INTO `notifications` (
+            `ENo`,
+            `type`,
+            `target`,
+            `message`
+          ) VALUES (
+            :ENo,
+            'trade_finish',
+            :target,
+            ''
+          );
+        ");
+  
+        $statement->bindParam(':ENo',    $trade['master']);
+        $statement->bindParam(':target', $_POST['id']);
+  
+        $result = $statement->execute();
+      }
+
+      if ($trade['webhook'] && $trade['notification_webhook_trade']) {
+        // 送付元のWebhookが入力されており、Discordのアイテムトレード通知が有効なら通知を送信
+        // 自分自身のニックネームを取得
+        $statement = $GAME_PDO->prepare("
+          SELECT
+            `characters`.`nickname`
+          FROM
+            `characters`
+          WHERE
+            `ENo` = :user;
+        ");
+  
+        $statement->bindParam(':user', $_SESSION['ENo']);
+  
+        $result = $statement->execute();
+        $nickname = $statement->fetch();
+  
+        notifyDiscord($trade['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'はあなたが送付したアイテムを受領しました。 '.$GAME_CONFIG['ABSOLUTE_URI'].'trade/history');
+      }
   
       // ここまで全て成功した場合はコミット
       $GAME_PDO->commit();
@@ -241,12 +351,15 @@
       // トランザクション開始
       $GAME_PDO->beginTransaction();
 
-      // 対象のトレード情報を取得、同時にこれが自分に送られたアイテムか、送付元のキャラクターが削除されていないか、既に終了したトレードでないかを判定
+      // 対象のトレード情報と通知情報を取得、同時にこれが自分に送られたアイテムか、送付元のキャラクターが削除されていないか、既に終了したトレードでないかを判定
       $statement = $GAME_PDO->prepare("
         SELECT
-          `item`,
-          `number`,
-          `master`
+          `trades`.`item`,
+          `trades`.`number`,
+          `characters`.`ENo` AS `master`,
+          `characters`.`notification_trade`,
+          `characters`.`notification_webhook_trade`,
+          `characters`.`webhook`
         FROM
           `trades`
         JOIN
@@ -313,6 +426,48 @@
       if (!$result) {
         $GAME_PDO->rollBack();
         responseError(500); // SQLの実行に失敗した場合は500(Internal Server Error)を返して処理を中断
+      }
+
+      if ($trade['notification_trade']) {
+        // 送付元のアイテムトレード通知が有効なら通知を作成
+        $statement = $GAME_PDO->prepare("
+          INSERT INTO `notifications` (
+            `ENo`,
+            `type`,
+            `target`,
+            `message`
+          ) VALUES (
+            :ENo,
+            'trade_decline',
+            :target,
+            ''
+          );
+        ");
+  
+        $statement->bindParam(':ENo',    $trade['master']);
+        $statement->bindParam(':target', $_POST['id']);
+  
+        $result = $statement->execute();
+      }
+
+      if ($trade['webhook'] && $trade['notification_webhook_trade']) {
+        // 送付元のWebhookが入力されており、Discordのアイテムトレード通知が有効なら通知を送信
+        // 自分自身のニックネームを取得
+        $statement = $GAME_PDO->prepare("
+          SELECT
+            `characters`.`nickname`
+          FROM
+            `characters`
+          WHERE
+            `ENo` = :user;
+        ");
+  
+        $statement->bindParam(':user', $_SESSION['ENo']);
+  
+        $result = $statement->execute();
+        $nickname = $statement->fetch();
+  
+        notifyDiscord($trade['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'はあなたが送付したアイテムを辞退しました。 '.$GAME_CONFIG['ABSOLUTE_URI'].'trade/history');
       }
   
       // ここまで全て成功した場合はコミット

@@ -2,6 +2,7 @@
   require GETENV('GAME_ROOT').'/middlewares/initialize.php';
   require GETENV('GAME_ROOT').'/middlewares/verification.php';
 
+  require_once GETENV('GAME_ROOT').'/utils/notification.php';
   require_once GETENV('GAME_ROOT').'/utils/validation.php';
 
   // POSTリクエスト時の処理
@@ -318,16 +319,21 @@
       // 対象のidの出品を取得（出品者がブロック/被ブロックの関係である出品は検索対象としない）
       $statement = $GAME_PDO->prepare("
         SELECT
-          `seller`,
-          `sell_item`,
-          `sell_item_number`,
-          `demand_item`,
-          `demand_item_number`,
-          `state`
+          `flea_markets`.`seller`,
+          `flea_markets`.`sell_item`,
+          `flea_markets`.`sell_item_number`,
+          `flea_markets`.`demand_item`,
+          `flea_markets`.`demand_item_number`,
+          `flea_markets`.`state`,
+          `characters`.`notification_flea_market`,
+          `characters`.`notification_webhook_flea_market`,
+          `characters`.`webhook`
         FROM
           `flea_markets`
+        JOIN
+          `characters` ON `characters`.`ENo` = `flea_markets`.`seller`
         WHERE
-          `id` = :id AND
+          `flea_markets`.`id` = :id AND
           NOT EXISTS (
             SELECT
               *
@@ -365,17 +371,19 @@
       // トランザクション開始
       $GAME_PDO->beginTransaction();
 
-      // 出品を購入済状態に
+      // 出品を購入済状態に＆購入者を設定
       $statement = $GAME_PDO->prepare("
         UPDATE
           `flea_markets`
         SET
-          `state` = 'sold'
+          `state` = 'sold',
+          `buyer` = :buyer
         WHERE
           `id` = :id;
       ");
 
-      $statement->bindValue(':id', $_POST['id'], PDO::PARAM_INT);
+      $statement->bindValue(':id',    $_POST['id'],     PDO::PARAM_INT);
+      $statement->bindValue(':buyer', $_SESSION['ENo'], PDO::PARAM_INT);
 
       $result = $statement->execute();
 
@@ -536,6 +544,48 @@
         $statement->bindValue(':demand_item_number', $target['demand_item_number'], PDO::PARAM_INT);
 
         $result = $statement->execute();
+      }
+
+      if ($target['notification_flea_market']) {
+        // 販売者のダイレクトメッセージ通知が有効なら通知を作成
+        $statement = $GAME_PDO->prepare("
+          INSERT INTO `notifications` (
+            `ENo`,
+            `type`,
+            `target`,
+            `message`
+          ) VALUES (
+            :ENo,
+            'flea_market',
+            :target,
+            ''
+          );
+        ");
+  
+        $statement->bindParam(':ENo',    $target['seller']);
+        $statement->bindParam(':target', $_POST['id']);
+  
+        $result = $statement->execute();
+      }
+
+      if ($target['webhook'] && $target['notification_webhook_flea_market']) {
+        // 販売者のWebhookが入力されており、Discordのアイテムトレード通知が有効なら通知を送信
+        // 自分自身のニックネームを取得
+        $statement = $GAME_PDO->prepare("
+          SELECT
+            `characters`.`nickname`
+          FROM
+            `characters`
+          WHERE
+            `ENo` = :user;
+        ");
+  
+        $statement->bindParam(':user', $_SESSION['ENo']);
+  
+        $result = $statement->execute();
+        $nickname = $statement->fetch();
+  
+        notifyDiscord($target['webhook'], 'ENo.'.$_SESSION['ENo'].' '.$nickname['nickname'].'はあなたが出品したアイテムを購入しました。 '.$GAME_CONFIG['ABSOLUTE_URI'].'market');
       }
 
       // ここまで全て成功した場合はコミット

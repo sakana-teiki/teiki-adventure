@@ -40,10 +40,14 @@
         `notification_new_arrival`            = :notification_new_arrival,
         `notification_faved`                  = :notification_faved,
         `notification_direct_message`         = :notification_direct_message,
+        `notification_trade`                  = :notification_trade,
+        `notification_flea_market`            = :notification_flea_market,
         `notification_webhook_replied`        = :notification_webhook_replied,
         `notification_webhook_new_arrival`    = :notification_webhook_new_arrival,
         `notification_webhook_faved`          = :notification_webhook_faved,
-        `notification_webhook_direct_message` = :notification_webhook_direct_message
+        `notification_webhook_direct_message` = :notification_webhook_direct_message,
+        `notification_webhook_trade`          = :notification_webhook_trade,
+        `notification_webhook_flea_market`    = :notification_webhook_flea_market
       WHERE
         `ENo` = :ENo;
     ");
@@ -55,10 +59,14 @@
     $statement->bindValue(':notification_new_arrival',            isset($_POST['notification_new_arrival']),            PDO::PARAM_BOOL);
     $statement->bindValue(':notification_faved',                  isset($_POST['notification_faved']),                  PDO::PARAM_BOOL);
     $statement->bindValue(':notification_direct_message',         isset($_POST['notification_direct_message']),         PDO::PARAM_BOOL);
+    $statement->bindValue(':notification_trade',                  isset($_POST['notification_trade']),                  PDO::PARAM_BOOL);
+    $statement->bindValue(':notification_flea_market',            isset($_POST['notification_flea_market']),            PDO::PARAM_BOOL);
     $statement->bindValue(':notification_webhook_replied',        isset($_POST['notification_webhook_replied']),        PDO::PARAM_BOOL);
     $statement->bindValue(':notification_webhook_new_arrival',    isset($_POST['notification_webhook_new_arrival']),    PDO::PARAM_BOOL);
     $statement->bindValue(':notification_webhook_faved',          isset($_POST['notification_webhook_faved']),          PDO::PARAM_BOOL);
     $statement->bindValue(':notification_webhook_direct_message', isset($_POST['notification_webhook_direct_message']), PDO::PARAM_BOOL);
+    $statement->bindValue(':notification_webhook_trade',          isset($_POST['notification_webhook_trade']),          PDO::PARAM_BOOL);
+    $statement->bindValue(':notification_webhook_flea_market',    isset($_POST['notification_webhook_flea_market']),    PDO::PARAM_BOOL);
 
     $result = $statement->execute();
 
@@ -86,10 +94,14 @@
       `notification_new_arrival`,
       `notification_faved`,
       `notification_direct_message`,
+      `notification_trade`,
+      `notification_flea_market`,
       `notification_webhook_replied`,
       `notification_webhook_new_arrival`,
       `notification_webhook_faved`,
-      `notification_webhook_direct_message`
+      `notification_webhook_direct_message`,
+      `notification_webhook_trade`,
+      `notification_webhook_flea_market`
     FROM
       `characters`
     WHERE
@@ -133,6 +145,8 @@
       <div><label><input name="notification_new_arrival" type="checkbox" <?=$character['notification_new_arrival'] ? 'checked' : ''?>> 購読中のトークルームに新着があった場合</label></div>
       <div><label><input name="notification_faved" type="checkbox" <?=$character['notification_faved'] ? 'checked' : ''?>> お気に入りされた場合</label></div>
       <div><label><input name="notification_direct_message" type="checkbox" <?=$character['notification_direct_message'] ? 'checked' : ''?>> ダイレクトメッセージを受け取った場合</label></div>
+      <div><label><input name="notification_trade" type="checkbox" <?=$character['notification_trade'] ? 'checked' : ''?>> アイテムトレードで何かアクションがあった場合</label></div>
+      <div><label><input name="notification_flea_market" type="checkbox" <?=$character['notification_flea_market'] ? 'checked' : ''?>> フリーマーケットで何かアクションがあった場合</label></div>
     </section>
 
     <section class="form">
@@ -142,6 +156,8 @@
       <div><label><input name="notification_webhook_new_arrival" type="checkbox" <?=$character['notification_webhook_new_arrival'] ? 'checked' : ''?>> 購読中のトークルームに新着があった場合</label></div>
       <div><label><input name="notification_webhook_faved" type="checkbox" <?=$character['notification_webhook_faved'] ? 'checked' : ''?>> お気に入りされた場合</label></div>
       <div><label><input name="notification_webhook_direct_message" type="checkbox" <?=$character['notification_webhook_direct_message'] ? 'checked' : ''?>> ダイレクトメッセージを受け取った場合</label></div>
+      <div><label><input name="notification_webhook_trade" type="checkbox" <?=$character['notification_webhook_trade'] ? 'checked' : ''?>> アイテムトレードで何かアクションがあった場合</label></div>
+      <div><label><input name="notification_webhook_flea_market" type="checkbox" <?=$character['notification_webhook_flea_market'] ? 'checked' : ''?>> フリーマーケットで何かアクションがあった場合</label></div>
     </section>
 
     <section class="form">

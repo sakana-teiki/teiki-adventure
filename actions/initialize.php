@@ -64,8 +64,6 @@
       `enemies_master_data_battle_lines`,
       `enemies_master_data_icons`,
       `enemies_master_data`,
-      `skills_master_data_skill_effects_elements`,
-      `skills_master_data_skill_effects`,
       `skills_master_data`;
   ");
 
@@ -95,28 +93,6 @@
 
       PRIMARY KEY (`id`),
       UNIQUE(`skill_id`)
-    );
-
-    CREATE TABLE `skills_master_data_skill_effects` (
-      `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `skill`           INT UNSIGNED NOT NULL,
-      `target`          TEXT         NOT NULL,
-      `target_value`    INT          NOT NULL,
-      `condition`       TEXT         NOT NULL,
-      `condition_value` INT          NOT NULL,
-
-      PRIMARY KEY (`id`),
-      FOREIGN KEY (`skill`) REFERENCES `skills_master_data`(`skill_id`)
-    );
-
-    CREATE TABLE `skills_master_data_skill_effects_elements` (
-      `id`      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      `effect`  INT UNSIGNED NOT NULL,
-      `element` TEXT         NOT NULL,
-      `value`   INT          NOT NULL,
-
-      PRIMARY KEY (`id`),
-      FOREIGN KEY (`effect`) REFERENCES `skills_master_data_skill_effects`(`id`)
     );
 
     CREATE TABLE `enemies_master_data` (
@@ -298,10 +274,14 @@
       `notification_new_arrival`            BOOLEAN   NOT NULL DEFAULT true,
       `notification_faved`                  BOOLEAN   NOT NULL DEFAULT true,
       `notification_direct_message`         BOOLEAN   NOT NULL DEFAULT true,
+      `notification_trade`                  BOOLEAN   NOT NULL DEFAULT true,
+      `notification_flea_market`            BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_replied`        BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_new_arrival`    BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_faved`          BOOLEAN   NOT NULL DEFAULT true,
       `notification_webhook_direct_message` BOOLEAN   NOT NULL DEFAULT true,
+      `notification_webhook_trade`          BOOLEAN   NOT NULL DEFAULT true,
+      `notification_webhook_flea_market`    BOOLEAN   NOT NULL DEFAULT true,
       `notifications_last_checked_at`       TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 
       PRIMARY KEY (`id`),
@@ -573,7 +553,7 @@
     CREATE TABLE `notifications` (
       `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `ENo`            INT,
-      `type`           ENUM('announcement', 'administrator', 'replied', 'new_arrival', 'faved', 'direct_message') NOT NULL,
+      `type`           ENUM('announcement', 'administrator', 'replied', 'new_arrival', 'faved', 'direct_message', 'trade_start', 'trade_finish', 'trade_decline', 'flea_market') NOT NULL,
       `target`         INT,
       `count`          INT,
       `message`        TEXT      NOT NULL,

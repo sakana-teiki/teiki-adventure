@@ -106,7 +106,7 @@
       `characters`.`AGI`,
       `characters`.`DEF`,
       IFNULL((SELECT `url` FROM `characters_icons` WHERE `characters_icons`.`ENo` = `characters`.`ENo` LIMIT 1), '') AS `icon`,
-      IFNULL(GROUP_CONCAT(DISTINCT `characters_tags`.`tag`     ORDER BY `characters_tags`.`id` SEPARATOR ' '), '') AS `tags`
+      IFNULL(GROUP_CONCAT(DISTINCT `characters_tags`.`tag` ORDER BY `characters_tags`.`id` SEPARATOR ' '), '') AS `tags`
       "
         .($skill !== '' ? " , IFNULL(GROUP_CONCAT(DISTINCT `skills_master_data`.`name` SEPARATOR ' '), '') AS `skills` " : "").
       "

@@ -129,6 +129,90 @@
       `notificated_at` < CURRENT_TIMESTAMP      AND
       (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
 
+    UNION
+
+    SELECT
+      `notifications`.`id`,
+      `notifications`.`type`,
+      `notifications`.`target`,
+      CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'からアイテムが送付されました。') AS `message`,
+      '' AS `detail`,
+      '' as `link_target`,
+      `notifications`.`notificated_at`
+    FROM
+      `notifications`
+    JOIN
+      `trades`     ON `trades`.`id`      = `notifications`.`target`
+    JOIN
+      `characters` ON `characters`.`ENo` = `trades`.`master`
+    WHERE
+      `notifications`.`type` = 'trade_start' AND
+      `notificated_at` < CURRENT_TIMESTAMP   AND
+      (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
+
+    UNION
+
+    SELECT
+      `notifications`.`id`,
+      `notifications`.`type`,
+      `notifications`.`target`,
+      CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'はあなたが送付したアイテムを受領しました。') AS `message`,
+      '' AS `detail`,
+      '' as `link_target`,
+      `notifications`.`notificated_at`
+    FROM
+      `notifications`
+    JOIN
+      `trades`     ON `trades`.`id`      = `notifications`.`target`
+    JOIN
+      `characters` ON `characters`.`ENo` = `trades`.`target`
+    WHERE
+      `notifications`.`type` = 'trade_finish' AND
+      `notificated_at` < CURRENT_TIMESTAMP    AND
+      (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
+
+    UNION
+
+    SELECT
+      `notifications`.`id`,
+      `notifications`.`type`,
+      `notifications`.`target`,
+      CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'はあなたが送付したアイテムを辞退しました。') AS `message`,
+      '' AS `detail`,
+      '' as `link_target`,
+      `notifications`.`notificated_at`
+    FROM
+      `notifications`
+    JOIN
+      `trades`     ON `trades`.`id`      = `notifications`.`target`
+    JOIN
+      `characters` ON `characters`.`ENo` = `trades`.`target`
+    WHERE
+      `notifications`.`type` = 'trade_decline' AND
+      `notificated_at` < CURRENT_TIMESTAMP     AND
+      (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
+
+    UNION
+
+    SELECT
+      `notifications`.`id`,
+      `notifications`.`type`,
+      `notifications`.`target`,
+      CONCAT('ENo.', `characters`.`ENo`, ' ', `characters`.`nickname`, 'はあなたが出品したアイテムを購入しました。') AS `message`,
+      '' AS `detail`,
+      '' as `link_target`,
+      `notifications`.`notificated_at`
+    FROM
+      `notifications`
+    JOIN
+      `flea_markets` ON `flea_markets`.`id` = `notifications`.`target`
+    JOIN
+      `characters`   ON `characters`.`ENo`  = `flea_markets`.`buyer`
+    WHERE
+      `notifications`.`type` = 'flea_market' AND
+      `notificated_at` < CURRENT_TIMESTAMP   AND
+      (`notifications`.`ENo` IS NULL OR `notifications`.`ENo` = :ENo)
+
     ORDER BY
       `notificated_at` DESC
     LIMIT
@@ -234,11 +318,14 @@
   <section class="notifications">
 <?php foreach ($notifications as $notification) { ?>
 <?php if (!is_null($notification['link_target']) || $notification['type'] == 'announcement') { ?>
-  <?php if ($notification['type'] == 'announcement')   { ?><a href="<?=$GAME_CONFIG['URI']?>announcements" class="notification-link"><?php } ?>
-  <?php if ($notification['type'] == 'replied')        { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=replaceRNoToAlias($notification['link_target'])?>&mode=rel" class="notification-link"><?php } ?>
-  <?php if ($notification['type'] == 'new_arrival')    { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
-  <?php if ($notification['type'] == 'faved')          { ?><a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
-  <?php if ($notification['type'] == 'direct_message') { ?><a href="<?=$GAME_CONFIG['URI']?>messages/message?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'announcement')  { ?><a href="<?=$GAME_CONFIG['URI']?>announcements" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'replied')       { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=replaceRNoToAlias($notification['link_target'])?>&mode=rel" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'new_arrival')   { ?><a href="<?=$GAME_CONFIG['URI']?>room?room=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'faved')         { ?><a href="<?=$GAME_CONFIG['URI']?>profile?ENo=<?=$notification['link_target']?>" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'trade_start')   { ?><a href="<?=$GAME_CONFIG['URI']?>trade" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'trade_finish')  { ?><a href="<?=$GAME_CONFIG['URI']?>trade/history" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'trade_decline') { ?><a href="<?=$GAME_CONFIG['URI']?>trade/history" class="notification-link"><?php } ?>
+  <?php if ($notification['type'] == 'flea_market')   { ?><a href="<?=$GAME_CONFIG['URI']?>market" class="notification-link"><?php } ?>
 <?php } ?>
     <section class="notification">
       <div class="notification-message"><?=htmlspecialchars($notification['message'])?></div>
