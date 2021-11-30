@@ -1,0 +1,19 @@
+[
+    {
+        "enemy": "1",
+        "start": "\/1\/ベチョ……",
+        "dodge": "",
+        "dodged": "",
+        "healed": "",
+        "healed_own": "",
+        "normal_attack": "",
+        "defeat": "",
+        "killed": "",
+        "killed_ally": "",
+        "critical": "",
+        "criticaled": "",
+        "win": "",
+        "even": "",
+        "lose": ""
+    }
+]

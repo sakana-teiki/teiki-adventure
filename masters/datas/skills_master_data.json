@@ -8,10 +8,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 160, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]",
         "type": "active",
         "required_status": null,
-        "required_status_value": "0",
-        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 160, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]"
+        "required_status_value": "0"
     },
     {
         "skill_id": "2",
@@ -22,10 +22,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 200, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}, {\"target\": \"AllEnemyTarget\", \"elements\": [{\"value\": 200, \"element\": \"AttackElement\"}], \"condition\": \"SpRemain\", \"dodgeable\": true, \"target_value\": 0, \"condition_value\": 30}]",
         "type": "active",
         "required_status": "ATK",
-        "required_status_value": "20",
-        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 200, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}, {\"target\": \"AllEnemyTarget\", \"elements\": [{\"value\": 200, \"element\": \"AttackElement\"}], \"condition\": \"SpRemain\", \"dodgeable\": true, \"target_value\": 0, \"condition_value\": 30}]"
+        "required_status_value": "20"
     },
     {
         "skill_id": "3",
@@ -36,10 +36,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 120, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 2, \"condition_value\": 0}]",
         "type": "active",
         "required_status": null,
-        "required_status_value": "0",
-        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 120, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 2, \"condition_value\": 0}]"
+        "required_status_value": "0"
     },
     {
         "skill_id": "4",
@@ -50,10 +50,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 30, \"element\": \"AttackElement\"}, {\"value\": 3, \"element\": \"PoisonElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]",
         "type": "active",
         "required_status": "DEX",
-        "required_status_value": "20",
-        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 30, \"element\": \"AttackElement\"}, {\"value\": 3, \"element\": \"PoisonElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]"
+        "required_status_value": "20"
     },
     {
         "skill_id": "5",
@@ -64,10 +64,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"SomeWeakenedAllyTarget\", \"elements\": [{\"value\": 40, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 1, \"condition_value\": 0}]",
         "type": "active",
         "required_status": null,
-        "required_status_value": "0",
-        "effects": "[{\"target\": \"SomeWeakenedAllyTarget\", \"elements\": [{\"value\": 40, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 1, \"condition_value\": 0}]"
+        "required_status_value": "0"
     },
     {
         "skill_id": "6",
@@ -78,10 +78,10 @@
         "trigger": "",
         "rate_numerator": "0",
         "rate_denominator": "0",
+        "effects": "[{\"target\": \"AllAllyTarget\", \"elements\": [{\"value\": 40, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]",
         "type": "active",
         "required_status": "MND",
-        "required_status_value": "20",
-        "effects": "[{\"target\": \"AllAllyTarget\", \"elements\": [{\"value\": 40, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]"
+        "required_status_value": "20"
     },
     {
         "skill_id": "7",
@@ -92,10 +92,10 @@
         "trigger": "start",
         "rate_numerator": "100",
         "rate_denominator": "100",
+        "effects": "[{\"target\": \"OwnTarget\", \"elements\": [{\"value\": 5, \"element\": \"GainAgiElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]",
         "type": "passive",
         "required_status": null,
-        "required_status_value": "0",
-        "effects": "[{\"target\": \"OwnTarget\", \"elements\": [{\"value\": 5, \"element\": \"GainAgiElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]"
+        "required_status_value": "0"
     },
     {
         "skill_id": "8",
@@ -106,10 +106,10 @@
         "trigger": "dodge",
         "rate_numerator": "30",
         "rate_denominator": "100",
+        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 50, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]",
         "type": "passive",
         "required_status": "AGI",
-        "required_status_value": "20",
-        "effects": "[{\"target\": \"SomeEnemyTarget\", \"elements\": [{\"value\": 50, \"element\": \"AttackElement\"}], \"condition\": \"\", \"dodgeable\": true, \"target_value\": 1, \"condition_value\": 0}]"
+        "required_status_value": "20"
     },
     {
         "skill_id": "9",
@@ -120,10 +120,10 @@
         "trigger": "start",
         "rate_numerator": "100",
         "rate_denominator": "100",
+        "effects": "[{\"target\": \"AllEnemyTarget\", \"elements\": [{\"value\": 300, \"element\": \"HateElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]",
         "type": "passive",
         "required_status": null,
-        "required_status_value": "0",
-        "effects": "[{\"target\": \"AllEnemyTarget\", \"elements\": [{\"value\": 300, \"element\": \"HateElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]"
+        "required_status_value": "0"
     },
     {
         "skill_id": "10",
@@ -134,9 +134,9 @@
         "trigger": "attacked",
         "rate_numerator": "20",
         "rate_denominator": "100",
+        "effects": "[{\"target\": \"OwnTarget\", \"elements\": [{\"value\": 10, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]",
         "type": "passive",
         "required_status": "DEF",
-        "required_status_value": "20",
-        "effects": "[{\"target\": \"OwnTarget\", \"elements\": [{\"value\": 10, \"element\": \"HealElement\"}], \"condition\": \"\", \"dodgeable\": false, \"target_value\": 0, \"condition_value\": 0}]"
+        "required_status_value": "20"
     }
 ]
