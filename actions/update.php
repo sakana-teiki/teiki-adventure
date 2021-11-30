@@ -675,7 +675,7 @@
     // 結果の保存
     // ディレクトリがなければ作成
     if (!file_exists(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/')) {
-      $result = mkdir(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/', 0644, true);
+      $result = mkdir(GETENV('GAME_ROOT').'/static/results/'.$target_nth.'/', 0755, true);
 
       if (!$result) {
         $GAME_PDO->rollBack();

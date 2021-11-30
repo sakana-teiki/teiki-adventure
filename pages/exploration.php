@@ -625,7 +625,7 @@
 
     // ディレクトリがなければ作成
     if (!file_exists(GETENV('GAME_ROOT').'/static/logs/'.$directory.'/')) {
-      $result = mkdir(GETENV('GAME_ROOT').'/static/logs/'.$directory.'/', 0644, true);
+      $result = mkdir(GETENV('GAME_ROOT').'/static/logs/'.$directory.'/', 0755, true);
 
       if (!$result) {
         $GAME_PDO->rollBack();
