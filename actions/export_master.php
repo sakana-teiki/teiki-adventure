@@ -4,9 +4,11 @@
   // .htaccessでSetEnvが使えず$_SERVER['DOCUMENT_ROOT']を使用するよう変更した場合用に、コマンドライン等からDOCUMENT_ROOTを設定できるように
   // GAME_ROOTをDOCUMENT_ROOTを使用する形に置換していないのであれば特に気にする必要はありません
   // 書式：php filename.php --document-root="path"
-  foreach ($argv as $arg) {
-    if (strpos($arg, '--document-root=') === 0) {
-      $_SERVER['DOCUMENT_ROOT'] = substr($arg, strlen('--document-root='));
+  if (isset($argv)) {
+    foreach ($argv as $arg) {
+      if (strpos($arg, '--document-root=') === 0) {
+        $_SERVER['DOCUMENT_ROOT'] = substr($arg, strlen('--document-root='));
+      }
     }
   }
   
@@ -63,10 +65,7 @@
         }
         
         file_put_contents(GETENV('GAME_ROOT').'/masters/datas/exports/'.$table.'.json', json_encode($masters, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_SH);
-        echo $table.'の出力が完了しました。';
       }
-    } else {
-      echo $table.'にはデータが存在しなかったためスキップされました。';
     }
   }
 
@@ -86,8 +85,6 @@
   // 設定でマスタデータに指定されたものをエクスポート
   foreach ($GAME_CONFIG['MASTER_DATA_TABLES'] as $table) {
     exportMasterData($table);
-  }  
-
-  echo "全てのマスタデータの出力が完了しました。";
+  }
 
 ?>

@@ -4,9 +4,11 @@
   // .htaccessでSetEnvが使えず$_SERVER['DOCUMENT_ROOT']を使用するよう変更した場合用に、コマンドライン等からDOCUMENT_ROOTを設定できるように
   // GAME_ROOTをDOCUMENT_ROOTを使用する形に置換していないのであれば特に気にする必要はありません
   // 書式：php filename.php --document-root="path"
-  foreach ($argv as $arg) {
-    if (strpos($arg, '--document-root=') === 0) {
-      $_SERVER['DOCUMENT_ROOT'] = substr($arg, strlen('--document-root='));
+  if (isset($argv)) {
+    foreach ($argv as $arg) {
+      if (strpos($arg, '--document-root=') === 0) {
+        $_SERVER['DOCUMENT_ROOT'] = substr($arg, strlen('--document-root='));
+      }
     }
   }
   
@@ -103,8 +105,6 @@
 
     // トランザクション完了
     $GAME_PDO->commit();
-    
-    echo $table.'の取り込みが完了しました。'; 
   }
 
   // 外部キー制約の対象となるカラムを含まないテーブルにマスタデータを取り込む関数
@@ -129,59 +129,59 @@
     }
 
     // 指定テーブルのデータを登録
-    foreach ($masters as $master) {
-      // キーのリストを取得
-      $keys = array_keys($master);
+    if (!is_null($masters)) {
+      foreach ($masters as $master) {
+        // キーのリストを取得
+        $keys = array_keys($master);
 
-      // SQL文の組み立て
-      // 以下のようなSQLが組み立てられます
-      // INSERT INTO `items_master_data_effects` (`item`, `effect`, `value`) VALUES (:item, :effect, :value);
-      $sql = "INSERT INTO `$table` (";
+        // SQL文の組み立て
+        // 以下のようなSQLが組み立てられます
+        // INSERT INTO `items_master_data_effects` (`item`, `effect`, `value`) VALUES (:item, :effect, :value);
+        $sql = "INSERT INTO `$table` (";
 
-      for ($i = 0; $i < count($keys); $i++) {
-        $sql .= '`'.$keys[$i].'`';
-        
-        // 最後のキーでなければカンマを追加
-        if ($i !== count($keys) - 1) {
-          $sql .= ', ';
+        for ($i = 0; $i < count($keys); $i++) {
+          $sql .= '`'.$keys[$i].'`';
+          
+          // 最後のキーでなければカンマを追加
+          if ($i !== count($keys) - 1) {
+            $sql .= ', ';
+          }
         }
-      }
 
-      $sql .= ") VALUES (";
+        $sql .= ") VALUES (";
 
-      for ($i = 0; $i < count($keys); $i++) {
-        $sql .= ':'.$keys[$i];
-        
-        // 最後のキーでなければカンマを追加
-        if ($i !== count($keys) - 1) {
-          $sql .= ', ';
+        for ($i = 0; $i < count($keys); $i++) {
+          $sql .= ':'.$keys[$i];
+          
+          // 最後のキーでなければカンマを追加
+          if ($i !== count($keys) - 1) {
+            $sql .= ', ';
+          }
         }
-      }
 
-      $sql .= ");";
+        $sql .= ");";
 
-      // プリペアドステートメントの準備
-      $statement = $GAME_PDO->prepare($sql);
+        // プリペアドステートメントの準備
+        $statement = $GAME_PDO->prepare($sql);
 
-      // プリペアドステートメントの割り当て
-      foreach ($keys as $key) {
-        $statement->bindParam(':'.$key, $master[$key]);
-      }
+        // プリペアドステートメントの割り当て
+        foreach ($keys as $key) {
+          $statement->bindParam(':'.$key, $master[$key]);
+        }
 
-      // SQLの実行
-      $result = $statement->execute();
+        // SQLの実行
+        $result = $statement->execute();
 
-      if (!$result) {
-        $GAME_PDO->rollBack();
-        echo $table.'の取り込み時にエラーが発生しました。';
-        exit;
+        if (!$result) {
+          $GAME_PDO->rollBack();
+          echo $table.'の取り込み時にエラーが発生しました。';
+          exit;
+        }
       }
     }
 
     // トランザクション完了
     $GAME_PDO->commit();
-    
-    echo $table.'の取り込みが完了しました。'; 
   }
 
   // 外部キー制約のあるカラムを持つテーブルから処理
@@ -202,8 +202,4 @@
   foreach ($tablesNotContainsForeignKey as $table) {
     importMasterDataNotContainsForeignKey($table);
   }
-
-  echo "全てのマスタデータの取り込みが完了しました。";
-  echo "外部キー制約の対象となるカラムを含むテーブルについては整合性上の理由から要素の削除については反映されないため注意してください。該当のテーブルの要素の削除はデータベース上から操作する必要があります。";
-
 ?>
