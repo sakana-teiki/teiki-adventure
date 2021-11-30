@@ -1,5 +1,14 @@
 <?php
   putenv('GAME_ROOT='.dirname(__DIR__));
+
+  // .htaccessでSetEnvが使えず$_SERVER['DOCUMENT_ROOT']を使用するよう変更した場合用に、コマンドライン等からDOCUMENT_ROOTを設定できるように
+  // GAME_ROOTをDOCUMENT_ROOTを使用する形に置換していないのであれば特に気にする必要はありません
+  // 書式：php filename.php --document-root="path"
+  foreach ($argv as $arg) {
+    if (strpos($arg, '--document-root=') === 0) {
+      $_SERVER['DOCUMENT_ROOT'] = substr($arg, strlen('--document-root='));
+    }
+  }
   
   require_once GETENV('GAME_ROOT').'/configs/environment.php';
   require_once GETENV('GAME_ROOT').'/configs/general.php';
